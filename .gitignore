@@ -9,3 +9,4 @@ backend-prod.tfvars.json
 github.auto.tfvars.json
 google-dev.tfvars.json
 google-prod.tfvars.json
+modules/start-instance/src/node_modules

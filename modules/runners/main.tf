@@ -86,7 +86,7 @@ resource "google_compute_instance" "runner" {
   }
 
   provisioner "file" {
-    source      = "scripts/setup-ubuntu.sh"
+    source      = "${path.module}/scripts/setup-ubuntu.sh"
     destination = "~/setup-ubuntu.sh"
   }
 
@@ -100,7 +100,7 @@ resource "google_compute_instance" "runner" {
 
   provisioner "file" {
     when        = destroy
-    source      = "scripts/destroy-ubuntu.sh"
+    source      = "${path.module}/scripts/destroy-ubuntu.sh"
     destination = "~/destroy-ubuntu.sh"
   }
 
