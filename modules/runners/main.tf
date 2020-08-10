@@ -60,6 +60,10 @@ resource "google_compute_instance" "runner" {
     ssh-keys = "ubuntu:${local.ssh_pub_key_without_new_line} ubuntu"
   }
 
+  labels = {
+    "env" = var.env
+  }
+
   boot_disk {
     initialize_params {
       image = "ubuntu-os-cloud/ubuntu-2004-lts"

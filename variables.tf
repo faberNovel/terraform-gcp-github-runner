@@ -9,6 +9,7 @@ variable "google" {
   type = object({
     project = string
     credentials_json_b64 = string
+    env = string
   })
 }
 

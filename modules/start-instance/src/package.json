@@ -5,5 +5,8 @@
   "license": "MIT",
   "scripts": {
     "myScript": "node -e 'require(\"./start_instance.js\").startInstance()'"
- }
+  },
+  "dependencies": {
+    "@google-cloud/compute": "^2.1.0"
+  }
 }

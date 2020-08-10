@@ -16,6 +16,7 @@ module "runners" {
     count = var.runner.count
     type = var.runner.type
   }
+  env = var.google.env
   github = {
     app_id = var.github.app_id
     app_installation_id = var.github.app_installation_id

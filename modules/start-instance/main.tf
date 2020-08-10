@@ -23,5 +23,14 @@ resource "google_cloudfunctions_function" "start_instance" {
     source_archive_bucket = google_storage_bucket.start_instance_bucket.name
     source_archive_object = google_storage_bucket_object.start_instance_zip.name
     entry_point           = "startInstance"
-    trigger_http          = true
+
+    event_trigger {
+        event_type = "google.pubsub.topic.publish"
+        resource = google_pubsub_topic.start_instance.name
+    }
+    
+}
+
+resource "google_pubsub_topic" "start_instance" {
+  name = "start-instance-topic"
 }
