@@ -9,7 +9,7 @@ resource "google_storage_bucket" "start_instance_bucket" {
 }
 
 resource "google_storage_bucket_object" "start_instance_zip" {
-    name   = "start_instance.zip"
+    name   = "start_instance_${data.archive_file.start_instance_zip.output_md5}.zip"
     bucket = google_storage_bucket.start_instance_bucket.name
     source = "${path.module}/start_instance.zip"
 }
