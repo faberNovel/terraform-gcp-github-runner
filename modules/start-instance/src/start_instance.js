@@ -8,19 +8,13 @@ module.exports.startInstance = async (data, context, callback) => {
             JSON.parse(Buffer.from(data.data, 'base64').toString())
         );
         console.log(`payload label = ${payload.label}`);
-        const options = { filter: `labels.${payload.label}` };
-        const vms = await compute.getVMs(options);
-        await Promise.all(
-            vms.map(async (instance) => {
-                const [operation] = await compute
-                    .zone(instance.zone.id)
-                    .vm(instance.name)
-                    .start();
-
-                // Operation pending
-                return operation.promise();
-            })
-        );
+        const options = {
+            filter: `labels.${payload.label}`
+        };
+        const vmsReponse = await compute.zone(payload.zone).getVMs(options);
+        const vms = vmsReponse[0];
+        console.log(`Found ${vms.length} VMs!`);
+        vms.forEach(vm => console.log(`Found VM : ${vm.name}`));
         // Operation complete. Instance successfully started.
         const message = `Successfully started instance(s)`;
         console.log(message);
