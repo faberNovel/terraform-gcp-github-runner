@@ -1,0 +1,7 @@
+{
+  "dependencies": {
+    "@octokit/auth-app": "^2.4.10",
+    "@octokit/rest": "^18.0.3",
+    "minimist": "^1.2.5"
+  }
+}

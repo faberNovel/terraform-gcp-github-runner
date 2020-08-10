@@ -1,0 +1,9 @@
+{
+  "name": "start_instance",
+  "version": "1.0.0",
+  "main": "start_instance.js",
+  "license": "MIT",
+  "scripts": {
+    "myScript": "node -e 'require(\"./start_instance.js\").startInstance()'"
+ }
+}

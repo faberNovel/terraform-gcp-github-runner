@@ -1,0 +1,6 @@
+.terraform
+terraform.tfstate.backup
+terraform.tfstate
+modules/runners/scripts/node_modules
+**.DS_Store
+modules/start-instance/start_instance.zip
