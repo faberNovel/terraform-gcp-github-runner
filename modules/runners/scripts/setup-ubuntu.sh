@@ -22,6 +22,9 @@ sudo systemctl enable docker
 sudo groupadd docker
 sudo usermod -aG docker $USER
 
+## Auto clean
+crontab croncleaner
+
 ## Runner
 mkdir actions-runner && cd actions-runner
 curl -O -L https://github.com/actions/runner/releases/download/v2.169.1/actions-runner-linux-x64-2.169.1.tar.gz

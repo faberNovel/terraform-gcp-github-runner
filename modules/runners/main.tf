@@ -90,6 +90,16 @@ resource "google_compute_instance" "runner" {
     destination = "~/setup-ubuntu.sh"
   }
 
+  provisioner "file" {
+    source      = "${path.module}/scripts/cleaner.sh"
+    destination = "~/cleaner.sh"
+  }
+
+  provisioner "file" {
+    source      = "${path.module}/scripts/cron-cleaner"
+    destination = "~/cron-cleaner"
+  }
+
   provisioner "remote-exec" {
     inline = [
       "cd",
