@@ -29,4 +29,5 @@ module "runners" {
 
 module "start_instance" {
   source = "./modules/start-instance"
+  env = var.google.env
 }

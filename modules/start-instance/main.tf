@@ -5,7 +5,7 @@ data "archive_file" "start_instance_zip" {
 }
 
 resource "google_storage_bucket" "start_instance_bucket" {
-    name   = "start_instance_bucket"
+    name   = "start_instance_bucket_${var.env}"
 }
 
 resource "google_storage_bucket_object" "start_instance_zip" {

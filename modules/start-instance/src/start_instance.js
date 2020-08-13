@@ -11,14 +11,17 @@ module.exports.startInstance = async (data, context) => {
         const options = {
             filter: `labels.${payload.label}`
         };
-        const vmsReponse = await compute.zone(payload.zone).getVMs(options);
-        const vms = vmsReponse[0];
+        const [vms] = await compute.getVMs(options);
         console.log(`Found ${vms.length} VMs!`);
-        vms.forEach(vm => console.log(`Found VM : ${vm.name}`));
+        await Promise.all(vms.map(async (vm) => {
+            console.log(`Found VM : ${vm.name}`);
+            await vm.start();
+            Promise.resolve(`VM started`)
+        }))
         // Operation complete. Instance successfully started.
-        const message = `Successfully started instance(s)`;
-        console.log(message);
-        return Promise.resolve(message);
+        const msg = `Successfully started instance(s)`
+        console.log(msg);
+        return Promise.resolve(msg);
     } catch (err) {
         console.log(err);
         return Promise.reject(err);
@@ -32,9 +35,7 @@ module.exports.startInstance = async (data, context) => {
  * @return {!object} the payload object.
  */
 const _validatePayload = (payload) => {
-    if (!payload.zone) {
-        throw new Error(`Attribute 'zone' missing from payload`);
-    } else if (!payload.label) {
+    if (!payload.label) {
         throw new Error(`Attribute 'label' missing from payload`);
     }
     return payload;
