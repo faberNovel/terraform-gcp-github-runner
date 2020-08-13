@@ -23,7 +23,7 @@ sudo groupadd docker
 sudo usermod -aG docker $USER
 
 ## Auto clean
-crontab croncleaner
+crontab cron-cleaner
 
 ## Runner
 mkdir actions-runner && cd actions-runner
