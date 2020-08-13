@@ -1,5 +1,5 @@
 resource "random_id" "instance_id" {
-  count = var.runner.count
+  count = var.runner.total_count
   byte_length = 8
 }
 
@@ -49,25 +49,39 @@ data "external" "remove_token" {
     "--client-id=${var.github.client_id}",
     "--client-secret=${var.github.client_secret}"
   ]
-}
+} 
 
-resource "google_compute_instance" "runner" {
-  count        = var.runner.count
-  name         = "vm-gcp-github-action-runner-${random_id.instance_id[count.index].hex}"
+resource "google_compute_instance_template" "runner" {
+  name = "runner-template"
   machine_type = var.runner.type
 
   metadata = {
     ssh-keys = "ubuntu:${local.ssh_pub_key_without_new_line} ubuntu"
   }
 
-  boot_disk {
-    initialize_params {
-      image = "ubuntu-os-cloud/ubuntu-2004-lts"
-      size = 40
-    }
+  disk {
+    source_image = "ubuntu-os-cloud/ubuntu-2004-lts"
+    disk_size_gb = 40
+    boot         = true
+    auto_delete  = true
   }
 
   depends_on = [google_compute_firewall.externalssh]
+
+  network_interface {
+    network = "default"
+  }
+}
+
+resource "google_compute_instance_from_template" "runner" {
+  source_instance_template = google_compute_instance_template.runner.id
+  name                     = "vm-gcp-github-action-runner-${random_id.instance_id[count.index].hex}"
+  count                    = var.runner.total_count
+  
+  labels = {
+    "env" = var.env
+    "eternal" = "${var.runner.eternal_count > count.index ? "true" : "false"}"
+  }
 
   network_interface {
     network = "default"
@@ -85,7 +99,7 @@ resource "google_compute_instance" "runner" {
     host        = self.network_interface.0.access_config.0.nat_ip
   }
 
-  provisioner "file" {
+    provisioner "file" {
     source      = "${path.module}/scripts/setup-ubuntu.sh"
     destination = "~/setup-ubuntu.sh"
   }
@@ -125,6 +139,6 @@ resource "google_compute_instance" "runner" {
 }
 
 resource "google_compute_address" "static" {
-  count = var.runner.count
+  count = var.runner.total_count
   name  = "vm-public-address-${random_id.instance_id[count.index].hex}"
 }

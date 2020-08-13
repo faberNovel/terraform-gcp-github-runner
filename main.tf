@@ -13,9 +13,11 @@ terraform {
 module "runners" {
   source = "./modules/runners"
   runner = {
-    count = var.runner.count
+    total_count = var.runner.total_count
+    eternal_count = var.runner.eternal_count
     type = var.runner.type
   }
+  env = var.google.env
   github = {
     app_id = var.github.app_id
     app_installation_id = var.github.app_installation_id
@@ -28,4 +30,5 @@ module "runners" {
 
 module "start_instance" {
   source = "./modules/start-instance"
+  env = var.google.env
 }
