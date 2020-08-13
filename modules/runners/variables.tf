@@ -1,6 +1,7 @@
 variable "runner" {
   type = object({
-    count = number
+    eternal_count = number
+    total_count = number
     type = string
   })
 }

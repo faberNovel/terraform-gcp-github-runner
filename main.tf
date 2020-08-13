@@ -13,7 +13,8 @@ terraform {
 module "runners" {
   source = "./modules/runners"
   runner = {
-    count = var.runner.count
+    total_count = var.runner.total_count
+    eternal_count = var.runner.eternal_count
     type = var.runner.type
   }
   env = var.google.env
