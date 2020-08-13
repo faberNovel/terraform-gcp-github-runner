@@ -1,7 +1,7 @@
 const Compute = require('@google-cloud/compute');
 const compute = new Compute();
 
-module.exports.startInstance = async (data, context, callback) => {
+module.exports.startInstance = async (data, context) => {
     try {
         console.log("startInstance start...")
         const payload = _validatePayload(
@@ -18,10 +18,10 @@ module.exports.startInstance = async (data, context, callback) => {
         // Operation complete. Instance successfully started.
         const message = `Successfully started instance(s)`;
         console.log(message);
-        callback(null, message);
+        return Promise.resolve(message);
     } catch (err) {
         console.log(err);
-        callback(err);
+        return Promise.reject(err);
     }
 };
 

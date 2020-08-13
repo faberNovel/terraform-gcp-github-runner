@@ -4,9 +4,13 @@
   "main": "start_instance.js",
   "license": "MIT",
   "scripts": {
-    "myScript": "node -e 'require(\"./start_instance.js\").startInstance()'"
+    "run": "node -e 'require(\"./start_instance.js\").startInstance()'",
+    "test": "mocha start_instance.test.js"
   },
   "dependencies": {
-    "@google-cloud/compute": "^2.1.0"
+    "@google-cloud/compute": "^2.1.0",
+    "chai": "^4.2.0",
+    "chai-as-promised": "^7.1.1",
+    "mocha": "^8.1.1"
   }
 }
