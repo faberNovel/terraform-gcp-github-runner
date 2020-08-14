@@ -7,8 +7,11 @@ module.exports.startAndStop = async (data, context) => {
         const payload = _validatePayload(
             JSON.parse(Buffer.from(data.data, 'base64').toString())
         );
+        const vms = await getInstances(payload.filter)
         if (payload.action == "start") {
-            await startInstances(payload.filter)
+            await startInstances(vms)
+        } else if (payload.action == "stop") {
+            await stopInstances(vms)
         }
         return Promise.resolve("startAndStop end");
     } catch (err) {
@@ -17,20 +20,32 @@ module.exports.startAndStop = async (data, context) => {
     }
 };
 
-async function startInstances(filter) {
-    console.log("startInstance start...");
-    console.log(`filter = ${filter}`);
+async function getInstances(filter) {
+    console.log(`looking for instance(s) with filter ${filter}...`);
     const options = {
         filter: filter
     };
     const [vms] = await compute.getVMs(options);
     console.log(`Found ${vms.length} VMs!`);
+    return vms;
+}
+
+async function startInstances(vms) {
     await Promise.all(vms.map(async (vm) => {
-        console.log(`Found VM : ${vm.name}`);
+        console.log(`Starting instance : ${vm.name}`);
         await vm.start();
-        Promise.resolve(`VM started`)
+        Promise.resolve(`instance started`)
     }))
     console.log(`Successfully started instance(s)`);
+}
+
+async function stopInstances(vms) {
+    await Promise.all(vms.map(async (vm) => {
+        console.log(`Stopping instance : ${vm.name}`);
+        await vm.stop();
+        Promise.resolve(`Instance stopped`)
+    }))
+    console.log(`Successfully stopped instance(s)`);
 }
 
 /**
