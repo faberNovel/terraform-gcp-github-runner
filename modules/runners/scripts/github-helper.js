@@ -13,6 +13,7 @@ module.exports.getOctokit = async function getOctokit() {
 
 function loadEnv() {
     global.ORG = argv.org;
+    global.ENV = argv.env;
     global.KEY = argv['private-key-pem'];
     global.APP_ID = argv['app-id'];
     global.INSTALLATION_ID = argv['app-installation-id'];
