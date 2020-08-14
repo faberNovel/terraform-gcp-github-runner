@@ -5,7 +5,7 @@ run()
 async function run() {
     const octokit = await githubHelper.getOctokit()
     const token = await octokit.actions.createRegistrationTokenForOrg({
-        org: "fabernovel"
+        org: ORG
     })
     console.log(JSON.stringify(token.data))
 } 
