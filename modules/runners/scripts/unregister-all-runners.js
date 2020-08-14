@@ -1,16 +1,15 @@
 const githubHelper = require('./github-helper.js');
+const argv = require('minimist')(process.argv.slice(2));
 
 run()
 
 async function run() {
+    const baseRunnerName = argv['base-runner-name']
     const octokit = await githubHelper.getOctokit()
     const runnersResponse = await octokit.actions.listSelfHostedRunnersForOrg({ org: ORG })
     const allRunners = runnersResponse.data.runners
     const gcpRunners = allRunners.filter(runner => {
-        const gcpLabels = runner.labels.filter(label => {
-            return label.name == `gcp-${ENV}`
-        })
-        return gcpLabels.length > 0
+        return runner.name.startsWith(baseRunnerName)
     })
     console.log(gcpRunners)
     await Promise.all(gcpRunners.map(async (gcpRunner) => {

@@ -10,3 +10,4 @@ github.auto.tfvars.json
 google-dev.tfvars.json
 google-prod.tfvars.json
 modules/start-instance/src/node_modules
+google-gitlab.tfvars.json
