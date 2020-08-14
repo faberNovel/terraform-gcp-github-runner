@@ -1,11 +1,11 @@
 {
-  "name": "start_instance",
+  "name": "start_and_stop",
   "version": "1.0.0",
-  "main": "start_instance.js",
+  "main": "start_and_stop.js",
   "license": "MIT",
   "scripts": {
-    "run": "node -e 'require(\"./start_instance.js\").startInstance()'",
-    "test": "mocha start_instance.test.js"
+    "run": "node -e 'require(\"./start_and_stop.js\").startAndStop()'",
+    "test": "mocha start_and_stop.test.js"
   },
   "dependencies": {
     "@google-cloud/compute": "^2.1.0",
