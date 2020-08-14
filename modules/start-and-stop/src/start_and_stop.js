@@ -7,19 +7,21 @@ module.exports.startAndStop = async (data, context) => {
         const payload = _validatePayload(
             JSON.parse(Buffer.from(data.data, 'base64').toString())
         );
-        await startInstances(payload.label)
-        return Promise.resolve(msg);
+        if (payload.action == "start") {
+            await startInstances(payload.filter)
+        }
+        return Promise.resolve("startAndStop end");
     } catch (err) {
         console.log(err);
         return Promise.reject(err);
     }
 };
 
-async function startInstances(label) {
+async function startInstances(filter) {
     console.log("startInstance start...");
-    console.log(`payload label = ${payload.label}`);
+    console.log(`filter = ${filter}`);
     const options = {
-        filter: `labels.${payload.label}`
+        filter: filter
     };
     const [vms] = await compute.getVMs(options);
     console.log(`Found ${vms.length} VMs!`);
@@ -28,9 +30,7 @@ async function startInstances(label) {
         await vm.start();
         Promise.resolve(`VM started`)
     }))
-    // Operation complete. Instance successfully started.
-    const msg = `Successfully started instance(s)`
-    console.log(msg);
+    console.log(`Successfully started instance(s)`);
 }
 
 /**
@@ -40,8 +40,8 @@ async function startInstances(label) {
  * @return {!object} the payload object.
  */
 const _validatePayload = (payload) => {
-    if (!payload.label) {
-        throw new Error(`Attribute 'label' missing from payload`);
+    if (!payload.filter) {
+        throw new Error(`Attribute 'filter' missing from payload`);
     }
     if (!payload.action) {
         throw new Error(`Attribute 'action' missing from payload`);
