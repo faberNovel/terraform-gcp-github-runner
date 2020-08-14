@@ -28,7 +28,7 @@ module "runners" {
   }
 }
 
-module "start_instance" {
-  source = "./modules/start-instance"
+module "start_and_stop" {
+  source = "./modules/start-and-stop"
   env = var.google.env
 }
