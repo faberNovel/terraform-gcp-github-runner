@@ -13,22 +13,22 @@ terraform {
 module "runners" {
   source = "./modules/runners"
   runner = {
-    total_count = var.runner.total_count
+    total_count   = var.runner.total_count
     eternal_count = var.runner.eternal_count
-    type = var.runner.type
+    type          = var.runner.type
   }
   env = var.google.env
   github = {
-    app_id = var.github.app_id
+    app_id              = var.github.app_id
     app_installation_id = var.github.app_installation_id
-    client_id = var.github.client_id
-    client_secret = var.github.client_secret
-    key_pem_b64 = var.github.key_pem_b64
-    organisation = var.github.organisation
+    client_id           = var.github.client_id
+    client_secret       = var.github.client_secret
+    key_pem_b64         = var.github.key_pem_b64
+    organisation        = var.github.organisation
   }
 }
 
 module "start_and_stop" {
   source = "./modules/start-and-stop"
-  env = var.google.env
+  env    = var.google.env
 }

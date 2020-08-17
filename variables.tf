@@ -1,16 +1,16 @@
 variable "runner" {
   type = object({
-    total_count = number
+    total_count   = number
     eternal_count = number
-    type = string
+    type          = string
   })
 }
 
 variable "google" {
   type = object({
-    project = string
+    project              = string
     credentials_json_b64 = string
-    env = string
+    env                  = string
   })
 }
 

@@ -1,5 +1,5 @@
 resource "random_id" "instance_id" {
-  count = var.runner.total_count
+  count       = var.runner.total_count
   byte_length = 8
 }
 
@@ -10,7 +10,7 @@ resource "tls_private_key" "ssh-key" {
 
 locals {
   ssh_pub_key_without_new_line = replace(tls_private_key.ssh-key.public_key_openssh, "\n", "")
-  base_runner_name = "vm-gcp-github-action-runner-${var.env}"
+  base_runner_name             = "vm-gcp-github-action-runner-${var.env}"
 }
 
 resource "google_compute_firewall" "externalssh" {
@@ -40,7 +40,7 @@ data "external" "registration_token" {
 }
 
 resource "google_compute_instance_template" "runner" {
-  name = "runner-template"
+  name         = "runner-template"
   machine_type = var.runner.type
 
   metadata = {
@@ -65,9 +65,9 @@ resource "google_compute_instance_from_template" "runner" {
   source_instance_template = google_compute_instance_template.runner.id
   name                     = "${local.base_runner_name}-${random_id.instance_id[count.index].hex}"
   count                    = var.runner.total_count
-  
+
   labels = {
-    "env" = var.env
+    "env"     = var.env
     "eternal" = "${var.runner.eternal_count > count.index ? "true" : "false"}"
   }
 
@@ -119,13 +119,13 @@ resource "google_compute_address" "static" {
 resource "null_resource" "unregister-runners" {
 
   triggers = {
-    org = var.github.organisation
-    key_64 = var.github.key_pem_b64
-    app_id = var.github.app_id
+    org                 = var.github.organisation
+    key_64              = var.github.key_pem_b64
+    app_id              = var.github.app_id
     app_installation_id = var.github.app_installation_id
-    client_id = var.github.client_id
-    client_secret = var.github.client_secret
-    base_runner_name = local.base_runner_name
+    client_id           = var.github.client_id
+    client_secret       = var.github.client_secret
+    base_runner_name    = local.base_runner_name
   }
 
   provisioner "local-exec" {
@@ -135,16 +135,16 @@ resource "null_resource" "unregister-runners" {
   }
 
   provisioner "local-exec" {
-    when   = destroy
+    when    = destroy
     command = "node ${path.module}/scripts/unregister-all-runners.js --org=$ORG \"--private-key-pem=$KEY\" --app-id=$APP_ID --app-installation-id=$APP_INSTALLATION_ID --client-id=$CLIENT_ID --client-secret=$CLIENT_SECRET --base-runner-name=$BASE_RUNNER_NAME"
     environment = {
-      ORG = self.triggers.org
-      KEY = "${base64decode(self.triggers.key_64)}"
-      APP_ID = self.triggers.app_id
+      ORG                 = self.triggers.org
+      KEY                 = "${base64decode(self.triggers.key_64)}"
+      APP_ID              = self.triggers.app_id
       APP_INSTALLATION_ID = self.triggers.app_installation_id
-      CLIENT_ID = self.triggers.client_id
-      CLIENT_SECRET = self.triggers.client_secret
-      BASE_RUNNER_NAME = self.triggers.base_runner_name
+      CLIENT_ID           = self.triggers.client_id
+      CLIENT_SECRET       = self.triggers.client_secret
+      BASE_RUNNER_NAME    = self.triggers.base_runner_name
     }
   }
 }
