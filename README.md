@@ -20,3 +20,25 @@ To address a specific GCP projet:
 * Grant organisation / self-hosted runners / R/W permissions.
 * Generate a private key, pass it in `b64` in terraform variable `secrets.github_key_pem_b64`.
 * Pass the app installation id in terraform as `github.app_installation_id` and the app id as `github.app_id`.
+
+## Requirements
+
+| Name | Version |
+|------|---------|
+| terraform | ~>0.12.28 |
+
+## Providers
+
+No provider.
+
+## Inputs
+
+| Name | Description | Type | Default | Required |
+|------|-------------|------|---------|:--------:|
+| github | n/a | <pre>object({<br>    organisation        = string<br>    app_id              = string<br>    app_installation_id = string<br>    client_id           = string<br>    client_secret       = string<br>    key_pem_b64         = string<br>  })</pre> | n/a | yes |
+| google | n/a | <pre>object({<br>    project              = string<br>    credentials_json_b64 = string<br>    env                  = string<br>  })</pre> | n/a | yes |
+| runner | n/a | <pre>object({<br>    total_count   = number<br>    eternal_count = number<br>    type          = string<br>  })</pre> | n/a | yes |
+
+## Outputs
+
+No output.
