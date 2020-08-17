@@ -34,3 +34,29 @@ resource "google_cloudfunctions_function" "start_and_stop" {
 resource "google_pubsub_topic" "start_and_stop" {
   name = "start-and-stop-topic"
 }
+
+resource "google_pubsub_topic" "topic" {
+  name = "job-topic"
+}
+
+resource "google_cloud_scheduler_job" "start_job" {
+  name        = "start-job"
+  schedule    = "0 8 * * *"
+  time_zone   = "Europe/Paris"
+
+  pubsub_target {
+    topic_name = google_pubsub_topic.start_and_stop.id
+    data       = base64encode("{\"action\":\"start\",\"filter\":\"labels.env=${var.env} AND labels.eternal=false\"}")
+  }
+}
+
+resource "google_cloud_scheduler_job" "stop_job" {
+  name        = "stop-job"
+  schedule    = "0 19 * * *"
+  time_zone   = "Europe/Paris"
+
+  pubsub_target {
+    topic_name = google_pubsub_topic.start_and_stop.id
+    data       = base64encode("{\"action\":\"stop\",\"filter\":\"labels.env=${var.env} AND labels.eternal=false\"}")
+  }
+}
