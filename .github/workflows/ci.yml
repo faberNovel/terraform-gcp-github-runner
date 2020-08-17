@@ -53,5 +53,5 @@ jobs:
 
       - name: Terraform plan
         run: |
-          terraform plan
+          terraform plan -lock=false
       
