@@ -13,7 +13,11 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2.1.0
-    
+
+      - name: Terraform fmt check  
+        run: |
+          terraform fmt -check -recursive
+
       - name: Terraform auth
         env:
           TF_CLI_CONFIG_FILE_CONTENT: ${{ secrets.TF_CLI_CONFIG_FILE_CONTENT }} 
