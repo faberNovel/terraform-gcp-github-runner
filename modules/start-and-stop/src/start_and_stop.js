@@ -1,4 +1,5 @@
 const Compute = require('@google-cloud/compute');
+const GithubHelper = require('./github-helper.js');
 const compute = new Compute();
 
 module.exports.startAndStop = async (data, context) => {
@@ -11,7 +12,8 @@ module.exports.startAndStop = async (data, context) => {
         if (payload.action == "start") {
             await startInstances(vms)
         } else if (payload.action == "stop") {
-            await stopInstances(vms)
+            const force = payload.force === true
+            await stopInstances(vms, force)
         }
         return Promise.resolve("startAndStop end");
     } catch (err) {
@@ -31,6 +33,7 @@ async function getInstances(filter) {
 }
 
 async function startInstances(vms) {
+    console.log("Starting instance(s)")
     await Promise.all(vms.map(async (vm) => {
         console.log(`Starting instance : ${vm.name}`);
         await vm.start();
@@ -39,13 +42,38 @@ async function startInstances(vms) {
     console.log(`Successfully started instance(s)`);
 }
 
-async function stopInstances(vms) {
+async function stopInstances(vms, force) {
+    console.log(`Stopping instance(s), force = ${force}`)
+    const runnersGitHubStatus = await getRunnersGitHubStatus()
+    console.log(`runners github status = ${runnersGitHubStatus}`)
     await Promise.all(vms.map(async (vm) => {
-        console.log(`Stopping instance : ${vm.name}`);
-        await vm.stop();
-        Promise.resolve(`Instance stopped`)
+        console.log(`Trying to stop instance : ${vm.name}`)
+        const githubStatus = getRunnerGitHubStatusByName(runnersGitHubStatus, vm.name)
+        console.log(`GitHub status of instance : ${githubStatus}`)
+        if (githubStatus == "busy" && force == false) {
+            console.log(`Instance busy, not stopping : ${vm.name}`)
+        } else {
+            console.log(`Stopping instance : ${vm.name}`)
+            await vm.stop();
+        }
+        Promise.resolve(`trying to stopping instance end : ${vm.name}`)
     }))
-    console.log(`Successfully stopped instance(s)`);
+    console.log(`Finishing stopping stopped instance(s)`)
+}
+
+async function getRunnersGitHubStatus() {
+    const octokit = await GithubHelper.getOctokit();
+    const response = await octokit.actions.listSelfHostedRunnersForOrg({
+        org: ORG
+    });
+    return response.data.runners;
+}
+
+function getRunnerGitHubStatusByName(githubRunners, name) {
+    const [githubRunner] = githubRunners.filter(runner => {
+        return runner.name == name
+    })
+    return githubRunner.status
 }
 
 /**
