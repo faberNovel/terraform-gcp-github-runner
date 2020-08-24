@@ -67,8 +67,8 @@ resource "google_compute_instance_from_template" "runner" {
   count                    = var.runner.total_count
 
   labels = {
-    "env"     = var.env
-    "eternal" = "${var.runner.eternal_count > count.index ? "true" : "false"}"
+    "env"  = var.env
+    "idle" = "${var.runner.idle_count > count.index ? "true" : "false"}"
   }
 
   network_interface {

@@ -13,9 +13,9 @@ terraform {
 module "runners" {
   source = "./modules/runners"
   runner = {
-    total_count   = var.runner.total_count
-    eternal_count = var.runner.eternal_count
-    type          = var.runner.type
+    total_count = var.runner.total_count
+    idle_count  = var.runner.idle_count
+    type        = var.runner.type
   }
   env = var.google.env
   github = {
