@@ -16,7 +16,7 @@ resource "google_storage_bucket_object" "start_and_stop_zip" {
 
 resource "google_cloudfunctions_function" "start_and_stop" {
   name                  = "start_and_stop_function"
-  description           = "Handling start and stop of non eternal runners"
+  description           = "Handling start and stop of non idle runners"
   runtime               = "nodejs10"
   available_memory_mb   = 128
   timeout               = 60
@@ -46,7 +46,7 @@ resource "google_cloud_scheduler_job" "start_job" {
 
   pubsub_target {
     topic_name = google_pubsub_topic.start_and_stop.id
-    data       = base64encode("{\"action\":\"start\",\"filter\":\"labels.env=${var.env} AND labels.eternal=false\"}")
+    data       = base64encode("{\"action\":\"start\",\"filter\":\"labels.env=${var.env} AND labels.idle=false\"}")
   }
 }
 
@@ -57,6 +57,6 @@ resource "google_cloud_scheduler_job" "stop_job" {
 
   pubsub_target {
     topic_name = google_pubsub_topic.start_and_stop.id
-    data       = base64encode("{\"action\":\"stop\",\"filter\":\"labels.env=${var.env} AND labels.eternal=false\"}")
+    data       = base64encode("{\"action\":\"stop\",\"filter\":\"labels.env=${var.env} AND labels.idle=false\"}")
   }
 }
