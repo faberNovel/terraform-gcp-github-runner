@@ -2,60 +2,61 @@ name: CI
 on: [push]
 
 jobs:
-  build:
-    name: CI
+  test-js:
+    runs-on: [self-hosted, linux, docker]
+    container:
+      image: docker://node:14
+      
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2.1.0
+
+      - name: Test js
+        run: |
+          yarn --cwd "modules/start-and-stop/src"
+          npm run --prefix modules/start-and-stop/src test
+
+  test-tf:
     runs-on: [self-hosted, linux, docker]
     container:
       image: docker://hashicorp/terraform:0.12.28
     env:
       TF_CLI_CONFIG_FILE: "terraformrc"
+      BACKEND_FILE_PATH: "backend.tfvars.json"
     
     steps:
       - name: Checkout
         uses: actions/checkout@v2.1.0
-
-      - name: Terraform fmt check  
-        run: |
-          terraform fmt -check -recursive
-
-      - name: Terraform auth
-        env:
-          TF_CLI_CONFIG_FILE_CONTENT: ${{ secrets.TF_CLI_CONFIG_FILE_CONTENT }} 
-        run: |
-          tfConfigFilePath=$TF_CLI_CONFIG_FILE
-          echo $TF_CLI_CONFIG_FILE_CONTENT > $tfConfigFilePath
-
-      - name: Terraform init
-        env:
-          BACKEND_DEV_TFVARS_JSON: ${{ secrets.BACKEND_DEV_TFVARS_JSON }}
-        run: |
-          backendFilePath=backend.tfvars.json
-          echo $BACKEND_DEV_TFVARS_JSON > $backendFilePath
-          terraform init -backend-config=$backendFilePath
-
-      - name: Terraform validate
-        run: |
-          terraform validate
-
-      - name: Load Terraform vars
-        env:
-          GOOGLE_TFVARS_JSON: ${{ secrets.GOOGLE_DEV_TFVARS_JSON }}
-          APP_GITHUB_TFVARS_JSON: ${{ secrets.APP_GITHUB_TFVARS_JSON }}
-        run: |
-          googleTfvarsJsonPath=google.auto.tfvars.json
-          echo $GOOGLE_TFVARS_JSON > $googleTfvarsJsonPath
-
-          githubTfvarsJsonPath=github.auto.tfvars.json
-          echo $APP_GITHUB_TFVARS_JSON > $githubTfvarsJsonPath
 
       - name: Install Terraform dependencies
         run: |
           apk add npm
           apk add nodejs
           npm install -g yarn
-          cd modules/runners/scripts && yarn
+          yarn --cwd "modules/runners/scripts"
 
-      - name: Terraform plan
+      - name: Setup env
+        env:
+          TF_CLI_CONFIG_FILE_CONTENT: ${{ secrets.TF_CLI_CONFIG_FILE_CONTENT }}
+          BACKEND_DEV_TFVARS_JSON: ${{ secrets.BACKEND_DEV_TFVARS_JSON }}
+          GOOGLE_TFVARS_JSON: ${{ secrets.GOOGLE_DEV_TFVARS_JSON }}
+          APP_GITHUB_TFVARS_JSON: ${{ secrets.APP_GITHUB_TFVARS_JSON }}
+        run: |
+          echo $TF_CLI_CONFIG_FILE_CONTENT > $TF_CLI_CONFIG_FILE
+          echo $BACKEND_DEV_TFVARS_JSON > $BACKEND_FILE_PATH
+          echo $GOOGLE_TFVARS_JSON > google.auto.tfvars.json
+          echo $APP_GITHUB_TFVARS_JSON > github.auto.tfvars.json
+
+      - name: Terraform init
+        run: |
+          terraform init -backend-config=$BACKEND_FILE_PATH
+
+      - name: Terraform checks 
+        run: |
+          terraform fmt -check -recursive
+          terraform validate
+
+      - name: Terraform run 
         run: |
           terraform plan -lock=false
       
