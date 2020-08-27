@@ -15,17 +15,37 @@ describe('start instance', function () {
     })
     describe('happy path 0 VMs', function() {
         it('Should be fulfilled', function() {
-            const env = "test"
-            const json = {
-                "action": "start",
-                "filter": `labels.env=${env} AND labels.idle=false}`
-            }
-            const jsonBase64 = Buffer.from(JSON.stringify(json)).toString('base64')
-            const payload = {
-                "data": jsonBase64
-            }
+            const payload = makePayload();
             sinon.stub(Compute.prototype, `getVMs`).callsFake(() => [[]])
             return startAndStop.startAndStop(payload, null).should.be.fulfilled
         })
     })
+    describe('happy path 1 VMs', function() {
+        it('Should be fulfilled', function() {
+            const payload = makePayload();
+            const vm = {
+                start: function() {},
+                name: 'vm1'
+            }
+            sinon.stub(Compute.prototype, `getVMs`).callsFake(() => [[vm]])
+            return startAndStop.startAndStop(payload, null).should.be.fulfilled
+        })
+    })
 })
+
+afterEach(function () {
+    sinon.restore();
+});
+
+function makePayload() {
+    const env = "test";
+    const json = {
+        "action": "start",
+        "filter": `labels.env=${env} AND labels.idle=false}`
+    };
+    const jsonBase64 = Buffer.from(JSON.stringify(json)).toString('base64');
+    const payload = {
+        "data": jsonBase64
+    };
+    return payload;
+}
