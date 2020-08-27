@@ -2,8 +2,21 @@ name: CI
 on: [push]
 
 jobs:
-  build:
-    name: CI
+  test-js:
+    runs-on: [self-hosted, linux, docker]
+    container:
+      image: docker://node:14
+      
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2.1.0
+
+      - name: Test js
+        run: |
+          yarn --cwd "modules/start-and-stop/src"
+          npm run --prefix modules/start-and-stop/src test
+
+  test-tf:
     runs-on: [self-hosted, linux, docker]
     container:
       image: docker://hashicorp/terraform:0.12.28
