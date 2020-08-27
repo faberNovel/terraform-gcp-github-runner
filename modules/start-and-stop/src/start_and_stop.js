@@ -22,6 +22,11 @@ module.exports.startAndStop = async (data, context) => {
     }
 };
 
+module.exports.dev = async () => {
+    const status = await getRunnersGitHubStatus()
+    console.log(status)
+}
+
 async function getInstances(filter) {
     console.log(`looking for instance(s) with filter ${filter}...`);
     const options = {

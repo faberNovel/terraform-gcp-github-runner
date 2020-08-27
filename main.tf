@@ -30,7 +30,10 @@ module "runners" {
 
 module "start_and_stop" {
   source = "./modules/start-and-stop"
-  env    = var.google.env
+  google = {
+    env     = var.google.env
+    project = var.google.project
+  }
 }
 
 module "secrets" {

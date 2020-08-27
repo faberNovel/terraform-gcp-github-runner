@@ -1,8 +1,12 @@
 const { createAppAuth } = require("@octokit/auth-app");
 const { Octokit } = require("@octokit/rest");
+const { SecretManagerServiceClient } = require('@google-cloud/secret-manager');
+const client = new SecretManagerServiceClient();
+
+const name = `projects/${process.env['PROJECT_NAME']}/secrets/github-json/versions/latest`;
 
 module.exports.getOctokit = async function getOctokit() {
-    loadEnv();
+    await loadEnv();
     const installAuth = await getInstallAuth(APP_ID, KEY, INSTALLATION_ID, CLIENT_ID, CLIENT_SECRET);
     const octokit = new Octokit({
         auth: installAuth.token,
@@ -10,17 +14,55 @@ module.exports.getOctokit = async function getOctokit() {
     return octokit
 }
 
-function loadEnv() {
-    setOrThrow("ORG")
-    setOrThrow("KEY")
-    setOrThrow("APP_ID")
-    setOrThrow("INSTALLATION_ID")
-    setOrThrow("CLIENT_ID")
-    setOrThrow("CLIENT_SECRET")
+async function loadEnv() {
+    console.log(`Loading env...`)
+    try {
+        loadEnvFromProcessEnv()
+        checkEnvIsSet()
+    } catch (error) {
+        await loadEnvFromGoogleSecrets()
+        checkEnvIsSet()
+    }
+    console.log(`Loading env done for org : ${ORG}`)
 }
 
-function setOrThrow(key) {
-    if (process.env[key] === undefined) throw new Error(`${key} undefined`)
+async function loadEnvFromGoogleSecrets() {
+    const [version] = await client.accessSecretVersion({
+        name: name,
+    });
+    const jsonPayload = version.payload.data;
+    const githubSecrets = JSON.parse(jsonPayload);
+    global["ORG"] = githubSecrets["organisation"];
+    global["KEY"] = Buffer.from(githubSecrets["key_pem_b64"], 'base64').toString();
+    global["APP_ID"] = githubSecrets["app_id"];
+    global["INSTALLATION_ID"] = githubSecrets["app_installation_id"];
+    global["CLIENT_ID"] = githubSecrets["client_id"];
+    global["CLIENT_SECRET"] = githubSecrets["client_secret"];
+}
+
+function checkEnvIsSet() {
+    throwIfNotSet(ORG)
+    throwIfNotSet(KEY)
+    throwIfNotSet(APP_ID)
+    throwIfNotSet(INSTALLATION_ID)
+    throwIfNotSet(CLIENT_ID)
+    throwIfNotSet(CLIENT_SECRET)
+}
+
+function throwIfNotSet(name) {
+    if (name === undefined) throw new Error(`${name} undefined`)
+}
+
+function loadEnvFromProcessEnv() {
+    setGlobal("ORG");
+    setGlobal("KEY");
+    setGlobal("APP_ID");
+    setGlobal("INSTALLATION_ID");
+    setGlobal("CLIENT_ID");
+    setGlobal("CLIENT_SECRET");
+}
+
+function setGlobal(key) {
     global[key] = process.env[key];
 }
 
