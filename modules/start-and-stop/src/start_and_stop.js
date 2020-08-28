@@ -50,7 +50,7 @@ async function startInstances(vms) {
 async function stopInstances(vms, force) {
     console.log(`Stopping instance(s), force = ${force}`)
     const runnersGitHubStatus = await getRunnersGitHubStatus()
-    console.log(`runners github status = ${runnersGitHubStatus}`)
+    console.log(`runners github status = ${JSON.stringify(runnersGitHubStatus)}`)
     await Promise.all(vms.map(async (vm) => {
         console.log(`Trying to stop instance : ${vm.name}`)
         const githubStatus = getRunnerGitHubStatusByName(runnersGitHubStatus, vm.name)
