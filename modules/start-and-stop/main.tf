@@ -66,6 +66,17 @@ resource "google_cloud_scheduler_job" "stop_job" {
   }
 }
 
+resource "google_cloud_scheduler_job" "force_stop_job" {
+  name      = "force-stop-job"
+  schedule  = "0 20 * * *"
+  time_zone = "Europe/Paris"
+
+  pubsub_target {
+    topic_name = google_pubsub_topic.start_and_stop.id
+    data       = base64encode("{\"action\":\"stop\", \"force\":\"true\", \"filter\":\"labels.env=${var.google.env} AND labels.idle=false\"}")
+  }
+}
+
 resource "google_service_account" "start_and_stop" {
   account_id   = "start-and-stop-user"
   display_name = "Start and Stop User"
