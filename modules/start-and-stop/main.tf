@@ -26,7 +26,7 @@ resource "google_cloudfunctions_function" "start_and_stop" {
   service_account_email = google_service_account.start_and_stop.email
 
   environment_variables = {
-    "PROJECT_NAME" = var.google.project
+    "SECRET_NAME_GITHUB_JSON" = var.secret_name_github_json
   }
 
   event_trigger {

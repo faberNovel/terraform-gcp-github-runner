@@ -3,8 +3,6 @@ const { Octokit } = require("@octokit/rest");
 const { SecretManagerServiceClient } = require('@google-cloud/secret-manager');
 const client = new SecretManagerServiceClient();
 
-const name = `projects/${process.env['PROJECT_NAME']}/secrets/github-json/versions/latest`;
-
 module.exports.getOctokit = async function getOctokit() {
     await loadEnv();
     const installAuth = await getInstallAuth(APP_ID, KEY, INSTALLATION_ID, CLIENT_ID, CLIENT_SECRET);
@@ -28,7 +26,7 @@ async function loadEnv() {
 
 async function loadEnvFromGoogleSecrets() {
     const [version] = await client.accessSecretVersion({
-        name: name,
+        name: process.env['SECRET_NAME_GITHUB_JSON'],
     });
     const jsonPayload = version.payload.data;
     const githubSecrets = JSON.parse(jsonPayload);

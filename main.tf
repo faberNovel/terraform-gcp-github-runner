@@ -23,6 +23,7 @@ module "start_and_stop" {
     env     = var.google.env
     project = var.google.project
   }
+  secret_name_github_json = module.secrets.secret_name_github_json
 }
 
 module "secrets" {
