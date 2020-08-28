@@ -13,7 +13,7 @@ terraform {
 module "runners" {
   source = "./modules/runners"
   runner = var.runner
-  env = var.google.env
+  env    = var.google.env
   github = var.github
 }
 
