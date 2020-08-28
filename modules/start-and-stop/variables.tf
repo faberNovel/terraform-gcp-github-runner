@@ -4,3 +4,5 @@ variable "google" {
     env     = string
   })
 }
+
+variable "secret_name_github_json" {}
