@@ -12,20 +12,9 @@ terraform {
 
 module "runners" {
   source = "./modules/runners"
-  runner = {
-    total_count = var.runner.total_count
-    idle_count  = var.runner.idle_count
-    type        = var.runner.type
-  }
+  runner = var.runner
   env = var.google.env
-  github = {
-    app_id              = var.github.app_id
-    app_installation_id = var.github.app_installation_id
-    client_id           = var.github.client_id
-    client_secret       = var.github.client_secret
-    key_pem_b64         = var.github.key_pem_b64
-    organisation        = var.github.organisation
-  }
+  github = var.github
 }
 
 module "start_and_stop" {
@@ -38,12 +27,5 @@ module "start_and_stop" {
 
 module "secrets" {
   source = "./modules/secrets"
-  github = {
-    app_id              = var.github.app_id
-    app_installation_id = var.github.app_installation_id
-    client_id           = var.github.client_id
-    client_secret       = var.github.client_secret
-    key_pem_b64         = var.github.key_pem_b64
-    organisation        = var.github.organisation
-  }
+  github = var.github
 }
