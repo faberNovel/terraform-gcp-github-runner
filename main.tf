@@ -30,5 +30,20 @@ module "runners" {
 
 module "start_and_stop" {
   source = "./modules/start-and-stop"
-  env    = var.google.env
+  google = {
+    env     = var.google.env
+    project = var.google.project
+  }
+}
+
+module "secrets" {
+  source = "./modules/secrets"
+  github = {
+    app_id              = var.github.app_id
+    app_installation_id = var.github.app_installation_id
+    client_id           = var.github.client_id
+    client_secret       = var.github.client_secret
+    key_pem_b64         = var.github.key_pem_b64
+    organisation        = var.github.organisation
+  }
 }
