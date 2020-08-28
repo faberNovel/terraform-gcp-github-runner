@@ -12,9 +12,12 @@ jobs:
         uses: actions/checkout@v2.1.0
 
       - name: Test js
+        env:
+          JS_SRC: "modules/start-and-stop/src"
         run: |
-          yarn --cwd "modules/start-and-stop/src"
-          npm run --prefix modules/start-and-stop/src test
+          yarn --cwd $JS_SRC
+          npm run --prefix $JS_SRC test
+          npx eslint $JS_SRC
 
   test-tf:
     runs-on: [self-hosted, linux, docker]
