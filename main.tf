@@ -24,15 +24,6 @@ terraform {
   backend "remote" {}
 }
 
-module "runners" {
-  source = "./modules/runners"
-  runner = var.runner
-  env    = var.google.env
-  github = var.github
-
-  depends_on = [google_project_service.gcp_services]
-}
-
 module "start_and_stop" {
   source = "./modules/start-and-stop"
   google = {
