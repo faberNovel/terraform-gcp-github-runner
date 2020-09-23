@@ -12,7 +12,6 @@ resource "google_project_service" "gcp_services" {
     "secretmanager.googleapis.com",
     "compute.googleapis.com",
     "cloudfunctions.googleapis.com",
-    "appengine.googleapis.com",
     "cloudbuild.googleapis.com",
   ])
 
