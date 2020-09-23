@@ -4,7 +4,7 @@ The self hosted runner are setup at the GitHub organisation level.
 ## Dependencies
 * terraform, tfenv
 * bash or compatible
-* node12 and yarn
+* node12
 
 ### Google Cloud Plateform
 To address a specific GCP projet:

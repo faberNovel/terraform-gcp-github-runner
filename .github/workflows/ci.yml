@@ -5,7 +5,7 @@ jobs:
   test-js:
     runs-on: [self-hosted, linux, docker]
     container:
-      image: docker://node:14
+      image: docker://node:12
       
     steps:
       - name: Checkout
@@ -15,7 +15,7 @@ jobs:
         env:
           JS_SRC: "modules/start-and-stop/src"
         run: |
-          yarn --cwd $JS_SRC
+          npm install --prefix $JS_SRC 
           npm run --prefix $JS_SRC test
           npx eslint $JS_SRC
 
@@ -33,10 +33,9 @@ jobs:
 
       - name: Install Terraform dependencies
         run: |
+          apk add nodejs=~12
           apk add npm
-          apk add nodejs
-          npm install -g yarn
-          yarn --cwd "modules/runners/scripts"
+          npm install --prefix "modules/runners/scripts"
 
       - name: Setup env
         env:
