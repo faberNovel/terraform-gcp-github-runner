@@ -1,17 +1,15 @@
 This Terraform projet is made to deploy GitHub self hosted runner VMs on GCP.
 The self hosted runner are setup at the GitHub organisation level.
 
-## Usage
-You need to pass additional terraform var to target a specific GCP projet and a
-specific GitHub organisation. You need locally:
-* terraform
+## Dependencies
+* terraform, tfenv
 * bash or compatible
 * node12 and yarn
 
 ### Google Cloud Plateform
 To address a specific GCP projet:
 * Create a GCP project and pass it to the terraform variable `google_project`.
-* Setup an [account service key](https://cloud.google.com/iam/docs/creating-managing-service-account-keys), with enough role to manage compute instance (usually `Compute Admin`).
+* Setup an [account service key](https://cloud.google.com/iam/docs/creating-managing-service-account-keys), with owner role.
 * Create a `json` key for this account.
 * Pass this key encoded in `b64` in terraform variable `secrets.google_credentials_json_b64`.
 
@@ -30,7 +28,9 @@ To address a specific GCP projet:
 
 ## Providers
 
-No provider.
+| Name | Version |
+|------|---------|
+| google | n/a |
 
 ## Inputs
 
