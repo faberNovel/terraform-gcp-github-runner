@@ -1,9 +1,7 @@
 const Compute = require('@google-cloud/compute')
 const GithubHelper = require('./github-helper.js')
 const compute = new Compute()
-
-// TODO : zone should come from terraform
-const zone = compute.zone('us-central1-c')
+const zone = compute.zone(process.env['ZONE'])
 
 /* global ORG */
 

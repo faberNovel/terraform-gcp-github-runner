@@ -27,6 +27,7 @@ resource "google_cloudfunctions_function" "start_and_stop" {
 
   environment_variables = {
     "SECRET_NAME_GITHUB_JSON" = var.secret_name_github_json
+    "ZONE"                    = var.google.zone
   }
 
   event_trigger {
