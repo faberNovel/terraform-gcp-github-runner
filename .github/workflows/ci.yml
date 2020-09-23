@@ -22,7 +22,7 @@ jobs:
   test-tf:
     runs-on: [self-hosted, linux, docker]
     container:
-      image: docker://hashicorp/terraform:0.12.28
+      image: docker://hashicorp/terraform:0.13.3
     env:
       TF_CLI_CONFIG_FILE: "terraformrc"
       BACKEND_FILE_PATH: "backend.tfvars.json"

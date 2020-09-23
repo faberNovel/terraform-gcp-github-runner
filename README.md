@@ -26,7 +26,7 @@ To address a specific GCP projet:
 
 | Name | Version |
 |------|---------|
-| terraform | ~>0.12.28 |
+| terraform | >= 0.13 |
 
 ## Providers
 
