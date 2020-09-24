@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "main": "start_and_stop.js",
   "license": "MIT",
+  "engines": {
+    "node": "12"
+  },
   "scripts": {
     "run": "node -e 'require(\"./start_and_stop.js\").startAndStop()'",
     "dev": "node -e 'require(\"./start_and_stop.js\").dev()'",

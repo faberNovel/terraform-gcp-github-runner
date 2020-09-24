@@ -17,7 +17,7 @@ resource "google_storage_bucket_object" "start_and_stop_zip" {
 resource "google_cloudfunctions_function" "start_and_stop" {
   name                  = "start_and_stop_function"
   description           = "Handling start and stop of non idle runners"
-  runtime               = "nodejs10"
+  runtime               = "nodejs12"
   available_memory_mb   = 128
   timeout               = 60
   source_archive_bucket = google_storage_bucket.start_and_stop_bucket.name
