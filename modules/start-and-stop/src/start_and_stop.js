@@ -26,7 +26,11 @@ module.exports.startAndStop = async (data, context) => {
 }
 
 module.exports.dev = async () => {
-  createVm()
+  vm = await createVm()
+  console.log('deleting VM ...')
+  const [operation] = await vm.delete()
+  await operation.promise()
+  console.log('VM deleted')
 }
 
 async function createVm () {
