@@ -51,6 +51,7 @@ function createVmName(runnerId) {
 function getVmConfig(isIdle, env) {
   const config = {
     machineType: process.env['RUNNER_MACHINE_TYPE'],
+    http: true,
     disks: [
       {
         boot: true,
