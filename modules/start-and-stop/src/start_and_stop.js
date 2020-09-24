@@ -1,7 +1,7 @@
 const Compute = require('@google-cloud/compute')
 const GithubHelper = require('./github-helper.js')
 const compute = new Compute()
-const zone = compute.zone(process.env['ZONE'])
+const zone = compute.zone(process.env['GOOGLE_ZONE'])
 
 /* global ORG */
 
@@ -32,9 +32,8 @@ module.exports.dev = async () => {
 async function createVm () {
   console.log(`create VM ...`)
   // TODO : implement accurate vm name generator
-  // TODO : env should come from terraform
   // TODO : idIdle should come from terraform + current gcp vm states
-  const [vm, operation] = await zone.createVM("test-vm", getVmConfig(true, "dev"))
+  const [vm, operation] = await zone.createVM("test-vm", getVmConfig(true, process.env['GOOGLE_ENV']))
   console.log(vm)
   console.log(`Creating VM ...`)
   await operation.promise();
@@ -44,7 +43,7 @@ async function createVm () {
 
 function getVmConfig(isIdle, env) {
   const config = {
-    machineType: 'n1-standard-1', // TODO : machine type should come from terraform
+    machineType: process.env['RUNNER_MACHINE_TYPE'],
     disks: [
       {
         boot: true,

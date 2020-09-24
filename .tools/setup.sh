@@ -10,6 +10,7 @@ cd "$scriptDir"
 
 source ./load-google-env.sh ../google-dev.tfvars.json
 source ./load-github-env.sh ../github.auto.tfvars.json
+source ./load-default-terraform-env.sh
 
 cd "$baseDir"
 
@@ -17,4 +18,8 @@ cd "$baseDir"
 > .env
 # generate .env file
 echo "GOOGLE_APPLICATION_CREDENTIALS=$GOOGLE_APPLICATION_CREDENTIALS" >> .env
-echo "ZONE=$ZONE" >> .env
+echo "GOOGLE_ZONE=$GOOGLE_ZONE" >> .env
+echo "GOOGLE_ENV=$GOOGLE_ENV" >> .env
+echo "RUNNER_MACHINE_TYPE=$RUNNER_MACHINE_TYPE" >> .env
+echo "RUNNER_IDLE_COUNT=$RUNNER_IDLE_COUNT" >> .env
+echo "RUNNER_TOTAL_COUNT=$RUNNER_TOTAL_COUNT" >> .env

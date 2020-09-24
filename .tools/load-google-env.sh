@@ -7,4 +7,5 @@ credentials_json=$(echo $credentials_json_b64 | base64 -d)
 echo $credentials_json > auth.json
 authPath=$(realpath auth.json) 
 export GOOGLE_APPLICATION_CREDENTIALS=$authPath
-export ZONE=$(jq -r .google.zone $1)
+export GOOGLE_ZONE=$(jq -r .google.zone $1)
+export GOOGLE_ENV=$(jq -r .google.env $1)

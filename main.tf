@@ -27,6 +27,7 @@ terraform {
 module "start_and_stop" {
   source                  = "./modules/start-and-stop"
   google                  = var.google
+  runner                  = var.runner
   secret_name_github_json = module.secrets.secret_name_github_json
 
   depends_on = [google_project_service.gcp_services]
