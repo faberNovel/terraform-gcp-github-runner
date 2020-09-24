@@ -11,3 +11,5 @@ github.auto.tfvars.json
 google-dev.tfvars.json
 google-prod.tfvars.json
 google-gitlab.tfvars.json
+.tools/auth.json
+modules/start-and-stop/src/.env

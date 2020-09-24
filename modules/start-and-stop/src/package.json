@@ -8,7 +8,8 @@
   },
   "scripts": {
     "run": "node -e 'require(\"./start_and_stop.js\").startAndStop()'",
-    "dev": "node -e 'require(\"./start_and_stop.js\").dev()'",
+    "predev": "bash ../../../.tools/setup.sh",
+    "dev": "node -r dotenv/config -e 'require(\"./start_and_stop.js\").dev()'",
     "test": "mocha start_and_stop.test.js"
   },
   "dependencies": {
@@ -18,6 +19,7 @@
     "@octokit/rest": "^18.0.3",
     "chai": "^4.2.0",
     "chai-as-promised": "^7.1.1",
+    "dotenv": "^8.2.0",
     "mocha": "^8.1.1",
     "sinon": "^9.0.3"
   },
