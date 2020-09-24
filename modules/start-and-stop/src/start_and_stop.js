@@ -2,6 +2,9 @@ const Compute = require('@google-cloud/compute')
 const GithubHelper = require('./github-helper.js')
 const compute = new Compute()
 
+// TODO : zone should come from terraform
+const zone = compute.zone('us-central1-c')
+
 /* global ORG */
 
 module.exports.startAndStop = async (data, context) => {
@@ -25,8 +28,46 @@ module.exports.startAndStop = async (data, context) => {
 }
 
 module.exports.dev = async () => {
-  const status = await getRunnersGitHubStatus()
-  console.log(status)
+  createVm()
+}
+
+async function createVm () {
+  console.log(`create VM ...`)
+  // TODO : implement accurate vm name generator
+  // TODO : env should come from terraform
+  // TODO : idIdle should come from terraform + current gcp vm states
+  const [vm, operation] = await zone.createVM("test-vm", getVmConfig(true, "dev"))
+  console.log(vm)
+  console.log(`Creating VM ...`)
+  await operation.promise();
+  console.log(`VM created`)
+  return vm
+}
+
+function getVmConfig(isIdle, env) {
+  const config = {
+    machineType: 'n1-standard-1', // TODO : machine type should come from terraform
+    disks: [
+      {
+        boot: true,
+        autoDelete: true,
+        initializeParams: {
+          diskSizeGb: '40',
+          sourceImage: 'https://www.googleapis.com/compute/v1/projects/ubuntu-os-cloud/global/images/family/ubuntu-2004-lts'
+        }
+      }
+    ],
+    networkInterfaces: [
+      {
+        network: 'global/networks/default'
+      }
+    ],
+    labels: {
+      idle: isIdle,
+      env: env
+    }
+  }
+  return config
 }
 
 async function getInstances (filter) {
