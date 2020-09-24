@@ -26,23 +26,26 @@ module.exports.startAndStop = async (data, context) => {
 }
 
 module.exports.dev = async () => {
-  vm = await createVm()
+  vm = await createVm(true, "1")
   console.log('deleting VM ...')
   const [operation] = await vm.delete()
   await operation.promise()
   console.log('VM deleted')
 }
 
-async function createVm () {
+async function createVm (isIdle, id) {
   console.log(`create VM ...`)
-  // TODO : implement accurate vm name generator
-  // TODO : idIdle should come from terraform + current gcp vm states
-  const [vm, operation] = await zone.createVM("test-vm", getVmConfig(true, process.env['GOOGLE_ENV']))
+  const [vm, operation] = await zone.createVM(createVmName(id), getVmConfig(isIdle, process.env['GOOGLE_ENV']))
   console.log(vm)
   console.log(`Creating VM ...`)
   await operation.promise();
   console.log(`VM created`)
   return vm
+}
+
+function createVmName(runnerId) {
+  vmName = `vm-gcp-github-action-runner-${process.env['GOOGLE_ENV']}-${runnerId}`
+  return vmName
 }
 
 function getVmConfig(isIdle, env) {
