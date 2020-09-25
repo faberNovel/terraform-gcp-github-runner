@@ -1,10 +1,19 @@
 #!/bin/bash
-echo "Export google and github env vars (if sourced) and generate .env file for nodejs file"
+
+# Exit immediately if a command returns a non-zero status
+saved_options=$(set +o)
+set -e
+
+cat << EOF
+The script will:
+- parse google-dev.tfvars.json, github.auto.tfvars.json and terraform.tfvars.json from the root folder of the project 
+- export google and github env vars (if sourced)
+- generate .env file from calling directory
+
+EOF
 
 baseDir=$(pwd)
 scriptDir="$(dirname "$0")"
-echo "baseDir=$baseDir"
-echo "scriptDir=$scriptDir"
 
 cd "$scriptDir"
 
@@ -24,3 +33,5 @@ echo "RUNNER_MACHINE_TYPE=$RUNNER_MACHINE_TYPE" >> .env
 echo "RUNNER_IDLE_COUNT=$RUNNER_IDLE_COUNT" >> .env
 echo "RUNNER_TOTAL_COUNT=$RUNNER_TOTAL_COUNT" >> .env
 echo "RUNNER_SERVICE_ACCOUNT=runner-user@$GOOGLE_PROJECT.iam.gserviceaccount.com" >> .env
+
+eval "$saved_options"
