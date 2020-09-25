@@ -28,7 +28,7 @@ async function loadEnv () {
 
 async function loadEnvFromGoogleSecrets () {
   const [version] = await client.accessSecretVersion({
-    name: process.env.SECRET_NAME_GITHUB_JSON
+    name: process.env.SECRET_GITHUB_JSON_RESOURCE_NAME
   })
   const jsonPayload = version.payload.data
   const githubSecrets = JSON.parse(jsonPayload)

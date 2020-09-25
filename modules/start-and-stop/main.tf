@@ -26,13 +26,14 @@ resource "google_cloudfunctions_function" "start_and_stop" {
   service_account_email = google_service_account.start_and_stop.email
 
   environment_variables = {
-    "SECRET_NAME_GITHUB_JSON" = var.secret_name_github_json
-    "GOOGLE_ZONE"             = var.google.zone
-    "GOOGLE_ENV"              = var.google.env
-    "RUNNER_MACHINE_TYPE"     = var.runner.type
-    "RUNNER_IDLE_COUNT"       = var.runner.idle_count
-    "RUNNER_TOTAL_COUNT"      = var.runner.total_count
-    "RUNNER_SERVICE_ACCOUNT"  = google_service_account.runner.email
+    "SECRET_GITHUB_JSON_RESOURCE_NAME" = var.secret_github_json.resource_name
+    "SECRET_GITHUB_JSON_ID"            = var.secret_github_json.id
+    "GOOGLE_ZONE"                      = var.google.zone
+    "GOOGLE_ENV"                       = var.google.env
+    "RUNNER_MACHINE_TYPE"              = var.runner.type
+    "RUNNER_IDLE_COUNT"                = var.runner.idle_count
+    "RUNNER_TOTAL_COUNT"               = var.runner.total_count
+    "RUNNER_SERVICE_ACCOUNT"           = google_service_account.runner.email
   }
 
   event_trigger {
