@@ -1,7 +1,7 @@
 const Compute = require('@google-cloud/compute')
 const GithubHelper = require('./github-helper.js')
 const compute = new Compute()
-const zone = compute.zone(process.env['GOOGLE_ZONE'])
+const zone = compute.zone(process.env.GOOGLE_ZONE)
 
 /* global ORG */
 
@@ -26,7 +26,7 @@ module.exports.startAndStop = async (data, context) => {
 }
 
 module.exports.dev = async () => {
-  vm = await createVm(true, "1")
+  const vm = await createVm(true, '1')
   console.log('deleting VM ...')
   const [operation] = await vm.delete()
   await operation.promise()
@@ -34,24 +34,24 @@ module.exports.dev = async () => {
 }
 
 async function createVm (isIdle, id) {
-  console.log(`create VM ...`)
-  const [vm, operation] = await zone.createVM(createVmName(id), createVmConfig(isIdle, process.env['GOOGLE_ENV']))
+  console.log('create VM ...')
+  const [vm, operation] = await zone.createVM(createVmName(id), createVmConfig(isIdle, process.env.GOOGLE_ENV))
   console.log(vm)
-  console.log(`Creating VM ...`)
-  await operation.promise();
-  console.log(`VM created`)
+  console.log('Creating VM ...')
+  await operation.promise()
+  console.log('VM created')
   return vm
 }
 
-function createVmName(runnerId) {
-  vmName = `vm-gcp-github-action-runner-${process.env['GOOGLE_ENV']}-${runnerId}`
+function createVmName (runnerId) {
+  const vmName = `vm-gcp-github-action-runner-${process.env.GOOGLE_ENV}-${runnerId}`
   console.log(`vm name created : ${vmName}`)
   return vmName
 }
 
-function createVmConfig(isIdle, env) {
+function createVmConfig (isIdle, env) {
   const config = {
-    machineType: process.env['RUNNER_MACHINE_TYPE'],
+    machineType: process.env.RUNNER_MACHINE_TYPE,
     http: true,
     disks: [
       {
@@ -74,12 +74,12 @@ function createVmConfig(isIdle, env) {
     },
     serviceAccounts: [
       {
-        email: process.env['RUNNER_SERVICE_ACCOUNT'],
+        email: process.env.RUNNER_SERVICE_ACCOUNT,
         scopes: [
           'https://www.googleapis.com/auth/cloud-platform'
         ]
       }
-    ],
+    ]
   }
   console.log(`vm config created : ${config}`)
   return config
