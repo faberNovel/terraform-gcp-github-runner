@@ -35,7 +35,7 @@ module.exports.dev = async () => {
 
 async function createVm (isIdle, id) {
   console.log(`create VM ...`)
-  const [vm, operation] = await zone.createVM(createVmName(id), getVmConfig(isIdle, process.env['GOOGLE_ENV']))
+  const [vm, operation] = await zone.createVM(createVmName(id), createVmConfig(isIdle, process.env['GOOGLE_ENV']))
   console.log(vm)
   console.log(`Creating VM ...`)
   await operation.promise();
@@ -45,10 +45,11 @@ async function createVm (isIdle, id) {
 
 function createVmName(runnerId) {
   vmName = `vm-gcp-github-action-runner-${process.env['GOOGLE_ENV']}-${runnerId}`
+  console.log(`vm name created : ${vmName}`)
   return vmName
 }
 
-function getVmConfig(isIdle, env) {
+function createVmConfig(isIdle, env) {
   const config = {
     machineType: process.env['RUNNER_MACHINE_TYPE'],
     http: true,
@@ -70,8 +71,17 @@ function getVmConfig(isIdle, env) {
     labels: {
       idle: isIdle,
       env: env
-    }
+    },
+    serviceAccounts: [
+      {
+        email: process.env['RUNNER_SERVICE_ACCOUNT'],
+        scopes: [
+          'https://www.googleapis.com/auth/cloud-platform'
+        ]
+      }
+    ],
   }
+  console.log(`vm config created : ${config}`)
   return config
 }
 

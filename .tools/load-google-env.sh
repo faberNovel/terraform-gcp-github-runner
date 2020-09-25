@@ -9,3 +9,4 @@ authPath=$(realpath auth.json)
 export GOOGLE_APPLICATION_CREDENTIALS=$authPath
 export GOOGLE_ZONE=$(jq -r .google.zone $1)
 export GOOGLE_ENV=$(jq -r .google.env $1)
+export GOOGLE_PROJECT=$(jq -r .google.project $1)

@@ -32,6 +32,7 @@ resource "google_cloudfunctions_function" "start_and_stop" {
     "RUNNER_MACHINE_TYPE"     = var.runner.type
     "RUNNER_IDLE_COUNT"       = var.runner.idle_count
     "RUNNER_TOTAL_COUNT"      = var.runner.total_count
+    "RUNNER_SERVICE_ACCOUNT"  = google_service_account.runner.email
   }
 
   event_trigger {
@@ -95,4 +96,14 @@ resource "google_project_iam_member" "start_and_stop_compute_admin" {
 resource "google_project_iam_member" "start_and_stop_secretmanager_secretAccessor" {
   role   = "roles/secretmanager.secretAccessor"
   member = "serviceAccount:${google_service_account.start_and_stop.email}"
+}
+
+resource "google_service_account" "runner" {
+  account_id   = "runner-user"
+  display_name = "Runner user"
+}
+
+resource "google_project_iam_member" "runner_secretmanager_secretaccessor" {
+  role   = "roles/secretmanager.secretAccessor"
+  member = "serviceAccount:${google_service_account.runner.email}"
 }

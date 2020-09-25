@@ -23,3 +23,4 @@ echo "GOOGLE_ENV=$GOOGLE_ENV" >> .env
 echo "RUNNER_MACHINE_TYPE=$RUNNER_MACHINE_TYPE" >> .env
 echo "RUNNER_IDLE_COUNT=$RUNNER_IDLE_COUNT" >> .env
 echo "RUNNER_TOTAL_COUNT=$RUNNER_TOTAL_COUNT" >> .env
+echo "RUNNER_SERVICE_ACCOUNT=runner-user@$GOOGLE_PROJECT.iam.gserviceaccount.com" >> .env
