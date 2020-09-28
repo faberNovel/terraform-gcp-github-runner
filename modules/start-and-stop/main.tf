@@ -108,3 +108,8 @@ resource "google_project_iam_member" "runner_secretmanager_secretaccessor" {
   role   = "roles/secretmanager.secretAccessor"
   member = "serviceAccount:${google_service_account.runner.email}"
 }
+
+resource "google_project_iam_member" "runner_compute_oslogin" {
+  role   = "roles/compute.osLogin"
+  member = "serviceAccount:${google_service_account.runner.email}"
+}
