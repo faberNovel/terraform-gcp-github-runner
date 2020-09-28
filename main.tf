@@ -36,6 +36,13 @@ module "start_and_stop" {
   depends_on = [google_project_service.gcp_services]
 }
 
+module "github_api" {
+  source             = "./modules/github-api"
+  secret_github_json = module.secrets.secret_github_json
+  google             = var.google
+  depends_on         = [google_project_service.gcp_services]
+}
+
 module "secrets" {
   source = "./modules/secrets"
   github = var.github

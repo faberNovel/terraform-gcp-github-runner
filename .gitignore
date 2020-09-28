@@ -13,3 +13,5 @@ google-prod.tfvars.json
 google-gitlab.tfvars.json
 .tools/auth.json
 modules/start-and-stop/src/.env
+modules/github-api/src/node_modules
+modules/github-api/github_api.zip
