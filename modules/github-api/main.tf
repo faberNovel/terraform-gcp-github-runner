@@ -24,6 +24,7 @@ resource "google_cloudfunctions_function" "github_api" {
   source_archive_object = google_storage_bucket_object.github_api_zip.name
   entry_point           = "githubApi"
   service_account_email = google_service_account.github_api.email
+  trigger_http          = true
 
   environment_variables = {
     "SECRET_GITHUB_JSON_RESOURCE_NAME" = var.secret_github_json.resource_name
@@ -38,4 +39,8 @@ resource "google_service_account" "github_api" {
 resource "google_project_iam_member" "github_api_secretmanager_secretaccessor" {
   role   = "roles/secretmanager.secretAccessor"
   member = "serviceAccount:${google_service_account.github_api.email}"
+}
+
+output "github_api_url" {
+  value = google_cloudfunctions_function.github_api.https_trigger_url
 }
