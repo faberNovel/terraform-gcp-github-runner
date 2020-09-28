@@ -79,7 +79,15 @@ function createVmConfig (isIdle, env) {
           'https://www.googleapis.com/auth/cloud-platform'
         ]
       }
-    ]
+    ],
+    metadata: {
+      items: [
+        {
+          value: process.env.SECRET_GITHUB_JSON_ID,
+          key: 'github-json-secret-id'
+        }
+      ]
+    }
   }
   console.log(`vm config created : ${config}`)
   return config

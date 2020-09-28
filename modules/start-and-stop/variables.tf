@@ -2,4 +2,9 @@ variable "google" {}
 
 variable "runner" {}
 
-variable "secret_name_github_json" {}
+variable "secret_github_json" {
+  type = object({
+    id            = string
+    resource_name = string
+  })
+}
