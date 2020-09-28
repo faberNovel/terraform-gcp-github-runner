@@ -15,3 +15,4 @@ google-gitlab.tfvars.json
 modules/start-and-stop/src/.env
 modules/github-api/src/node_modules
 modules/github-api/github_api.zip
+modules/github-api/src/.env

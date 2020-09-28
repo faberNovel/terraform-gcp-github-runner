@@ -33,6 +33,7 @@ echo "RUNNER_MACHINE_TYPE=$RUNNER_MACHINE_TYPE" >> .env
 echo "RUNNER_IDLE_COUNT=$RUNNER_IDLE_COUNT" >> .env
 echo "RUNNER_TOTAL_COUNT=$RUNNER_TOTAL_COUNT" >> .env
 echo "RUNNER_SERVICE_ACCOUNT=runner-user@$GOOGLE_PROJECT.iam.gserviceaccount.com" >> .env
+echo "SECRET_GITHUB_JSON_RESOURCE_NAME=projects/$GOOGLE_PROJECT/secrets/github-json/versions/latest" >> .env
 echo "SECRET_GITHUB_JSON_ID=github-json" >> .env
 
 eval "$saved_options"

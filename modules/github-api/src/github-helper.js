@@ -27,6 +27,7 @@ async function loadEnv () {
 }
 
 async function loadEnvFromGoogleSecrets () {
+  console.log('Loading env from google secrets')
   const [version] = await client.accessSecretVersion({
     name: process.env.SECRET_GITHUB_JSON_RESOURCE_NAME
   })
@@ -54,6 +55,7 @@ function throwIfNotSet (name) {
 }
 
 function loadEnvFromProcessEnv () {
+  console.log('Loading env from process env')
   setGlobal('ORG')
   setGlobal('KEY')
   setGlobal('APP_ID')
