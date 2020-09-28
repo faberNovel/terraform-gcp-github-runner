@@ -8,20 +8,22 @@
   },
   "scripts": {
     "run": "node -e 'require(\"./start_and_stop.js\").startAndStop()'",
-    "dev": "node -e 'require(\"./start_and_stop.js\").dev()'",
+    "predev": "bash ../../../.tools/setup.sh",
+    "dev": "node -r dotenv/config -e 'require(\"./start_and_stop.js\").dev()'",
     "test": "mocha start_and_stop.test.js"
   },
   "dependencies": {
     "@google-cloud/compute": "^2.1.0",
     "@google-cloud/secret-manager": "^3.1.0",
     "@octokit/auth-app": "^2.4.14",
-    "@octokit/rest": "^18.0.3",
+    "@octokit/rest": "^18.0.3"
+  },
+  "devDependencies": {
+    "dotenv": "^8.2.0",
     "chai": "^4.2.0",
     "chai-as-promised": "^7.1.1",
     "mocha": "^8.1.1",
-    "sinon": "^9.0.3"
-  },
-  "devDependencies": {
+    "sinon": "^9.0.3",
     "eslint": "^7.7.0",
     "eslint-config-standard": "^14.1.1",
     "eslint-plugin-import": "^2.22.0",

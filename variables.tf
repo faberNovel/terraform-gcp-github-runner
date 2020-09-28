@@ -9,6 +9,8 @@ variable "runner" {
 variable "google" {
   type = object({
     project              = string
+    region               = string
+    zone                 = string
     credentials_json_b64 = string
     env                  = string
   })
