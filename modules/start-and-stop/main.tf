@@ -47,10 +47,6 @@ resource "google_pubsub_topic" "start_and_stop" {
   name = "start-and-stop-topic"
 }
 
-resource "google_pubsub_topic" "topic" {
-  name = "job-topic"
-}
-
 resource "google_cloud_scheduler_job" "start_job" {
   name      = "start-job"
   schedule  = "0 8 * * *"
