@@ -6,6 +6,9 @@ jobs:
     runs-on: [self-hosted, linux, docker]
     container:
       image: docker://node:12
+    strategy:
+      matrix:
+        js_src: ["modules/start-and-stop/src", "modules/github-api/src"]  
       
     steps:
       - name: Checkout
@@ -13,7 +16,7 @@ jobs:
 
       - name: Test js
         env:
-          JS_SRC: "modules/start-and-stop/src"
+          JS_SRC: ${{ matrix.js_src }}
         run: |
           npm install --prefix $JS_SRC 
           npm run --prefix $JS_SRC test
