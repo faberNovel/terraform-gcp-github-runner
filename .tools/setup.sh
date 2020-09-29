@@ -37,6 +37,6 @@ echo "RUNNER_SERVICE_ACCOUNT=runner-user@$GOOGLE_PROJECT.iam.gserviceaccount.com
 echo "SECRET_GITHUB_JSON_RESOURCE_NAME=projects/$GOOGLE_PROJECT/secrets/github-json/versions/latest" >> .env
 echo "SECRET_GITHUB_JSON_ID=github-json" >> .env
 echo "GITHUB_API_TRIGGER_URL=https://$GOOGLE_REGION-$GOOGLE_PROJECT.cloudfunctions.net/github_api_function" >> .env
-echo "ORG=$ORG" >> .env
+echo "GITHUB_ORG=$GITHUB_ORG" >> .env
 
 eval "$saved_options"

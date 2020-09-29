@@ -18,11 +18,11 @@ installation_id=$(jq -r .github.app_installation_id $1)
 client_id=$(jq -r .github.client_id $1)
 client_secret=$(jq -e -r .github.client_secret $1)
 
-export ORG=$org
-export KEY=$key
-export APP_ID=$app_id
-export INSTALLATION_ID=$installation_id
-export CLIENT_ID=$client_id
-export CLIENT_SECRET=$client_secret
+export GITHUB_ORG=$org
+export GITHUB_KEY=$key
+export GITHUB_APP_ID=$app_id
+export GITHUB_INSTALLATION_ID=$installation_id
+export GITHUB_CLIENT_ID=$client_id
+export GITHUB_CLIENT_SECRET=$client_secret
 
 eval "$saved_options"

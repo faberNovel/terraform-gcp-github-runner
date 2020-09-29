@@ -143,7 +143,7 @@ async function getRunnersGitHubStatus () {
       scope: 'actions',
       function: 'listSelfHostedRunnersForOrg',
       params: {
-        org: process.env.ORG
+        org: process.env.GITHUB_ORG
       }
     }
   })

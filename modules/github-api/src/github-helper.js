@@ -3,11 +3,11 @@ const { Octokit } = require('@octokit/rest')
 const { SecretManagerServiceClient } = require('@google-cloud/secret-manager')
 const client = new SecretManagerServiceClient()
 
-/* global ORG, APP_ID, KEY, INSTALLATION_ID, CLIENT_ID, CLIENT_SECRET */
+/* global GITHUB_ORG, GITHUB_APP_ID, GITHUB_KEY, GITHUB_INSTALLATION_ID, GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET */
 
 module.exports.getOctokit = async function getOctokit () {
   await loadEnv()
-  const installAuth = await getInstallAuth(APP_ID, KEY, INSTALLATION_ID, CLIENT_ID, CLIENT_SECRET)
+  const installAuth = await getInstallAuth(GITHUB_APP_ID, GITHUB_KEY, GITHUB_INSTALLATION_ID, GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET)
   const octokit = new Octokit({
     auth: installAuth.token
   })
@@ -23,7 +23,7 @@ async function loadEnv () {
     await loadEnvFromGoogleSecrets()
     checkEnvIsSet()
   }
-  console.log(`Loading env done for org : ${ORG}`)
+  console.log(`Loading env done for org : ${GITHUB_ORG}`)
 }
 
 async function loadEnvFromGoogleSecrets () {
@@ -33,21 +33,21 @@ async function loadEnvFromGoogleSecrets () {
   })
   const jsonPayload = version.payload.data
   const githubSecrets = JSON.parse(jsonPayload)
-  global.ORG = githubSecrets.organisation
-  global.KEY = Buffer.from(githubSecrets.key_pem_b64, 'base64').toString()
-  global.APP_ID = githubSecrets.app_id
-  global.INSTALLATION_ID = githubSecrets.app_installation_id
-  global.CLIENT_ID = githubSecrets.client_id
-  global.CLIENT_SECRET = githubSecrets.client_secret
+  global.GITHUB_ORG = githubSecrets.organisation
+  global.GITHUB_KEY = Buffer.from(githubSecrets.key_pem_b64, 'base64').toString()
+  global.GITHUB_APP_ID = githubSecrets.app_id
+  global.GITHUB_INSTALLATION_ID = githubSecrets.app_installation_id
+  global.GITHUB_CLIENT_ID = githubSecrets.client_id
+  global.GITHUB_CLIENT_SECRET = githubSecrets.client_secret
 }
 
 function checkEnvIsSet () {
-  throwIfNotSet(ORG)
-  throwIfNotSet(KEY)
-  throwIfNotSet(APP_ID)
-  throwIfNotSet(INSTALLATION_ID)
-  throwIfNotSet(CLIENT_ID)
-  throwIfNotSet(CLIENT_SECRET)
+  throwIfNotSet(GITHUB_ORG)
+  throwIfNotSet(GITHUB_KEY)
+  throwIfNotSet(GITHUB_APP_ID)
+  throwIfNotSet(GITHUB_INSTALLATION_ID)
+  throwIfNotSet(GITHUB_CLIENT_ID)
+  throwIfNotSet(GITHUB_CLIENT_SECRET)
 }
 
 function throwIfNotSet (name) {
@@ -56,12 +56,12 @@ function throwIfNotSet (name) {
 
 function loadEnvFromProcessEnv () {
   console.log('Loading env from process env')
-  setGlobal('ORG')
-  setGlobal('KEY')
-  setGlobal('APP_ID')
-  setGlobal('INSTALLATION_ID')
-  setGlobal('CLIENT_ID')
-  setGlobal('CLIENT_SECRET')
+  setGlobal('GITHUB_ORG')
+  setGlobal('GITHUB_KEY')
+  setGlobal('GITHUB_APP_ID')
+  setGlobal('GITHUB_INSTALLATION_ID')
+  setGlobal('GITHUB_CLIENT_ID')
+  setGlobal('GITHUB_CLIENT_SECRET')
 }
 
 function setGlobal (key) {
