@@ -16,11 +16,13 @@ credentials_json=$(echo $credentials_json_b64 | base64 -d)
 echo $credentials_json > auth.json
 auth_path=$(realpath auth.json)
 
+google_region=$(jq -r .google.region $1)
 google_zone=$(jq -r .google.zone $1)
 google_env=$(jq -r .google.env $1)
 google_project=$(jq -r .google.project $1)
 
 export GOOGLE_APPLICATION_CREDENTIALS=$auth_path
+export GOOGLE_REGION=$google_region
 export GOOGLE_ZONE=$google_zone
 export GOOGLE_ENV=$google_env
 export GOOGLE_PROJECT=$google_project

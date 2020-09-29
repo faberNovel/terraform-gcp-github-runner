@@ -9,7 +9,8 @@ The script will:
 - parse google-dev.tfvars.json, github.auto.tfvars.json and terraform.tfvars.json from the root folder of the project 
 - export google and github env vars (if sourced)
 - generate .env file from calling directory
-
+Warning : Values are evaluated from best effort parsing of terraform vars files. As some values are
+locals terraform vars or constants, this script could need update in the future.
 EOF
 
 baseDir=$(pwd)
@@ -25,7 +26,7 @@ cd "$baseDir"
 
 # clear .env file
 > .env
-# generate .env file
+# generate .env file.
 echo "GOOGLE_APPLICATION_CREDENTIALS=$GOOGLE_APPLICATION_CREDENTIALS" >> .env
 echo "GOOGLE_ZONE=$GOOGLE_ZONE" >> .env
 echo "GOOGLE_ENV=$GOOGLE_ENV" >> .env
@@ -35,5 +36,6 @@ echo "RUNNER_TOTAL_COUNT=$RUNNER_TOTAL_COUNT" >> .env
 echo "RUNNER_SERVICE_ACCOUNT=runner-user@$GOOGLE_PROJECT.iam.gserviceaccount.com" >> .env
 echo "SECRET_GITHUB_JSON_RESOURCE_NAME=projects/$GOOGLE_PROJECT/secrets/github-json/versions/latest" >> .env
 echo "SECRET_GITHUB_JSON_ID=github-json" >> .env
+echo "GITHUB_API_TRIGGER_URL=https://$GOOGLE_REGION-$GOOGLE_PROJECT.cloudfunctions.net/github_api_function" >> .env
 
 eval "$saved_options"

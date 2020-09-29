@@ -28,7 +28,6 @@ module "start_and_stop" {
   source                 = "./modules/start-and-stop"
   google                 = var.google
   runner                 = var.runner
-  secret_github_json     = module.secrets.secret_github_json
   github_api_trigger_url = module.github_api.github_api_trigger_url
 
   depends_on = [google_project_service.gcp_services]
@@ -38,7 +37,8 @@ module "github_api" {
   source             = "./modules/github-api"
   secret_github_json = module.secrets.secret_github_json
   google             = var.google
-  depends_on         = [google_project_service.gcp_services]
+
+  depends_on = [google_project_service.gcp_services]
 }
 
 module "secrets" {

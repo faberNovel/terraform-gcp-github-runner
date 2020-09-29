@@ -1,9 +1,8 @@
 const Compute = require('@google-cloud/compute')
-const GithubHelper = require('./github-helper.js')
+const { GoogleAuth } = require('google-auth-library')
 const compute = new Compute()
 const zone = compute.zone(process.env.GOOGLE_ZONE)
-
-/* global ORG */
+const auth = new GoogleAuth()
 
 module.exports.startAndStop = async (data, context) => {
   try {
@@ -26,6 +25,8 @@ module.exports.startAndStop = async (data, context) => {
 }
 
 module.exports.dev = async () => {
+  console.info(await getRunnersGitHubStatus())
+
   const vm = await createVm(true, '1')
   console.log('deleting VM ...')
   const [operation] = await vm.delete()
@@ -133,11 +134,16 @@ async function stopInstances (vms, force) {
 }
 
 async function getRunnersGitHubStatus () {
-  const octokit = await GithubHelper.getOctokit()
-  const response = await octokit.actions.listSelfHostedRunnersForOrg({
-    org: ORG
+  const githubApiFunctionUrl = process.env.GITHUB_API_TRIGGER_URL
+  const client = await auth.getIdTokenClient(githubApiFunctionUrl)
+  const res = await client.request({
+    url: githubApiFunctionUrl,
+    method: 'POST',
+    data: {
+      action: 'listSelfHostedRunnersForOrg'
+    }
   })
-  return response.data.runners
+  return res.data.runners
 }
 
 function getRunnerGitHubStatusByName (githubRunners, name) {
