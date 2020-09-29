@@ -109,3 +109,8 @@ resource "google_project_iam_member" "runner_cloudfunctions_invoker" {
   role   = "roles/cloudfunctions.invoker"
   member = "serviceAccount:${google_service_account.runner.email}"
 }
+
+resource "google_project_iam_member" "runner_logging_logwriter" {
+  role   = "roles/logging.logWriter"
+  member = "serviceAccount:${google_service_account.runner.email}"
+}

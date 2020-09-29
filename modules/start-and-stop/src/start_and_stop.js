@@ -1,5 +1,6 @@
 const Compute = require('@google-cloud/compute')
 const { GoogleAuth } = require('google-auth-library')
+const Fs = require('fs')
 const compute = new Compute()
 const zone = compute.zone(process.env.GOOGLE_ZONE)
 const auth = new GoogleAuth()
@@ -51,6 +52,7 @@ function createVmName (runnerId) {
 }
 
 function createVmConfig (isIdle, env) {
+  const startScript = Fs.readFileSync('runner-start-script.sh', 'utf8')
   const config = {
     machineType: process.env.RUNNER_MACHINE_TYPE,
     http: true,
@@ -90,6 +92,10 @@ function createVmConfig (isIdle, env) {
         {
           value: process.env.GITHUB_ORG,
           key: 'github-org'
+        },
+        {
+          value: startScript,
+          key: 'startup-script'
         }
       ]
     }
