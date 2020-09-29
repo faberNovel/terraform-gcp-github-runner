@@ -140,7 +140,11 @@ async function getRunnersGitHubStatus () {
     url: githubApiFunctionUrl,
     method: 'POST',
     data: {
-      action: 'listSelfHostedRunnersForOrg'
+      scope: 'actions',
+      function: 'listSelfHostedRunnersForOrg',
+      params: {
+        org: process.env.ORG
+      }
     }
   })
   return res.data.runners

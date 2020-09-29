@@ -33,6 +33,7 @@ resource "google_cloudfunctions_function" "start_and_stop" {
     "RUNNER_TOTAL_COUNT"     = var.runner.total_count
     "RUNNER_SERVICE_ACCOUNT" = google_service_account.runner.email
     "GITHUB_API_TRIGGER_URL" = var.github_api_trigger_url
+    "ORG"                    = var.github_org
   }
 
   event_trigger {

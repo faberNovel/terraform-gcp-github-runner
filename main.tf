@@ -29,6 +29,7 @@ module "start_and_stop" {
   google                 = var.google
   runner                 = var.runner
   github_api_trigger_url = module.github_api.github_api_trigger_url
+  github_org             = var.github.organisation
 
   depends_on = [google_project_service.gcp_services]
 }

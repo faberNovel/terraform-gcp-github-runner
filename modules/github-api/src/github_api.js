@@ -1,6 +1,5 @@
 const GithubHelper = require('./github-helper.js')
-
-/* global ORG */
+const Util = require('util')
 
 /**
  * HTTP Cloud Function.
@@ -12,9 +11,9 @@ const GithubHelper = require('./github-helper.js')
  */
 module.exports.githubApi = async (req, res) => {
   try {
-    console.log(`Received req ${req}`)
+    console.log(`Received req with body: ${Util.inspect(req.body, { depth: 0 })}`)
     validateRequest(req)
-    const apiResult = await getApiResult(req.body.action)
+    const apiResult = await getApiResult(req.body.scope, req.body.function, req.body.params)
     res.status(200).send(apiResult)
   } catch (err) {
     console.log(err)
@@ -23,63 +22,30 @@ module.exports.githubApi = async (req, res) => {
 }
 
 module.exports.dev = async () => {
-  const apiResult = await getApiResult('listSelfHostedRunnersForOrg')
+  const apiResult = await getApiResult('actions', 'listSelfHostedRunnersForOrg', { org: 'fabernovel' })
   console.log(apiResult)
 }
 
-async function getApiResult (action) {
-  const apiCall = (function (color) {
-    switch (color) {
-      case 'createRegistrationTokenForOrg':
-        return createRegistrationTokenForOrg()
-      case 'createRemoveTokenForOrg':
-        return createRemoveTokenForOrg()
-      case 'listSelfHostedRunnersForOrg':
-        return listSelfHostedRunnersForOrg()
-      default:
-        throw new Error(`action ${action} invalid`)
-    }
-  })(action)
+async function getApiResult (scopeName, functionName, params) {
+  console.log(`calling octokit.${scopeName}.${functionName}(${Util.inspect(params)})`)
+  const octokit = await GithubHelper.getOctokit()
+  const apiCall = octokit[scopeName][functionName](params)
   const apiResult = await apiCall
   return apiResult.data
 }
 
-async function createRegistrationTokenForOrg () {
-  console.log('createRegistrationTokenForOrg...')
-  const octokit = await GithubHelper.getOctokit()
-  const response = await octokit.actions.createRegistrationTokenForOrg({
-    org: ORG
-  })
-  console.log('createRegistrationTokenForOrg done')
-  return response
-}
-
-async function createRemoveTokenForOrg () {
-  console.log('createRemoveTokenForOrg...')
-  const octokit = await GithubHelper.getOctokit()
-  const response = await octokit.actions.createRemoveTokenForOrg({
-    org: ORG
-  })
-  console.log('createRemoveTokenForOrg done')
-  return response
-}
-
-async function listSelfHostedRunnersForOrg () {
-  console.log('listSelfHostedRunnersForOrg...')
-  const octokit = await GithubHelper.getOctokit()
-  const response = await octokit.actions.listSelfHostedRunnersForOrg({
-    org: ORG
-  })
-  console.log('listSelfHostedRunnersForOrg done')
-  return response
-}
-
 function validateRequest (request) {
   if (request.method !== 'POST') {
-    throw new Error('Only POST supported')
+    throw new Error('Only POST method supported')
   }
-  if (!request.body.action) {
-    throw new Error('\'action\' missing from json body')
+  if (!request.body.scope) {
+    throw new Error('\'scope\' missing from json body')
+  }
+  if (!request.body.function) {
+    throw new Error('\'function\' missing from json body')
+  }
+  if (!request.body.params) {
+    throw new Error('\'params\' missing from json body')
   }
   return request
 }
