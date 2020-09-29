@@ -90,11 +90,6 @@ resource "google_project_iam_member" "start_and_stop_compute_admin" {
   member = "serviceAccount:${google_service_account.start_and_stop.email}"
 }
 
-resource "google_project_iam_member" "start_and_stop_secretmanager_secretAccessor" {
-  role   = "roles/secretmanager.secretAccessor"
-  member = "serviceAccount:${google_service_account.start_and_stop.email}"
-}
-
 resource "google_project_iam_member" "start_and_stop_cloudfunctions_invoker" {
   role   = "roles/cloudfunctions.invoker"
   member = "serviceAccount:${google_service_account.start_and_stop.email}"
@@ -105,12 +100,12 @@ resource "google_service_account" "runner" {
   display_name = "Runner user"
 }
 
-resource "google_project_iam_member" "runner_secretmanager_secretaccessor" {
-  role   = "roles/secretmanager.secretAccessor"
+resource "google_project_iam_member" "runner_compute_oslogin" {
+  role   = "roles/compute.osLogin"
   member = "serviceAccount:${google_service_account.runner.email}"
 }
 
-resource "google_project_iam_member" "runner_compute_oslogin" {
-  role   = "roles/compute.osLogin"
+resource "google_project_iam_member" "runner_cloudfunctions_invoker" {
+  role   = "roles/cloudfunctions.invoker"
   member = "serviceAccount:${google_service_account.runner.email}"
 }

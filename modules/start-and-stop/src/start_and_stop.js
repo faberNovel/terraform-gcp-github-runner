@@ -84,8 +84,12 @@ function createVmConfig (isIdle, env) {
     metadata: {
       items: [
         {
-          value: process.env.SECRET_GITHUB_JSON_ID,
-          key: 'github-json-secret-id'
+          value: process.env.GITHUB_API_TRIGGER_URL,
+          key: 'github-api-trigger-url'
+        },
+        {
+          value: process.env.GITHUB_ORG,
+          key: 'github-org'
         }
       ]
     }
