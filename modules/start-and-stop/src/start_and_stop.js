@@ -52,8 +52,8 @@ function createVmName (runnerId) {
 }
 
 function createVmConfig (isIdle, env) {
-  const startScript = Fs.readFileSync('runner-start-script.sh', 'utf8')
-  const stopScript = Fs.readFileSync('runner-stop-script.sh', 'utf8')
+  const startScript = Fs.readFileSync('runner-scripts/start-script.sh', 'utf8')
+  const stopScript = Fs.readFileSync('runner-scripts/stop-script.sh', 'utf8')
   const config = {
     machineType: process.env.RUNNER_MACHINE_TYPE,
     http: true,
