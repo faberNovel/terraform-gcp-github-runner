@@ -12,6 +12,9 @@ while true; do
   esac
 done
 
+# Hack to ensure VM is well started
+sleep 15
+
 sudo apt-get -y update
 
 ## Minimum tools
