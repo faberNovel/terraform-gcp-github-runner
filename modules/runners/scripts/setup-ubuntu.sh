@@ -18,9 +18,10 @@ sleep 15
 sudo apt-get -y update
 
 ## Minimum tools
-sudo apt-get -y install git
-sudo apt-get -y install curl
-sudo apt-get -y install jq
+sudo apt-get -y install \
+    git \
+    curl \
+    jq
 
 ## Docker
 sudo apt install -y docker.io
