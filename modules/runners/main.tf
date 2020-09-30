@@ -74,9 +74,8 @@ resource "google_compute_instance_from_template" "runner" {
   network_interface {
     network = "default"
 
-    # Associated our public IP address to this instance
     access_config {
-      nat_ip = google_compute_address.static[count.index].address
+      // ephemeral
     }
   }
 
@@ -109,11 +108,6 @@ resource "google_compute_instance_from_template" "runner" {
       "./setup-ubuntu.sh --token ${data.external.registration_token.result.token} --name ${self.name} --org ${var.github.organisation}"
     ]
   }
-}
-
-resource "google_compute_address" "static" {
-  count = var.runner.total_count
-  name  = "vm-public-address-${random_id.instance_id[count.index].hex}"
 }
 
 resource "null_resource" "unregister-runners" {
