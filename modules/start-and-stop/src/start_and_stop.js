@@ -128,6 +128,19 @@ async function stopInstances (vms, force) {
   // TODO : Stop and delete non idle runners
 }
 
+async function scaleIdleRunners () {
+  const idleRunners = await getInstances(true)
+  const targetIdleRunnersCount = process.env.RUNNER_IDLE_COUNT
+  const idleRunnerDelta = targetIdleRunnersCount - idleRunners.length
+  if (idleRunnerDelta < 0) {
+    console.log('idle runners in excess, reducing idle runners')
+  } else if (idleRunnerDelta > 0) {
+    console.log(`not enough idle runners, increasing idle runners by ${idleRunnerDelta}`)
+  } else {
+    console.log('consistent idle runners count detected')
+  }
+}
+
 async function getRunnersGitHubStatus () {
   const githubApiFunctionUrl = process.env.GITHUB_API_TRIGGER_URL
   const client = await auth.getIdTokenClient(githubApiFunctionUrl)
