@@ -26,12 +26,14 @@ module.exports.startAndStop = async (data, context) => {
 
 module.exports.dev = async () => {
   console.info(await getRunnersGitHubStatus())
-
+  startInstances()
+/*
   const vm = await createVm(true, '1')
   console.log('deleting VM ...')
   const [operation] = await vm.delete()
   await operation.promise()
   console.log('VM deleted')
+  */
 }
 
 async function getInstances (idle) {
@@ -60,6 +62,13 @@ async function scaleIdleRunners () {
   const idleRunnerDelta = targetIdleRunnersCount - idleRunners.length
   if (idleRunnerDelta < 0) {
     console.log('idle runners in excess, reducing idle runners')
+    const deletePromises = []
+    for (let i = 0; i < Math.abs(idleRunnersDelta); i++) {
+      deletePromises[i] = idleRunners[i].delete()
+    }
+    console.log(deletePromises)
+    await Promise.all(deletePromises)
+    console.log('reducing idle runners succeed')
   } else if (idleRunnerDelta > 0) {
     console.log(`not enough idle runners, increasing idle runners by ${idleRunnerDelta}`)
     const createPromises = []
@@ -68,7 +77,7 @@ async function scaleIdleRunners () {
     }
     console.log(createPromises)
     await Promise.all(createPromises)
-    console.log('increasing idle runners with succeed')
+    console.log('increasing idle runners succeed')
   } else {
     console.log('consistent idle runners count detected')
   }
