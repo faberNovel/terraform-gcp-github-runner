@@ -38,10 +38,11 @@ cd "/home/$RUNNER_USER"
 CLEANER_FILE="cleaner.sh"
 sudo -u $RUNNER_USER touch $CLEANER_FILE
 > $CLEANER_FILE
-echo "#!/bin/sh" >> $CLEANER_FILE
-echo "if [ $(id -u) -ne 0 ] ; then echo\"Please run as root\" ; exit 1 ; fi" >> $CLEANER_FILE
-echo "rm -r /home/ubuntu/actions-runner/_work/_temp" >> $CLEANER_FILE
-echo "docker image prune -a -f" >> $CLEANER_FILE
+cat << EOF > $CLEANER_FILE
+if [ $(id -u) -ne 0 ] ; then echo\"Please run as root\" ; exit 1 ; fi
+rm -r /home/ubuntu/actions-runner/_work/_temp
+docker image prune -a -f
+EOF
 echo "0 */6 * * * sudo sh /home/$RUNNER_USER/$CLEANER_FILE >> /home/$RUNNER_USER/cron-cleaner-log 2>&1" | sudo -u $RUNNER_USER crontab -
 
 log_debug "runner software setup done, start runner registration"
@@ -63,7 +64,7 @@ fi
 
 ## Runner
 cd "/home/$RUNNER_USER"
-sudo -u $RUNNER_USER mkdir actions-runner && cd actions-runner
+sudo -u $RUNNER_USER mkdir actions-runner && cd $_
 sudo -u $RUNNER_USER curl -O -L https://github.com/actions/runner/releases/download/v2.169.1/actions-runner-linux-x64-2.169.1.tar.gz
 sudo -u $RUNNER_USER tar xzf ./actions-runner-linux-x64-2.169.1.tar.gz
 sudo -u $RUNNER_USER ./config.sh  --unattended --url https://github.com/$GITHUB_ORG --token $REGISTRATION_TOKEN --labels docker --name $HOSTNAME
