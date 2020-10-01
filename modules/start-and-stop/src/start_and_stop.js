@@ -11,12 +11,11 @@ module.exports.startAndStop = async (data, context) => {
     const payload = _validatePayload(
       JSON.parse(Buffer.from(data.data, 'base64').toString())
     )
-    const vms = await getInstances(payload.filter)
     if (payload.action === 'start') {
-      await startInstances(vms)
+      await startInstances()
     } else if (payload.action === 'stop') {
       const force = payload.force === true
-      await stopInstances(vms, force)
+      await stopInstances(force)
     }
     return Promise.resolve('startAndStop end')
   } catch (err) {
@@ -109,43 +108,24 @@ function createVmConfig (isIdle, env) {
   return config
 }
 
-async function getInstances (filter) {
-  console.log(`looking for instance(s) with filter ${filter}...`)
+async function getInstances (idle) {
+  const filter = `labels.env=${process.env.GOOGLE_ENV} AND labels.idle=${idle}`
+  console.log(`looking for instance(s) with filder : ${filter}`)
   const options = {
     filter: filter
   }
   const [vms] = await compute.getVMs(options)
-  console.log(`Found ${vms.length} VMs!`)
+  console.log(`Found ${vms.length} VMs`)
   return vms
 }
 
-async function startInstances (vms) {
-  console.log('Starting instance(s)')
-  await Promise.all(vms.map(async (vm) => {
-    console.log(`Starting instance : ${vm.name}`)
-    await vm.start()
-    Promise.resolve('instance started')
-  }))
-  console.log('Successfully started instance(s)')
+async function startInstances () {
+  // TODO : Ensure idle runners are running + start non idle runners
+  scaleIdleRunners()
 }
 
 async function stopInstances (vms, force) {
-  console.log(`Stopping instance(s), force = ${force}`)
-  const runnersGitHubStatus = await getRunnersGitHubStatus()
-  console.log(`runners github status = ${JSON.stringify(runnersGitHubStatus)}`)
-  await Promise.all(vms.map(async (vm) => {
-    console.log(`Trying to stop instance : ${vm.name}`)
-    const githubStatus = getRunnerGitHubStatusByName(runnersGitHubStatus, vm.name)
-    console.log(`GitHub status of instance : ${githubStatus}`)
-    if (githubStatus === 'busy' && force === false) {
-      console.log(`Instance busy, not stopping : ${vm.name}`)
-    } else {
-      console.log(`Stopping instance : ${vm.name}`)
-      await vm.stop()
-    }
-    Promise.resolve(`trying to stopping instance end : ${vm.name}`)
-  }))
-  console.log('Finishing stopping stopped instance(s)')
+  // TODO : Stop and delete non idle runners
 }
 
 async function getRunnersGitHubStatus () {
