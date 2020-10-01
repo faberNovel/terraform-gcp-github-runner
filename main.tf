@@ -25,13 +25,19 @@ terraform {
 }
 
 module "start_and_stop" {
-  source = "./modules/start-and-stop"
-  google = var.google
-  runner = var.runner
-  secret_github_json = {
-    id            = module.secrets.secret_github_json.id
-    resource_name = module.secrets.secret_github_json.resource_name
-  }
+  source                 = "./modules/start-and-stop"
+  google                 = var.google
+  runner                 = var.runner
+  github_api_trigger_url = module.github_api.github_api_trigger_url
+  github_org             = var.github.organisation
+
+  depends_on = [google_project_service.gcp_services]
+}
+
+module "github_api" {
+  source             = "./modules/github-api"
+  secret_github_json = module.secrets.secret_github_json
+  google             = var.google
 
   depends_on = [google_project_service.gcp_services]
 }

@@ -1,27 +1,28 @@
 {
-  "name": "start_and_stop",
+  "name": "github_api",
   "version": "1.0.0",
-  "main": "start_and_stop.js",
+  "main": "github_api.js",
   "license": "MIT",
   "engines": {
     "node": "12"
   },
   "scripts": {
-    "run": "node -e 'require(\"./start_and_stop.js\").startAndStop()'",
+    "run": "node -e 'require(\"./github_api.js\").githubApi()'",
     "predev": "bash ../../../.tools/setup.sh",
-    "dev": "node -r dotenv/config -e 'require(\"./start_and_stop.js\").dev()'",
-    "test": "mocha start_and_stop.test.js"
+    "dev": "node -r dotenv/config -e 'require(\"./github_api.js\").dev()'",
+    "test": "mocha github_api.test.js"
   },
   "dependencies": {
-    "@google-cloud/compute": "^2.1.0",
-    "google-auth-library": "^6.1.0"
-  },
-  "devDependencies": {
-    "dotenv": "^8.2.0",
+    "@google-cloud/secret-manager": "^3.1.0",
+    "@octokit/auth-app": "^2.4.14",
+    "@octokit/rest": "^18.0.3",
     "chai": "^4.2.0",
     "chai-as-promised": "^7.1.1",
+    "dotenv": "^8.2.0",
     "mocha": "^8.1.1",
-    "sinon": "^9.0.3",
+    "sinon": "^9.0.3"
+  },
+  "devDependencies": {
     "eslint": "^7.7.0",
     "eslint-config-standard": "^14.1.1",
     "eslint-plugin-import": "^2.22.0",
