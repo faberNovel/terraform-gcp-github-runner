@@ -1,11 +1,12 @@
 const Compute = require('@google-cloud/compute')
 const Fs = require('fs')
+const short = require('short-uuid')
 const compute = new Compute()
 const zone = compute.zone(process.env.GOOGLE_ZONE)
 
-module.exports.createVm = async function createVm (isIdle, id) {
+module.exports.createVm = async function createVm (isIdle) {
   console.log('create VM ...')
-  const [vm, operation] = await zone.createVM(createVmName(id), createVmConfig(isIdle, process.env.GOOGLE_ENV))
+  const [vm, operation] = await zone.createVM(createVmName(), createVmConfig(isIdle, process.env.GOOGLE_ENV))
   console.log(vm)
   console.log('Creating VM ...')
   await operation.promise()
@@ -13,8 +14,9 @@ module.exports.createVm = async function createVm (isIdle, id) {
   return vm
 }
 
-function createVmName (runnerId) {
-  const vmName = `vm-gcp-github-action-runner-${process.env.GOOGLE_ENV}-${runnerId}`
+function createVmName () {
+  const runnerId = short.generate()
+  const vmName = `vm-gcp-${process.env.GOOGLE_ENV}-${runnerId}`
   console.log(`vm name created : ${vmName}`)
   return vmName
 }

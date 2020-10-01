@@ -62,6 +62,13 @@ async function scaleIdleRunners () {
     console.log('idle runners in excess, reducing idle runners')
   } else if (idleRunnerDelta > 0) {
     console.log(`not enough idle runners, increasing idle runners by ${idleRunnerDelta}`)
+    const createPromises = []
+    for (let i = 0; i < idleRunnerDelta; i++) {
+      createPromises[i] = CreateVMHelper.createVm(true)
+    }
+    console.log(createPromises)
+    await Promise.all(createPromises)
+    console.log('increasing idle runners with succeed')
   } else {
     console.log('consistent idle runners count detected')
   }
