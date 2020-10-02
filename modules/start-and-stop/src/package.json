@@ -15,7 +15,7 @@
   "dependencies": {
     "@google-cloud/compute": "^2.1.0",
     "google-auth-library": "^6.1.0",
-    "short-uuid": "^4.1.0"
+    "uuid": "^8.3.0"
   },
   "devDependencies": {
     "dotenv": "^8.2.0",
