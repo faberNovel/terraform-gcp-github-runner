@@ -2,7 +2,6 @@ const Compute = require('@google-cloud/compute')
 const { GoogleAuth } = require('google-auth-library')
 const CreateVMHelper = require('./create_vm_helper.js')
 const compute = new Compute()
-const zone = compute.zone(process.env.GOOGLE_ZONE)
 const auth = new GoogleAuth()
 
 module.exports.startAndStop = async (data, context) => {
@@ -26,33 +25,51 @@ module.exports.startAndStop = async (data, context) => {
 
 module.exports.dev = async () => {
   startRunners()
-/*
-  const vm = await createVm(true, '1')
-  console.log('deleting VM ...')
-  const [operation] = await vm.delete()
-  await operation.promise()
-  console.log('VM deleted')
-  */
+  // stopRunners(true)
+}
+
+async function startRunners () {
+  await scaleUpNonIdleRunners()
+  await scaleIdleRunners()
+}
+
+async function stopRunners (force) {
+  await scaleDownNonIdleRunners(force)
+}
+
+async function scaleUpNonIdleRunners () {
+  const idle = false
+  const targetRunnerCountDelta = await getTargetRunnerCountDelta(idle)
+  if (targetRunnerCountDelta > 0) {
+    scaleUpRunners(idle, targetRunnerCountDelta)
+  }
+}
+
+async function scaleIdleRunners () {
+  const idle = true
+  const targetRunnerCountDelta = await getTargetRunnerCountDelta(idle)
+  if (targetRunnerCountDelta > 0) {
+    scaleUpRunners(idle, targetRunnerCountDelta)
+  } else if (targetRunnerCountDelta < 0) {
+    scaleDownRunners(idle, Math.abs(targetRunnerCountDelta), true)
+  } else {
+    console.log('idle runners reached, no scale to apply')
+  }
+}
+
+async function scaleDownNonIdleRunners (force) {
+  const idle = false
+  const runnerVms = await getRunnerVMs(idle)
+  scaleDownRunners(idle, runnerVms.length, force)
 }
 
 async function getRunnerVMs (idle) {
   const filter = `labels.env=${process.env.GOOGLE_ENV} AND labels.idle=${idle}`
-  console.log(`looking for runner VM(s) with filter : ${filter}`)
   const options = {
     filter: filter
   }
   const [vms] = await compute.getVMs(options)
-  console.log(`found ${vms.length} runners VMs with filder : ${filter}`)
   return vms
-}
-
-async function startRunners () {
-  // TODO : Ensure idle runners are running + start non idle runners
-  scaleIdleRunners()
-}
-
-async function stopRunners (vms, force) {
-  // TODO : Stop and delete non idle runners
 }
 
 function getTargetRunnersCount (idle) {
@@ -81,23 +98,28 @@ async function scaleUpRunners (idle, count) {
   console.log(`scale up runners idle:${idle} by ${count} succeed`)
 }
 
-async function scaleDownRunners (idle, count) {
-  console.log(`scale down runners idle:${idle} by ${count}...`)
-  const deletePromises = []
-  for (let i = 0; i < count; i++) {
-    deletePromises[i] = idleRunners[i].delete()
+async function scaleDownRunners (idle, count, force) {
+  console.log(`scale down runners idle:${idle}, force:${force}, by ${count}...`)
+  const runnerVMs = await getRunnerVMs(idle)
+  if (runnerVMs.length === 0) {
+    console.info('runners already 0, nothing to scale down')
+    return
   }
-  await Promise.all(deletePromises)
-  console.log(`scale down runners idle:${idle} by ${count} succeed`)
-}
-
-async function scaleIdleRunners () {
-  const targetRunnerCountDelta = await getTargetRunnerCountDelta(true)
-  if (targetRunnerCountDelta > 0) {
-    scaleUpRunners(true, targetRunnerCountDelta)
-  } else if (targetRunnerCountDelta < 0) {
-    scaleDownRunners(true, Math.abs(targetRunnerCountDelta))
-  }
+  const runnerGitHubStates = await getRunnerGitHubStates()
+  const runnerVMsToDelete = runnerVMs.slice(-count)
+  await Promise.all(runnerVMsToDelete.map(async (runnerVM) => {
+    console.log(`trying to delete runner : ${runnerVM.name}`)
+    const githubStatus = getRunnerGitHubStateByName(runnerGitHubStates, runnerVM.name)
+    console.log(`GitHub status of runner : ${githubStatus}`)
+    if (githubStatus === 'busy' && force === false) {
+      console.log(`runner busy, not deleting : ${runnerVM.name}`)
+    } else {
+      console.log(`deleting instance : ${runnerVM.name}`)
+      await runnerVM.delete()
+    }
+    Promise.resolve(`trying to delete instance end : ${runnerVM.name}`)
+  }))
+  console.log(`scale down runners idle:${idle}, force:${force} end`)
 }
 
 async function getRunnerGitHubStates () {
@@ -121,6 +143,9 @@ function getRunnerGitHubStateByName (githubRunners, name) {
   const [githubRunner] = githubRunners.filter(runner => {
     return runner.name === name
   })
+  if (githubRunner === undefined) {
+    return undefined
+  }
   return githubRunner.status
 }
 
