@@ -8,14 +8,14 @@ const auth = new GoogleAuth()
 module.exports.startAndStop = async (data, context) => {
   try {
     console.log('startAndStop...')
-    const payload = _validatePayload(
+    const payload = validatePayload(
       JSON.parse(Buffer.from(data.data, 'base64').toString())
     )
     if (payload.action === 'start') {
-      await startInstances()
+      await startRunners()
     } else if (payload.action === 'stop') {
       const force = payload.force === true
-      await stopInstances(force)
+      await stopRunners(force)
     }
     return Promise.resolve('startAndStop end')
   } catch (err) {
@@ -25,8 +25,8 @@ module.exports.startAndStop = async (data, context) => {
 }
 
 module.exports.dev = async () => {
-  console.info(await getRunnersGitHubStatus())
-  startInstances()
+  console.info(await getRunnerGitHubStates())
+  startRunners()
 /*
   const vm = await createVm(true, '1')
   console.log('deleting VM ...')
@@ -36,32 +36,34 @@ module.exports.dev = async () => {
   */
 }
 
-async function getInstances (idle) {
+async function getRunnerVMs (idle) {
   const filter = `labels.env=${process.env.GOOGLE_ENV} AND labels.idle=${idle}`
-  console.log(`looking for instance(s) with filder : ${filter}`)
+  console.log(`looking for runner VM(s) with filter : ${filter}`)
   const options = {
     filter: filter
   }
   const [vms] = await compute.getVMs(options)
-  console.log(`Found ${vms.length} VMs`)
+  console.log(`found ${vms.length} runners VMs with filder : ${filter}`)
   return vms
 }
 
-async function startInstances () {
+async function startRunners () {
   // TODO : Ensure idle runners are running + start non idle runners
   scaleIdleRunners()
 }
 
-async function stopInstances (vms, force) {
+async function stopRunners (vms, force) {
   // TODO : Stop and delete non idle runners
 }
 
 async function scaleIdleRunners () {
-  const idleRunners = await getInstances(true)
+  console.log('start scaling idle runners ...')
+  const idleRunners = await getRunnerVMs(true)
   const targetIdleRunnersCount = process.env.RUNNER_IDLE_COUNT
   const idleRunnerDelta = targetIdleRunnersCount - idleRunners.length
+  console.log(`target idle runners count : ${targetIdleRunnersCount}, current idle runners count : ${idleRunners.length}`)
   if (idleRunnerDelta < 0) {
-    console.log('idle runners in excess, reducing idle runners')
+    console.log(`idle runners in excess, reducing idle runners by ${Math.abs(idleRunnerDelta)}`)
     const deletePromises = []
     for (let i = 0; i < Math.abs(idleRunnersDelta); i++) {
       deletePromises[i] = idleRunners[i].delete()
@@ -83,7 +85,7 @@ async function scaleIdleRunners () {
   }
 }
 
-async function getRunnersGitHubStatus () {
+async function getRunnerGitHubStates () {
   const githubApiFunctionUrl = process.env.GITHUB_API_TRIGGER_URL
   const client = await auth.getIdTokenClient(githubApiFunctionUrl)
   const res = await client.request({
@@ -100,20 +102,14 @@ async function getRunnersGitHubStatus () {
   return res.data.runners
 }
 
-function getRunnerGitHubStatusByName (githubRunners, name) {
+function getRunnerGitHubStateByName (githubRunners, name) {
   const [githubRunner] = githubRunners.filter(runner => {
     return runner.name === name
   })
   return githubRunner.status
 }
 
-/**
- * Validates that a request payload contains the expected fields.
- *
- * @param {!object} payload the request payload to validate.
- * @return {!object} the payload object.
- */
-const _validatePayload = (payload) => {
+function validatePayload (payload) {
   if (!payload.filter) {
     throw new Error('Attribute \'filter\' missing from payload')
   }
