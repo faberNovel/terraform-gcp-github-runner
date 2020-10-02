@@ -25,7 +25,6 @@ module.exports.startAndStop = async (data, context) => {
 }
 
 module.exports.dev = async () => {
-  console.info(await getRunnerGitHubStates())
   startRunners()
 /*
   const vm = await createVm(true, '1')
@@ -56,32 +55,48 @@ async function stopRunners (vms, force) {
   // TODO : Stop and delete non idle runners
 }
 
-async function scaleIdleRunners () {
-  console.log('start scaling idle runners ...')
-  const idleRunners = await getRunnerVMs(true)
-  const targetIdleRunnersCount = process.env.RUNNER_IDLE_COUNT
-  const idleRunnerDelta = targetIdleRunnersCount - idleRunners.length
-  console.log(`target idle runners count : ${targetIdleRunnersCount}, current idle runners count : ${idleRunners.length}`)
-  if (idleRunnerDelta < 0) {
-    console.log(`idle runners in excess, reducing idle runners by ${Math.abs(idleRunnerDelta)}`)
-    const deletePromises = []
-    for (let i = 0; i < Math.abs(idleRunnersDelta); i++) {
-      deletePromises[i] = idleRunners[i].delete()
-    }
-    console.log(deletePromises)
-    await Promise.all(deletePromises)
-    console.log('reducing idle runners succeed')
-  } else if (idleRunnerDelta > 0) {
-    console.log(`not enough idle runners, increasing idle runners by ${idleRunnerDelta}`)
-    const createPromises = []
-    for (let i = 0; i < idleRunnerDelta; i++) {
-      createPromises[i] = CreateVMHelper.createVm(true)
-    }
-    console.log(createPromises)
-    await Promise.all(createPromises)
-    console.log('increasing idle runners succeed')
+function getTargetRunnersCount (idle) {
+  if (idle) {
+    return process.env.RUNNER_IDLE_COUNT
   } else {
-    console.log('consistent idle runners count detected')
+    return process.env.RUNNER_TOTAL_COUNT - process.env.RUNNER_IDLE_COUNT
+  }
+}
+
+async function getTargetRunnerCountDelta (idle) {
+  const runnerVms = await getRunnerVMs(idle)
+  const targetRunnersCount = getTargetRunnersCount(idle)
+  console.log(`runners idle:${idle}, target count=${targetRunnersCount}, current count=${runnerVms.length}`)
+  const targetRunnerCountDelta = targetRunnersCount - runnerVms.length
+  return targetRunnerCountDelta
+}
+
+async function scaleUpRunners (idle, count) {
+  console.log(`scale up runners idle:${idle} by ${count}...`)
+  const createPromises = []
+  for (let i = 0; i < count; i++) {
+    createPromises[i] = CreateVMHelper.createVm(true)
+  }
+  await Promise.all(createPromises)
+  console.log(`scale up runners idle:${idle} by ${count} succeed`)
+}
+
+async function scaleDownRunners (idle, count) {
+  console.log(`scale down runners idle:${idle} by ${count}...`)
+  const deletePromises = []
+  for (let i = 0; i < count; i++) {
+    deletePromises[i] = idleRunners[i].delete()
+  }
+  await Promise.all(deletePromises)
+  console.log(`scale down runners idle:${idle} by ${count} succeed`)
+}
+
+async function scaleIdleRunners () {
+  const targetRunnerCountDelta = await getTargetRunnerCountDelta(true)
+  if (targetRunnerCountDelta > 0) {
+    scaleUpRunners(true, targetRunnerCountDelta)
+  } else if (targetRunnerCountDelta < 0) {
+    scaleDownRunners(true, Math.abs(targetRunnerCountDelta))
   }
 }
 
