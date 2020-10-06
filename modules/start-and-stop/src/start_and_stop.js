@@ -74,7 +74,7 @@ async function getRunnerVMs (idle) {
 
 function getTargetRunnersCount (idle) {
   if (idle) {
-    return process.env.RUNNER_IDLE_COUNT
+    return Number(process.env.RUNNER_IDLE_COUNT)
   } else {
     return process.env.RUNNER_TOTAL_COUNT - process.env.RUNNER_IDLE_COUNT
   }
@@ -92,7 +92,7 @@ async function scaleUpRunners (idle, count) {
   console.log(`scale up runners idle:${idle} by ${count}...`)
   const createPromises = []
   for (let i = 0; i < count; i++) {
-    createPromises[i] = CreateVMHelper.createVm(true)
+    createPromises[i] = CreateVMHelper.createVm(idle)
   }
   await Promise.all(createPromises)
   console.log(`scale up runners idle:${idle} by ${count} succeed`)
