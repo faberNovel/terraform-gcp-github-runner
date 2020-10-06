@@ -54,7 +54,7 @@ resource "google_cloud_scheduler_job" "start_job" {
 
   pubsub_target {
     topic_name = google_pubsub_topic.start_and_stop.id
-    data       = base64encode("{\"action\":\"start\",\"filter\":\"labels.env=${var.google.env} AND labels.idle=false\"}")
+    data       = base64encode("{\"action\":\"start\"}")
   }
 }
 
@@ -65,7 +65,7 @@ resource "google_cloud_scheduler_job" "stop_job" {
 
   pubsub_target {
     topic_name = google_pubsub_topic.start_and_stop.id
-    data       = base64encode("{\"action\":\"stop\",\"filter\":\"labels.env=${var.google.env} AND labels.idle=false\"}")
+    data       = base64encode("{\"action\":\"stop\"}")
   }
 }
 
@@ -76,7 +76,7 @@ resource "google_cloud_scheduler_job" "force_stop_job" {
 
   pubsub_target {
     topic_name = google_pubsub_topic.start_and_stop.id
-    data       = base64encode("{\"action\":\"stop\", \"force\":\"true\", \"filter\":\"labels.env=${var.google.env} AND labels.idle=false\"}")
+    data       = base64encode("{\"action\":\"stop\", \"force\":\"true\"}")
   }
 }
 

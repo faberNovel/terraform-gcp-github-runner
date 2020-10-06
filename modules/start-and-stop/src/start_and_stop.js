@@ -1,22 +1,20 @@
 const Compute = require('@google-cloud/compute')
 const { GoogleAuth } = require('google-auth-library')
-const Fs = require('fs')
+const CreateVMHelper = require('./create_vm_helper.js')
 const compute = new Compute()
-const zone = compute.zone(process.env.GOOGLE_ZONE)
 const auth = new GoogleAuth()
 
 module.exports.startAndStop = async (data, context) => {
   try {
     console.log('startAndStop...')
-    const payload = _validatePayload(
+    const payload = validatePayload(
       JSON.parse(Buffer.from(data.data, 'base64').toString())
     )
-    const vms = await getInstances(payload.filter)
     if (payload.action === 'start') {
-      await startInstances(vms)
+      await startRunners()
     } else if (payload.action === 'stop') {
       const force = payload.force === true
-      await stopInstances(vms, force)
+      await stopRunners(force)
     }
     return Promise.resolve('startAndStop end')
   } catch (err) {
@@ -26,129 +24,161 @@ module.exports.startAndStop = async (data, context) => {
 }
 
 module.exports.dev = async () => {
-  console.info(await getRunnersGitHubStatus())
-
-  const vm = await createVm(true, '1')
-  console.log('deleting VM ...')
-  const [operation] = await vm.delete()
-  await operation.promise()
-  console.log('VM deleted')
+  // await startRunners()
+  // await stopRunners(true)
+  await healthCheck()
 }
 
-async function createVm (isIdle, id) {
-  console.log('create VM ...')
-  const [vm, operation] = await zone.createVM(createVmName(id), createVmConfig(isIdle, process.env.GOOGLE_ENV))
-  console.log(vm)
-  console.log('Creating VM ...')
-  await operation.promise()
-  console.log('VM created')
-  return vm
+async function startRunners () {
+  await scaleUpNonIdleRunners()
+  await scaleIdleRunners()
 }
 
-function createVmName (runnerId) {
-  const vmName = `vm-gcp-github-action-runner-${process.env.GOOGLE_ENV}-${runnerId}`
-  console.log(`vm name created : ${vmName}`)
-  return vmName
+async function stopRunners (force) {
+  await scaleDownNonIdleRunners(force)
 }
 
-function createVmConfig (isIdle, env) {
-  const startScript = Fs.readFileSync('runner-scripts/start-script.sh', 'utf8')
-  const stopScript = Fs.readFileSync('runner-scripts/stop-script.sh', 'utf8')
-  const config = {
-    machineType: process.env.RUNNER_MACHINE_TYPE,
-    http: true,
-    disks: [
-      {
-        boot: true,
-        autoDelete: true,
-        initializeParams: {
-          diskSizeGb: '40',
-          sourceImage: 'https://www.googleapis.com/compute/v1/projects/ubuntu-os-cloud/global/images/family/ubuntu-2004-lts'
-        }
-      }
-    ],
-    networkInterfaces: [
-      {
-        network: 'global/networks/default'
-      }
-    ],
-    labels: {
-      idle: isIdle,
-      env: env
-    },
-    serviceAccounts: [
-      {
-        email: process.env.RUNNER_SERVICE_ACCOUNT,
-        scopes: [
-          'https://www.googleapis.com/auth/cloud-platform'
-        ]
-      }
-    ],
-    metadata: {
-      items: [
-        {
-          value: process.env.GITHUB_API_TRIGGER_URL,
-          key: 'github-api-trigger-url'
-        },
-        {
-          value: process.env.GITHUB_ORG,
-          key: 'github-org'
-        },
-        {
-          value: startScript,
-          key: 'startup-script'
-        },
-        {
-          value: stopScript,
-          key: 'shutdown-script'
-        }
-      ]
-    }
+async function healthCheck () {
+  await removeOfflineOrDanglingRunners()
+  await startRunners()
+}
+
+async function removeOfflineOrDanglingRunners () {
+  const offlineGcpRunnerGitHubStates = await getOfflineGcpRunnerGitHubStates()
+  console.log(`Found ${offlineGcpRunnerGitHubStates.length} offline GitHub runner(s) ${offlineGcpRunnerGitHubStates.map(it => it.name)}`)
+  const danglingVMs = await getDanglingGcpVMs(offlineGcpRunnerGitHubStates)
+  console.log(`Found ${danglingVMs.length} dangling GCP runner(s) ${danglingVMs.map(it => it.metadata.name)}`)
+  if (danglingVMs.length > 0) {
+    console.log('Delete dangling GCP runners...')
+    Promise.all(danglingVMs.map(it => it.delete()))
+    console.log('Delete dangling GCP runners with success')
+  } else {
+    console.log('No dangling GCP runner to delete')
   }
-  console.log(`vm config created : ${config}`)
-  return config
+  if (offlineGcpRunnerGitHubStates.length > 0) {
+    console.log('Delete offline GitHub runners...')
+    const offlineGcpRunnerGitHubStatesIds = offlineGcpRunnerGitHubStates.map(it => it.id)
+    Promise.all(offlineGcpRunnerGitHubStatesIds.map(it => deleteRunnerGitHub(it)))
+    console.log('Delete offline GitHub runners with success')
+  } else {
+    console.log('No offline GitHub runner to delete')
+  }
 }
 
-async function getInstances (filter) {
-  console.log(`looking for instance(s) with filter ${filter}...`)
+async function getDanglingGcpVMs (offlineGcpRunnerGitHubStates) {
+  const vms = await getAllRunnerVMs()
+  const danglingVMs = vms.filter(function (vm) {
+    return offlineGcpRunnerGitHubStates.map(gh => gh.name).includes(vm.metadata.name)
+  })
+  return danglingVMs
+}
+
+async function getOfflineGcpRunnerGitHubStates () {
+  const runnerGitHubStates = await getRunnerGitHubStates()
+  const gcpRunnerGitHubStates = runnerGitHubStates.filter(function (runnerGitHubState) {
+    return runnerGitHubState.name.startsWith(getRunnerNamePrefix())
+  })
+  const offlineGcpRunnerGitHubStates = gcpRunnerGitHubStates.filter(function (gcpRunnerGitHubState) {
+    return gcpRunnerGitHubState.status === 'offline'
+  })
+  return offlineGcpRunnerGitHubStates
+}
+
+async function scaleUpNonIdleRunners () {
+  const idle = false
+  const targetRunnerCountDelta = await getTargetRunnerCountDelta(idle)
+  if (targetRunnerCountDelta > 0) {
+    scaleUpRunners(idle, targetRunnerCountDelta)
+  }
+}
+
+async function scaleIdleRunners () {
+  const idle = true
+  const targetRunnerCountDelta = await getTargetRunnerCountDelta(idle)
+  if (targetRunnerCountDelta > 0) {
+    scaleUpRunners(idle, targetRunnerCountDelta)
+  } else if (targetRunnerCountDelta < 0) {
+    scaleDownRunners(idle, Math.abs(targetRunnerCountDelta), true)
+  } else {
+    console.log('idle runners reached, no scale to apply')
+  }
+}
+
+async function scaleDownNonIdleRunners (force) {
+  const idle = false
+  const runnerVms = await getRunnerVMs(idle)
+  scaleDownRunners(idle, runnerVms.length, force)
+}
+
+async function getRunnerVMs (idle) {
+  const filter = `labels.env=${process.env.GOOGLE_ENV} AND labels.idle=${idle}`
   const options = {
     filter: filter
   }
   const [vms] = await compute.getVMs(options)
-  console.log(`Found ${vms.length} VMs!`)
   return vms
 }
 
-async function startInstances (vms) {
-  console.log('Starting instance(s)')
-  await Promise.all(vms.map(async (vm) => {
-    console.log(`Starting instance : ${vm.name}`)
-    await vm.start()
-    Promise.resolve('instance started')
-  }))
-  console.log('Successfully started instance(s)')
+async function getAllRunnerVMs () {
+  const filter = `labels.env=${process.env.GOOGLE_ENV}`
+  const options = {
+    filter: filter
+  }
+  const [vms] = await compute.getVMs(options)
+  return vms
 }
 
-async function stopInstances (vms, force) {
-  console.log(`Stopping instance(s), force = ${force}`)
-  const runnersGitHubStatus = await getRunnersGitHubStatus()
-  console.log(`runners github status = ${JSON.stringify(runnersGitHubStatus)}`)
-  await Promise.all(vms.map(async (vm) => {
-    console.log(`Trying to stop instance : ${vm.name}`)
-    const githubStatus = getRunnerGitHubStatusByName(runnersGitHubStatus, vm.name)
-    console.log(`GitHub status of instance : ${githubStatus}`)
+function getTargetRunnersCount (idle) {
+  if (idle) {
+    return Number(process.env.RUNNER_IDLE_COUNT)
+  } else {
+    return process.env.RUNNER_TOTAL_COUNT - process.env.RUNNER_IDLE_COUNT
+  }
+}
+
+async function getTargetRunnerCountDelta (idle) {
+  const runnerVms = await getRunnerVMs(idle)
+  const targetRunnersCount = getTargetRunnersCount(idle)
+  console.log(`runners idle:${idle}, target count=${targetRunnersCount}, current count=${runnerVms.length}`)
+  const targetRunnerCountDelta = targetRunnersCount - runnerVms.length
+  return targetRunnerCountDelta
+}
+
+async function scaleUpRunners (idle, count) {
+  console.log(`scale up runners idle:${idle} by ${count}...`)
+  const createPromises = []
+  for (let i = 0; i < count; i++) {
+    createPromises[i] = CreateVMHelper.createVm(getRunnerNamePrefix(), idle)
+  }
+  await Promise.all(createPromises)
+  console.log(`scale up runners idle:${idle} by ${count} succeed`)
+}
+
+async function scaleDownRunners (idle, count, force) {
+  console.log(`scale down runners idle:${idle}, force:${force}, by ${count}...`)
+  const runnerVMs = await getRunnerVMs(idle)
+  if (runnerVMs.length === 0) {
+    console.info('runners already 0, nothing to scale down')
+    return
+  }
+  const runnerGitHubStates = await getRunnerGitHubStates()
+  const runnerVMsToDelete = runnerVMs.slice(-count)
+  await Promise.all(runnerVMsToDelete.map(async (runnerVM) => {
+    console.log(`trying to delete runner : ${runnerVM.name}`)
+    const githubStatus = getRunnerGitHubStateByName(runnerGitHubStates, runnerVM.name)
+    console.log(`GitHub status of runner : ${githubStatus}`)
     if (githubStatus === 'busy' && force === false) {
-      console.log(`Instance busy, not stopping : ${vm.name}`)
+      console.log(`runner busy, not deleting : ${runnerVM.name}`)
     } else {
-      console.log(`Stopping instance : ${vm.name}`)
-      await vm.stop()
+      console.log(`deleting instance : ${runnerVM.name}`)
+      await runnerVM.delete()
     }
-    Promise.resolve(`trying to stopping instance end : ${vm.name}`)
+    Promise.resolve(`trying to delete instance end : ${runnerVM.name}`)
   }))
-  console.log('Finishing stopping stopped instance(s)')
+  console.log(`scale down runners idle:${idle}, force:${force} end`)
 }
 
-async function getRunnersGitHubStatus () {
+async function getRunnerGitHubStates () {
   const githubApiFunctionUrl = process.env.GITHUB_API_TRIGGER_URL
   const client = await auth.getIdTokenClient(githubApiFunctionUrl)
   const res = await client.request({
@@ -165,20 +195,39 @@ async function getRunnersGitHubStatus () {
   return res.data.runners
 }
 
-function getRunnerGitHubStatusByName (githubRunners, name) {
+async function deleteRunnerGitHub (gitHubRunnerId) {
+  const githubApiFunctionUrl = process.env.GITHUB_API_TRIGGER_URL
+  const client = await auth.getIdTokenClient(githubApiFunctionUrl)
+  const res = await client.request({
+    url: githubApiFunctionUrl,
+    method: 'POST',
+    data: {
+      scope: 'actions',
+      function: 'deleteSelfHostedRunnerFromOrg',
+      params: {
+        org: process.env.GITHUB_ORG,
+        runner_id: gitHubRunnerId
+      }
+    }
+  })
+  return res.data.runners
+}
+
+function getRunnerGitHubStateByName (githubRunners, name) {
   const [githubRunner] = githubRunners.filter(runner => {
     return runner.name === name
   })
+  if (githubRunner === undefined) {
+    return undefined
+  }
   return githubRunner.status
 }
 
-/**
- * Validates that a request payload contains the expected fields.
- *
- * @param {!object} payload the request payload to validate.
- * @return {!object} the payload object.
- */
-const _validatePayload = (payload) => {
+function getRunnerNamePrefix () {
+  return `vm-gcp-${process.env.GOOGLE_ENV}`
+}
+
+function validatePayload (payload) {
   if (!payload.filter) {
     throw new Error('Attribute \'filter\' missing from payload')
   }
