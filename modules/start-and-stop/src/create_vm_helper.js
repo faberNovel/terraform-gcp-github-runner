@@ -29,8 +29,7 @@ function createVmConfig (isIdle, env) {
         boot: true,
         autoDelete: true,
         initializeParams: {
-          diskSizeGb: '40',
-          sourceImage: 'https://www.googleapis.com/compute/v1/projects/ubuntu-os-cloud/global/images/family/ubuntu-2004-lts'
+          sourceImage: 'https://www.googleapis.com/compute/v1/projects/github-runners-dev/global/images/ubuntu-runner'
         }
       }
     ],
