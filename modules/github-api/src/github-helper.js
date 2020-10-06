@@ -3,80 +3,94 @@ const { Octokit } = require('@octokit/rest')
 const { SecretManagerServiceClient } = require('@google-cloud/secret-manager')
 const client = new SecretManagerServiceClient()
 
-/* global GITHUB_ORG, GITHUB_APP_ID, GITHUB_KEY, GITHUB_INSTALLATION_ID, GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET */
-
 module.exports.getOctokit = async function getOctokit () {
-  await loadEnv()
-  const installAuth = await getInstallAuth(GITHUB_APP_ID, GITHUB_KEY, GITHUB_INSTALLATION_ID, GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET)
+  const githubParams = await getGithubParams()
+  const installAuth = await getInstallAuth(githubParams)
   const octokit = new Octokit({
     auth: installAuth.token
   })
   return octokit
 }
 
-async function loadEnv () {
-  console.log('Loading env...')
+async function getGithubParams () {
+  console.log('Loading github params...')
   try {
-    loadEnvFromProcessEnv()
-    checkEnvIsSet()
+    const githubParams = getGithubParamsFromProcessEnv()
+    return githubParams
   } catch (error) {
-    await loadEnvFromGoogleSecrets()
-    checkEnvIsSet()
+    console.log(`Error loading github params from from process : ${error}`)
+    const githubParams = await getGithubParamsFromGoogleSecrets()
+    return githubParams
   }
-  console.log(`Loading env done for org : ${GITHUB_ORG}`)
 }
 
-async function loadEnvFromGoogleSecrets () {
-  console.log('Loading env from google secrets')
+function getGithubParamsFromProcessEnv () {
+  console.log('Loading github params from process env')
+  return new GithubParams(
+    process.env.GITHUB_ORG,
+    process.env.GITHUB_APP_ID,
+    Buffer.from(process.env.GITHUB_KEY_B64, 'base64').toString(),
+    process.env.GITHUB_INSTALLATION_ID,
+    process.env.GITHUB_CLIENT_ID,
+    process.env.GITHUB_CLIENT_SECRET
+  )
+}
+
+async function getGithubParamsFromGoogleSecrets () {
+  console.log('Loading github params from google secrets')
   const [version] = await client.accessSecretVersion({
     name: process.env.SECRET_GITHUB_JSON_RESOURCE_NAME
   })
   const jsonPayload = version.payload.data
   const githubSecrets = JSON.parse(jsonPayload)
-  global.GITHUB_ORG = githubSecrets.organisation
-  global.GITHUB_KEY = Buffer.from(githubSecrets.key_pem_b64, 'base64').toString()
-  global.GITHUB_APP_ID = githubSecrets.app_id
-  global.GITHUB_INSTALLATION_ID = githubSecrets.app_installation_id
-  global.GITHUB_CLIENT_ID = githubSecrets.client_id
-  global.GITHUB_CLIENT_SECRET = githubSecrets.client_secret
+  return new GithubParams(
+    githubSecrets.organisation,
+    githubSecrets.app_id,
+    Buffer.from(githubSecrets.key_pem_b64, 'base64').toString(),
+    githubSecrets.app_installation_id,
+    githubSecrets.client_id,
+    githubSecrets.client_secret
+  )
 }
 
-function checkEnvIsSet () {
-  throwIfNotSet(GITHUB_ORG)
-  throwIfNotSet(GITHUB_KEY)
-  throwIfNotSet(GITHUB_APP_ID)
-  throwIfNotSet(GITHUB_INSTALLATION_ID)
-  throwIfNotSet(GITHUB_CLIENT_ID)
-  throwIfNotSet(GITHUB_CLIENT_SECRET)
-}
-
-function throwIfNotSet (name) {
-  if (name === undefined) throw new Error(`${name} undefined`)
-}
-
-function loadEnvFromProcessEnv () {
-  console.log('Loading env from process env')
-  setGlobal('GITHUB_ORG')
-  setGlobal('GITHUB_KEY')
-  setGlobal('GITHUB_APP_ID')
-  setGlobal('GITHUB_INSTALLATION_ID')
-  setGlobal('GITHUB_CLIENT_ID')
-  setGlobal('GITHUB_CLIENT_SECRET')
-}
-
-function setGlobal (key) {
-  global[key] = process.env[key]
-}
-
-async function getInstallAuth (appId, privateKey, installationId, clientId, clientSecret) {
+async function getInstallAuth (githubParams) {
   const auth = createAppAuth({
-    id: appId,
-    privateKey: privateKey,
-    installationId: Number(installationId),
-    clientId: clientId,
-    clientSecret: clientSecret
+    id: githubParams.appId,
+    privateKey: githubParams.key,
+    installationId: githubParams.installationId,
+    clientId: githubParams.clientId,
+    clientSecret: githubParams.clientSecret
   })
 
   const installationAuthentication = await auth({ type: 'installation' })
   return installationAuthentication
+}
+
+class GithubParams {
+  constructor (org, appId, key, installationId, clientId, clientSecret) {
+    if (org === undefined) {
+      throw Error('org is undefined')
+    }
+    this.org = org
+    if (appId === undefined) {
+      throw Error('appId is undefined')
+    }
+    this.appId = appId
+    if (key === undefined) {
+      throw Error('key is undefined')
+    }
+    this.key = key
+    if (installationId === undefined) {
+      throw Error('installationId is undefined or not an number')
+    }
+    this.installationId = Number(installationId)
+    if (clientId === undefined) {
+      throw Error('clientId is undefined')
+    }
+    this.clientId = clientId
+    if (clientSecret === undefined) {
+      throw Error('clientSecret is undefined')
+    }
+    this.clientSecret = clientSecret
+  }
 }

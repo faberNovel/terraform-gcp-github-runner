@@ -38,5 +38,10 @@ echo "SECRET_GITHUB_JSON_RESOURCE_NAME=projects/$GOOGLE_PROJECT/secrets/github-j
 echo "SECRET_GITHUB_JSON_ID=github-json" >> .env
 echo "GITHUB_API_TRIGGER_URL=https://$GOOGLE_REGION-$GOOGLE_PROJECT.cloudfunctions.net/github_api_function" >> .env
 echo "GITHUB_ORG=$GITHUB_ORG" >> .env
+echo "GITHUB_KEY_B64=$GITHUB_KEY_B64" >> .env
+echo "GITHUB_APP_ID=$GITHUB_APP_ID" >> .env
+echo "GITHUB_INSTALLATION_ID=$GITHUB_INSTALLATION_ID" >> .env
+echo "GITHUB_CLIENT_ID=$GITHUB_CLIENT_ID" >> .env
+echo "GITHUB_CLIENT_SECRET=$GITHUB_CLIENT_SECRET" >> .env
 
 eval "$saved_options"
