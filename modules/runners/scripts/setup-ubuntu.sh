@@ -12,15 +12,31 @@ while true; do
   esac
 done
 
+# Hack to ensure VM is well started
+sleep 15
+
 sudo apt-get -y update
 
 ## Minimum tools
-sudo apt-get -y install git
-sudo apt-get -y install curl
-sudo apt-get -y install jq
+sudo apt-get -y install \
+    git \
+    curl \
+    jq
 
 ## Docker
-sudo apt install -y docker.io
+sudo apt-get -y install \
+    apt-transport-https \
+    ca-certificates \
+    curl \
+    gnupg-agent \
+    software-properties-common
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+sudo add-apt-repository \
+   "deb [arch=amd64] https://download.docker.com/linux/ubuntu \
+   $(lsb_release -cs) \
+   stable"
+sudo apt-get -y update
+sudo apt-get -y install docker-ce docker-ce-cli containerd.io
 sudo systemctl start docker
 sudo systemctl enable docker
 sudo usermod -aG docker $USER
