@@ -4,17 +4,17 @@ const { v4: uuidv4 } = require('uuid')
 const compute = new Compute()
 const zone = compute.zone(process.env.GOOGLE_ZONE)
 
-module.exports.createVm = async function createVm (isIdle) {
+module.exports.createVm = async function createVm (prefix, isIdle) {
   console.log(`create idle:${isIdle} VM ...`)
-  const [vm, operation] = await zone.createVM(createVmName(), createVmConfig(isIdle, process.env.GOOGLE_ENV))
+  const [vm, operation] = await zone.createVM(createVmName(prefix), createVmConfig(isIdle, process.env.GOOGLE_ENV))
   await operation.promise()
   console.log(`VM ${vm.name} created`)
   return vm
 }
 
-function createVmName () {
+function createVmName (prefix) {
   const runnerId = uuidv4()
-  const vmName = `vm-gcp-${process.env.GOOGLE_ENV}-${runnerId}`
+  const vmName = `${prefix}-${runnerId}`
   return vmName
 }
 

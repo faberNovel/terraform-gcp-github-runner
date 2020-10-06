@@ -24,8 +24,9 @@ module.exports.startAndStop = async (data, context) => {
 }
 
 module.exports.dev = async () => {
-  startRunners()
-  // stopRunners(true)
+  // await startRunners()
+  // await stopRunners(true)
+  await healthCheck()
 }
 
 async function startRunners () {
@@ -35,6 +36,52 @@ async function startRunners () {
 
 async function stopRunners (force) {
   await scaleDownNonIdleRunners(force)
+}
+
+async function healthCheck () {
+  await removeOfflineOrDanglingRunners()
+  await startRunners()
+}
+
+async function removeOfflineOrDanglingRunners () {
+  const offlineGcpRunnerGitHubStates = await getOfflineGcpRunnerGitHubStates()
+  console.log(`Found ${offlineGcpRunnerGitHubStates.length} offline GitHub runner(s) ${offlineGcpRunnerGitHubStates.map(it => it.name)}`)
+  const danglingVMs = await getDanglingGcpVMs(offlineGcpRunnerGitHubStates)
+  console.log(`Found ${danglingVMs.length} dangling GCP runner(s) ${danglingVMs.map(it => it.metadata.name)}`)
+  if (danglingVMs.length > 0) {
+    console.log('Delete dangling GCP runners...')
+    Promise.all(danglingVMs.map(it => it.delete()))
+    console.log('Delete dangling GCP runners with success')
+  } else {
+    console.log('No dangling GCP runner to delete')
+  }
+  if (offlineGcpRunnerGitHubStates.length > 0) {
+    console.log('Delete offline GitHub runners...')
+    const offlineGcpRunnerGitHubStatesIds = offlineGcpRunnerGitHubStates.map(it => it.id)
+    Promise.all(offlineGcpRunnerGitHubStatesIds.map(it => deleteRunnerGitHub(it)))
+    console.log('Delete offline GitHub runners with success')
+  } else {
+    console.log('No offline GitHub runner to delete')
+  }
+}
+
+async function getDanglingGcpVMs (offlineGcpRunnerGitHubStates) {
+  const vms = await getAllRunnerVMs()
+  const danglingVMs = vms.filter(function (vm) {
+    return offlineGcpRunnerGitHubStates.map(gh => gh.name).includes(vm.metadata.name)
+  })
+  return danglingVMs
+}
+
+async function getOfflineGcpRunnerGitHubStates () {
+  const runnerGitHubStates = await getRunnerGitHubStates()
+  const gcpRunnerGitHubStates = runnerGitHubStates.filter(function (runnerGitHubState) {
+    return runnerGitHubState.name.startsWith(getRunnerNamePrefix())
+  })
+  const offlineGcpRunnerGitHubStates = gcpRunnerGitHubStates.filter(function (gcpRunnerGitHubState) {
+    return gcpRunnerGitHubState.status === 'offline'
+  })
+  return offlineGcpRunnerGitHubStates
 }
 
 async function scaleUpNonIdleRunners () {
@@ -72,6 +119,15 @@ async function getRunnerVMs (idle) {
   return vms
 }
 
+async function getAllRunnerVMs () {
+  const filter = `labels.env=${process.env.GOOGLE_ENV}`
+  const options = {
+    filter: filter
+  }
+  const [vms] = await compute.getVMs(options)
+  return vms
+}
+
 function getTargetRunnersCount (idle) {
   if (idle) {
     return Number(process.env.RUNNER_IDLE_COUNT)
@@ -92,7 +148,7 @@ async function scaleUpRunners (idle, count) {
   console.log(`scale up runners idle:${idle} by ${count}...`)
   const createPromises = []
   for (let i = 0; i < count; i++) {
-    createPromises[i] = CreateVMHelper.createVm(idle)
+    createPromises[i] = CreateVMHelper.createVm(getRunnerNamePrefix(), idle)
   }
   await Promise.all(createPromises)
   console.log(`scale up runners idle:${idle} by ${count} succeed`)
@@ -139,6 +195,24 @@ async function getRunnerGitHubStates () {
   return res.data.runners
 }
 
+async function deleteRunnerGitHub (gitHubRunnerId) {
+  const githubApiFunctionUrl = process.env.GITHUB_API_TRIGGER_URL
+  const client = await auth.getIdTokenClient(githubApiFunctionUrl)
+  const res = await client.request({
+    url: githubApiFunctionUrl,
+    method: 'POST',
+    data: {
+      scope: 'actions',
+      function: 'deleteSelfHostedRunnerFromOrg',
+      params: {
+        org: process.env.GITHUB_ORG,
+        runner_id: gitHubRunnerId
+      }
+    }
+  })
+  return res.data.runners
+}
+
 function getRunnerGitHubStateByName (githubRunners, name) {
   const [githubRunner] = githubRunners.filter(runner => {
     return runner.name === name
@@ -147,6 +221,10 @@ function getRunnerGitHubStateByName (githubRunners, name) {
     return undefined
   }
   return githubRunner.status
+}
+
+function getRunnerNamePrefix () {
+  return `vm-gcp-${process.env.GOOGLE_ENV}`
 }
 
 function validatePayload (payload) {
