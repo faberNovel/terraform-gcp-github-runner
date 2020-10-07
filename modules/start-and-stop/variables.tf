@@ -1,8 +1,7 @@
-variable "google" {
-  type = object({
-    project = string
-    env     = string
-  })
-}
+variable "google" {}
 
-variable "secret_name_github_json" {}
+variable "runner" {}
+
+variable "github_api_trigger_url" {}
+
+variable "github_org" {}

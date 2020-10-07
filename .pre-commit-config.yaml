@@ -4,3 +4,10 @@ repos:
   hooks:
     - id: terraform_fmt
     - id: terraform_docs
+
+- repo: https://github.com/pre-commit/mirrors-eslint
+  rev: 'v7.9.0'
+  hooks:
+    - id: eslint
+      args: [--fix]
+      exclude: 'modules/runners/scripts/*'

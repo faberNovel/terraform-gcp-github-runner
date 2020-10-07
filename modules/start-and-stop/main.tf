@@ -26,7 +26,14 @@ resource "google_cloudfunctions_function" "start_and_stop" {
   service_account_email = google_service_account.start_and_stop.email
 
   environment_variables = {
-    "SECRET_NAME_GITHUB_JSON" = var.secret_name_github_json
+    "GOOGLE_ZONE"            = var.google.zone
+    "GOOGLE_ENV"             = var.google.env
+    "RUNNER_MACHINE_TYPE"    = var.runner.type
+    "RUNNER_IDLE_COUNT"      = var.runner.idle_count
+    "RUNNER_TOTAL_COUNT"     = var.runner.total_count
+    "RUNNER_SERVICE_ACCOUNT" = google_service_account.runner.email
+    "GITHUB_API_TRIGGER_URL" = var.github_api_trigger_url
+    "GITHUB_ORG"             = var.github_org
   }
 
   event_trigger {
@@ -40,10 +47,6 @@ resource "google_pubsub_topic" "start_and_stop" {
   name = "start-and-stop-topic"
 }
 
-resource "google_pubsub_topic" "topic" {
-  name = "job-topic"
-}
-
 resource "google_cloud_scheduler_job" "start_job" {
   name      = "start-job"
   schedule  = "0 8 * * *"
@@ -51,7 +54,7 @@ resource "google_cloud_scheduler_job" "start_job" {
 
   pubsub_target {
     topic_name = google_pubsub_topic.start_and_stop.id
-    data       = base64encode("{\"action\":\"start\",\"filter\":\"labels.env=${var.google.env} AND labels.idle=false\"}")
+    data       = base64encode("{\"action\":\"start\"}")
   }
 }
 
@@ -62,7 +65,7 @@ resource "google_cloud_scheduler_job" "stop_job" {
 
   pubsub_target {
     topic_name = google_pubsub_topic.start_and_stop.id
-    data       = base64encode("{\"action\":\"stop\",\"filter\":\"labels.env=${var.google.env} AND labels.idle=false\"}")
+    data       = base64encode("{\"action\":\"stop\"}")
   }
 }
 
@@ -73,7 +76,7 @@ resource "google_cloud_scheduler_job" "force_stop_job" {
 
   pubsub_target {
     topic_name = google_pubsub_topic.start_and_stop.id
-    data       = base64encode("{\"action\":\"stop\", \"force\":\"true\", \"filter\":\"labels.env=${var.google.env} AND labels.idle=false\"}")
+    data       = base64encode("{\"action\":\"stop\", \"force\":\"true\"}")
   }
 }
 
@@ -87,7 +90,27 @@ resource "google_project_iam_member" "start_and_stop_compute_admin" {
   member = "serviceAccount:${google_service_account.start_and_stop.email}"
 }
 
-resource "google_project_iam_member" "start_and_stop_secretmanager_secretAccessor" {
-  role   = "roles/secretmanager.secretAccessor"
+resource "google_project_iam_member" "start_and_stop_cloudfunctions_invoker" {
+  role   = "roles/cloudfunctions.invoker"
   member = "serviceAccount:${google_service_account.start_and_stop.email}"
+}
+
+resource "google_service_account" "runner" {
+  account_id   = "runner-user"
+  display_name = "Runner user"
+}
+
+resource "google_project_iam_member" "runner_compute_oslogin" {
+  role   = "roles/compute.osLogin"
+  member = "serviceAccount:${google_service_account.runner.email}"
+}
+
+resource "google_project_iam_member" "runner_cloudfunctions_invoker" {
+  role   = "roles/cloudfunctions.invoker"
+  member = "serviceAccount:${google_service_account.runner.email}"
+}
+
+resource "google_project_iam_member" "runner_logging_logwriter" {
+  role   = "roles/logging.logWriter"
+  member = "serviceAccount:${google_service_account.runner.email}"
 }
