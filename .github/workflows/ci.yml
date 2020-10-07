@@ -34,12 +34,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2.1.0
 
-      - name: Install Terraform dependencies
-        run: |
-          apk add nodejs=~12
-          apk add npm
-          npm install --prefix "modules/runners/scripts"
-
       - name: Setup env
         env:
           TF_CLI_CONFIG_FILE_CONTENT: ${{ secrets.TF_CLI_CONFIG_FILE_CONTENT }}
