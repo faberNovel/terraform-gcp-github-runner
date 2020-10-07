@@ -58,4 +58,24 @@ jobs:
       - name: Terraform run 
         run: |
           terraform plan -lock=false
+        
+  test-packer:
+    runs-on: [self-hosted, linux, docker]
+    container:
+      image: docker://hashicorp/packer
+            
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2.1.0
+        
+      - name: Setup env
+        env:
+          GOOGLE_TFVARS_JSON: ${{ secrets.GOOGLE_DEV_TFVARS_JSON }}
+        run: |
+          echo $GOOGLE_TFVARS_JSON > google.auto.tfvars.json
+        
+      - name: Packer validate
+        run: |
+          apk add jq
+          bash image/packer.sh --env-file google.auto.tfvars.json --packer-action validate  
       
