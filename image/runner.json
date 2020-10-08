@@ -3,7 +3,8 @@
       "machine_type": "var",
       "region": "var",
       "zone": "var",
-      "project_id": "var"
+      "project_id": "var",
+      "path": "var"
     },
     "builders": [
       {
@@ -23,7 +24,7 @@
     "provisioners": [
       {
         "type": "shell",
-        "script": "init.sh"
+        "script": "{{user `path`}}/init.sh"
       }
     ]
   }

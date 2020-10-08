@@ -1,7 +1,6 @@
 #!/bin/bash
 
 # Exit immediately if a command returns a non-zero status
-saved_options=$(set +o)
 set -e
 
 cat << EOF
@@ -13,16 +12,13 @@ Warning : Values are evaluated from best effort parsing of terraform vars files.
 locals terraform vars or constants, this script could need update in the future.
 EOF
 
-baseDir=$(pwd)
-scriptDir="$(dirname "$0")"
+project_root_path=$(realpath "$(dirname "$0")/..")
+google_path=$project_root_path/google-dev.tfvars.json
+github_path=$project_root_path/github.auto.tfvars.json
 
-cd "$scriptDir"
-
-source ./load-google-env.sh ../google-dev.tfvars.json
-source ./load-github-env.sh ../github.auto.tfvars.json
-source ./load-default-terraform-env.sh
-
-cd "$baseDir"
+source $project_root_path/.tools/load-google-env.sh $google_path
+source $project_root_path/.tools/load-github-env.sh $github_path
+source $project_root_path/.tools/load-default-terraform-env.sh
 
 # clear .env file
 > .env
@@ -43,5 +39,3 @@ echo "GITHUB_APP_ID=$GITHUB_APP_ID" >> .env
 echo "GITHUB_INSTALLATION_ID=$GITHUB_INSTALLATION_ID" >> .env
 echo "GITHUB_CLIENT_ID=$GITHUB_CLIENT_ID" >> .env
 echo "GITHUB_CLIENT_SECRET=$GITHUB_CLIENT_SECRET" >> .env
-
-eval "$saved_options"

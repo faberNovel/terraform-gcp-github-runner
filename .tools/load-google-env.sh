@@ -9,7 +9,6 @@ extract_google_params_from_json_file() {
 }
 
 # Exit immediately if a command returns a non-zero status
-saved_options=$(set +o)
 set -e
 
 if [ -z "$1" ]; then
@@ -33,5 +32,3 @@ export GOOGLE_REGION=$google_region
 export GOOGLE_ZONE=$google_zone
 export GOOGLE_ENV=$google_env
 export GOOGLE_PROJECT=$google_project
-
-eval "$saved_options"

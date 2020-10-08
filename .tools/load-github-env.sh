@@ -9,7 +9,6 @@ extract_github_params_from_json_file() {
 }
 
 # Exit immediately if a command returns a non-zero status
-saved_options=$(set +o)
 set -e
 
 if [ -z "$1" ]; then
@@ -32,5 +31,3 @@ export GITHUB_APP_ID=$app_id
 export GITHUB_INSTALLATION_ID=$installation_id
 export GITHUB_CLIENT_ID=$client_id
 export GITHUB_CLIENT_SECRET=$client_secret
-
-eval "$saved_options"

@@ -1,6 +1,5 @@
 #!/bin/bash
 # Exit immediately if a command returns a non-zero status
-saved_options=$(set +o)
 set -e
 
 # Printing script usage
@@ -29,16 +28,16 @@ if [ -z "$packer_action" ]; then
 fi
 
 env_file_path=$(realpath $env_file)
-echo $env_file_path
+project_root_path=$(realpath "$(dirname "$0")/..")
+packer_project_path=$project_root_path/image
 
-source ../.tools/load-google-env.sh $env_file_path
-source ../.tools/load-default-terraform-env.sh
+source $project_root_path/.tools/load-google-env.sh $env_file_path
+source $project_root_path/.tools/load-default-terraform-env.sh
 
 packer $packer_action \
   -var region=$GOOGLE_REGION \
   -var zone=$GOOGLE_ZONE \
   -var machine_type=$RUNNER_MACHINE_TYPE \
   -var project_id=$GOOGLE_PROJECT \
-  runner.json
-
-eval "$saved_options"
+  -var path=$packer_project_path \
+  $packer_project_path/runner.json
