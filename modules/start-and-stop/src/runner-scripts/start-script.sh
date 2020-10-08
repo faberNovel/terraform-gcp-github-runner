@@ -20,6 +20,9 @@ log_debug "start startup script"
 
 RUNNER_USER="ubuntu"
 
+## Start stack driver
+sudo service stackdriver-agent start
+
 ## Fetch registration token
 ZONE=$(curl -H Metadata-Flavor:Google http://metadata/computeMetadata/v1/instance/zone)
 TOKEN=$(gcloud auth print-identity-token)

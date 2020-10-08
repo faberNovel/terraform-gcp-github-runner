@@ -33,6 +33,12 @@ sudo systemctl start docker
 sudo systemctl enable docker
 sudo usermod -aG docker $RUNNER_USER
 
+## Stack driver
+curl -sSO https://dl.google.com/cloudagents/add-monitoring-agent-repo.sh
+sudo bash add-monitoring-agent-repo.sh
+sudo apt-get -y update
+sudo apt-get install -y 'stackdriver-agent=6.*'
+
 ## Auto clean
 cd "/home/$RUNNER_USER"
 CLEANER_FILE="cleaner.sh"
