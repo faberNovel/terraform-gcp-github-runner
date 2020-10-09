@@ -13,6 +13,8 @@ module.exports.startAndStop = async (data, context) => {
     } else if (payload.action === 'stop') {
       const force = payload.force === true
       await stopRunners(force)
+    } else if (payload.action === 'healthcheck') {
+      await healthCheck()
     }
     return Promise.resolve('startAndStop end')
   } catch (err) {
@@ -22,7 +24,9 @@ module.exports.startAndStop = async (data, context) => {
 }
 
 module.exports.dev = async () => {
-  await healthCheck()
+  // await healthCheck()
+  // await startRunners()
+  // await stopRunners(true)
 }
 
 async function startRunners () {
