@@ -35,7 +35,9 @@ async function stopRunners (force) {
 }
 
 async function healthCheck () {
-  await HealthCheckHelper.removeOfflineOrDanglingRunners()
+  await HealthCheckHelper.removeDisconnectedGcpRunners()
+  await HealthCheckHelper.removeOfflineGitHubRunners()
+  await startRunners()
 }
 
 function validatePayload (payload) {
