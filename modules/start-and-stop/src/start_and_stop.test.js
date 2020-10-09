@@ -1,47 +1,74 @@
-const startAndStop = require('./start_and_stop.js')
 const sinon = require('sinon')
 const chai = require('chai')
 const chaiAsPromised = require('chai-as-promised')
-const Compute = require('@google-cloud/compute')
+const ScaleHelper = require('./scale_helper.js')
+const HealthCheck = require('./healthcheck.js')
+const rewire = require('rewire')
+const startAndStop = rewire('./start_and_stop.js')
 
 chai.use(chaiAsPromised)
 chai.should()
 
-describe('start instance', function () {
-  describe('wrong args', function () {
-    it('Should error if wrong args', function () {
+describe('start and stop tests', () => {
+  describe('When wrong args', () => {
+    it('Should throw error', () => {
       return startAndStop.startAndStop(null, null).should.rejected
     })
   })
-  describe('happy path 0 VMs', function () {
-    it('Should be fulfilled', function () {
-      const payload = makePayload()
-      sinon.stub(Compute.prototype, 'getVMs').callsFake(() => [[]])
-      return startAndStop.startAndStop(payload, null).should.be.fulfilled
+  describe('When start payload', () => {
+    it('Should trigger scale', async () => {
+      const payload = makePayload('start')
+      const stubScaleUpNonIdleRunners = sinon.stub(ScaleHelper, 'scaleUpNonIdleRunners').returns(Promise.resolve())
+      const stubscaleIdleRunners = sinon.stub(ScaleHelper, 'scaleIdleRunners').returns(Promise.resolve())
+
+      await startAndStop.startAndStop(payload, null)
+
+      stubScaleUpNonIdleRunners.callCount.should.equal(1)
+      stubscaleIdleRunners.callCount.should.equal(1)
     })
   })
-  describe('happy path 1 VMs', function () {
-    it('Should be fulfilled', function () {
-      const payload = makePayload()
-      const vm = {
-        start: function () {},
-        name: 'vm1'
-      }
-      sinon.stub(Compute.prototype, 'getVMs').callsFake(() => [[vm]])
-      return startAndStop.startAndStop(payload, null).should.be.fulfilled
+  describe('When stop payload', () => {
+    it('Should trigger stop', async () => {
+      const payload = makePayload('stop')
+      const stubScaleDownNonIdleRunners = sinon.stub(ScaleHelper, 'scaleDownNonIdleRunners').returns(Promise.resolve())
+
+      await startAndStop.startAndStop(payload, null)
+
+      stubScaleDownNonIdleRunners.callCount.should.equal(1)
+    })
+  })
+  describe('When healthcheck payload', () => {
+    it('Should trigger healthcheck', async () => {
+      const payload = makePayload('healthcheck')
+      const stubRemoveDisconnectedGcpRunners = sinon.stub(HealthCheck, 'removeDisconnectedGcpRunners').returns(Promise.resolve())
+      const stubRemoveOfflineGitHubRunners = sinon.stub(HealthCheck, 'removeOfflineGitHubRunners').returns(Promise.resolve())
+      const stubStartRunners = sinon.stub().returns(Promise.resolve())
+      const revert = startAndStop.__set__('startRunners', stubStartRunners)
+
+      await startAndStop.startAndStop(payload, null)
+
+      stubRemoveDisconnectedGcpRunners.callCount.should.equal(1)
+      stubRemoveOfflineGitHubRunners.callCount.should.equal(1)
+      stubStartRunners.callCount.should.equal(1)
+      revert()
     })
   })
 })
 
-afterEach(function () {
+beforeEach(() => {
+  sinon.stub(console, 'log') // disable console.log
+  sinon.stub(console, 'info') // disable console.info
+  sinon.stub(console, 'warn') // disable console.warn
+  sinon.stub(console, 'error') // disable console.error
+})
+
+afterEach(() => {
   sinon.restore()
 })
 
-function makePayload () {
-  const env = 'test'
+function makePayload (action) {
   const json = {
-    action: 'start',
-    filter: `labels.env=${env} AND labels.idle=false}`
+    action: action
   }
   const jsonBase64 = Buffer.from(JSON.stringify(json)).toString('base64')
   const payload = {
