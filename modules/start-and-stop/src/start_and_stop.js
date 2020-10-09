@@ -1,9 +1,10 @@
 const HealthCheckHelper = require('./healthcheck.js')
 const ScaleHelper = require('./scale_helper.js')
+const chalk = require('chalk')
 
 module.exports.startAndStop = async (data, context) => {
   try {
-    console.log('startAndStop...')
+    console.info('startAndStop...')
     const payload = validatePayload(
       JSON.parse(Buffer.from(data.data, 'base64').toString())
     )
@@ -15,16 +16,13 @@ module.exports.startAndStop = async (data, context) => {
     }
     return Promise.resolve('startAndStop end')
   } catch (err) {
-    console.log(err)
+    console.error(chalk.red(err.stack))
     return Promise.reject(err)
   }
 }
 
 module.exports.dev = async () => {
-  // await ScaleHelper.startRunners()
-  // await ScaleHelperstopRunners(true)
-  healthCheck()
-  ScaleHelper.scaleUpNonIdleRunners()
+  await healthCheck()
 }
 
 async function startRunners () {

@@ -1,6 +1,7 @@
 const GetVMHelper = require('./get_vm_helper.js')
 const CreateVMHelper = require('./create_vm_helper.js')
 const GitHubHelper = require('./github_helper')
+const chalk = require('chalk')
 
 module.exports.scaleIdleRunners = async function scaleIdleRunners () {
   const idle = true
@@ -10,7 +11,7 @@ module.exports.scaleIdleRunners = async function scaleIdleRunners () {
   } else if (targetRunnerCountDelta < 0) {
     scaleDownRunners(idle, Math.abs(targetRunnerCountDelta), true)
   } else {
-    console.log('idle runners reached, no scale to apply')
+    console.info(chalk.green('idle runners reached, no scale to apply'))
   }
 }
 
@@ -39,23 +40,23 @@ function getTargetRunnersCount (idle) {
 async function getTargetRunnerCountDelta (idle) {
   const runnerVms = await GetVMHelper.getRunnerVMs(idle)
   const targetRunnersCount = getTargetRunnersCount(idle)
-  console.log(`runners idle:${idle}, target count=${targetRunnersCount}, current count=${runnerVms.length}`)
+  console.info(`runners(idle:${idle}) : current count=${runnerVms.length} -> target count=${targetRunnersCount}`)
   const targetRunnerCountDelta = targetRunnersCount - runnerVms.length
   return targetRunnerCountDelta
 }
 
 async function scaleUpRunners (idle, count) {
-  console.log(`scale up runners idle:${idle} by ${count}...`)
+  console.info(`scale up runners idle:${idle} by ${count}...`)
   const createPromises = []
   for (let i = 0; i < count; i++) {
     createPromises[i] = CreateVMHelper.createVm(idle)
   }
   await Promise.all(createPromises)
-  console.log(`scale up runners idle:${idle} by ${count} succeed`)
+  console.info(chalk.green(`scale up runners idle:${idle} by ${count} succeed`))
 }
 
 async function scaleDownRunners (idle, count, force) {
-  console.log(`scale down runners idle:${idle}, force:${force}, by ${count}...`)
+  console.info(`scale down runners idle:${idle}, force:${force}, by ${count}...`)
   const runnerVMs = await GetVMHelper.getRunnerVMs(idle)
   if (runnerVMs.length === 0) {
     console.info('runners already 0, nothing to scale down')
@@ -64,16 +65,16 @@ async function scaleDownRunners (idle, count, force) {
   const runnerGitHubStates = await GitHubHelper.getRunnerGitHubStates()
   const runnerVMsToDelete = runnerVMs.slice(-count)
   await Promise.all(runnerVMsToDelete.map(async (runnerVM) => {
-    console.log(`trying to delete runner : ${runnerVM.name}`)
+    console.info(`trying to delete runner : ${runnerVM.name}`)
     const githubStatus = GitHubHelper.getRunnerGitHubStateByName(runnerGitHubStates, runnerVM.name)
-    console.log(`GitHub status of runner : ${githubStatus}`)
+    console.info(`GitHub status of runner : ${githubStatus}`)
     if (githubStatus === 'busy' && force === false) {
-      console.log(`runner busy, not deleting : ${runnerVM.name}`)
+      console.info(`runner busy, not deleting : ${runnerVM.name}`)
     } else {
-      console.log(`deleting instance : ${runnerVM.name}`)
+      console.info(`deleting instance : ${runnerVM.name}`)
       await runnerVM.delete()
     }
     Promise.resolve(`trying to delete instance end : ${runnerVM.name}`)
   }))
-  console.log(`scale down runners idle:${idle}, force:${force} end`)
+  console.info(chalk.green(`scale down runners idle:${idle}, force:${force} end`))
 }

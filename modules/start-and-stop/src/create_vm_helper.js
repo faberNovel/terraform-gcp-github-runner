@@ -1,14 +1,15 @@
 const Compute = require('@google-cloud/compute')
 const Fs = require('fs')
 const { v4: uuidv4 } = require('uuid')
+const chalk = require('chalk')
 const compute = new Compute()
 const zone = compute.zone(process.env.GOOGLE_ZONE)
 
 module.exports.createVm = async function createVm (isIdle) {
-  console.log(`create idle:${isIdle} VM ...`)
+  console.info(`create idle:${isIdle} VM ...`)
   const [vm, operation] = await zone.createVM(createVmName(), createVmConfig(isIdle, process.env.GOOGLE_ENV))
   await operation.promise()
-  console.log(`VM ${vm.name} created`)
+  console.info(chalk.green(`VM ${vm.name} created`))
   return vm
 }
 
