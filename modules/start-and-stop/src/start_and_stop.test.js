@@ -55,17 +55,6 @@ describe('start and stop tests', () => {
   })
 })
 
-beforeEach(() => {
-  sinon.stub(console, 'log') // disable console.log
-  sinon.stub(console, 'info') // disable console.info
-  sinon.stub(console, 'warn') // disable console.warn
-  sinon.stub(console, 'error') // disable console.error
-})
-
-afterEach(() => {
-  sinon.restore()
-})
-
 function makePayload (action) {
   const json = {
     action: action
