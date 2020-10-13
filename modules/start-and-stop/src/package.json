@@ -10,10 +10,12 @@
     "run": "node -e 'require(\"./start_and_stop.js\").startAndStop()'",
     "predev": "bash ../../../.tools/setup.sh",
     "dev": "node -r dotenv/config -e 'require(\"./start_and_stop.js\").dev()'",
-    "test": "mocha start_and_stop.test.js"
+    "pretest": "bash ../../../.tools/setup.sh",
+    "test": "mocha *.test.js"
   },
   "dependencies": {
     "@google-cloud/compute": "^2.1.0",
+    "chai-string": "^1.5.0",
     "chalk": "^4.1.0",
     "google-auth-library": "^6.1.0",
     "rewire": "^5.0.0",
