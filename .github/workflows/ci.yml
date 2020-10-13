@@ -77,5 +77,17 @@ jobs:
       - name: Packer validate
         run: |
           apk add jq
-          bash image/packer.sh --env-file google.auto.tfvars.json --packer-action validate  
-      
+          bash image/packer.sh --env-file google.auto.tfvars.json --packer-action validate
+
+  lint-bash:
+    runs-on: [self-hosted, linux, docker]
+    container:
+      image: docker://koalaman/shellcheck-alpine
+            
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2.1.0
+        
+      - name: Shellcheck
+        run: |
+          shellcheck **/*.sh -x
