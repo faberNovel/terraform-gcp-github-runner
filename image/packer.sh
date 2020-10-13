@@ -27,17 +27,19 @@ if [ -z "$packer_action" ]; then
     usage
 fi
 
-env_file_path=$(realpath $env_file)
+env_file_path=$(realpath "$env_file")
 project_root_path=$(realpath "$(dirname "$0")/..")
 packer_project_path=$project_root_path/image
 
-source $project_root_path/.tools/load-google-env.sh $env_file_path
-source $project_root_path/.tools/load-default-terraform-env.sh
+# shellcheck source=.tools/load-google-env.sh
+source "$project_root_path"/.tools/load-google-env.sh "$env_file_path"
+# shellcheck source=.tools/load-default-terraform-env.sh
+source "$project_root_path"/.tools/load-default-terraform-env.sh
 
-packer $packer_action \
-  -var region=$GOOGLE_REGION \
-  -var zone=$GOOGLE_ZONE \
-  -var machine_type=$RUNNER_MACHINE_TYPE \
-  -var project_id=$GOOGLE_PROJECT \
-  -var path=$packer_project_path \
-  $packer_project_path/runner.json
+packer "$packer_action" \
+  -var region="$GOOGLE_REGION" \
+  -var zone="$GOOGLE_ZONE" \
+  -var machine_type="$RUNNER_MACHINE_TYPE" \
+  -var project_id="$GOOGLE_PROJECT" \
+  -var path="$packer_project_path" \
+  "$packer_project_path"/runner.json
