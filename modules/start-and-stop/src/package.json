@@ -10,8 +10,10 @@
     "run": "node -e 'require(\"./start_and_stop.js\").startAndStop()'",
     "predev": "bash ../../../.tools/setup.sh",
     "dev": "node -r dotenv/config -e 'require(\"./start_and_stop.js\").dev()'",
-    "pretest": "bash ../../../.tools/setup.sh",
-    "test": "mocha *.test.js --require test/hooks.js"
+    "test": "DOTENV_CONFIG_PATH=./test/.test.env mocha *.test.js"
+  },
+  "mocha": {
+    "require": "dotenv/config, test/hooks.js"
   },
   "dependencies": {
     "@google-cloud/compute": "^2.1.0",
