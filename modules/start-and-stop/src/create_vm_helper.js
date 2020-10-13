@@ -5,7 +5,7 @@ const chalk = require('chalk')
 const compute = new Compute()
 const zone = compute.zone(process.env.GOOGLE_ZONE)
 
-module.exports.createVm = async function createVm (isIdle) {
+async function createVm (isIdle) {
   console.info(`create idle:${isIdle} VM ...`)
   const [vm, operation] = await zone.createVM(createVmName(), createVmConfig(isIdle, process.env.GOOGLE_ENV))
   await operation.promise()
@@ -13,15 +13,12 @@ module.exports.createVm = async function createVm (isIdle) {
   return vm
 }
 
-module.exports.getRunnerNamePrefix = getRunnerNamePrefix
-
 function getRunnerNamePrefix () {
   return `vm-gcp-${process.env.GOOGLE_ENV}`
 }
 
 function createVmName () {
-  const vmName = `${getRunnerNamePrefix()}-${uuidv4()}`
-  return vmName
+  return `${getRunnerNamePrefix()}-${uuidv4()}`
 }
 
 function createVmConfig (isIdle, env) {
@@ -79,3 +76,6 @@ function createVmConfig (isIdle, env) {
   }
   return config
 }
+
+module.exports.createVm = createVm
+module.exports.getRunnerNamePrefix = getRunnerNamePrefix
