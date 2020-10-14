@@ -1,4 +1,4 @@
-const sinon = require('sinon')
+const sandbox = require('sinon').createSandbox()
 const chai = require('chai')
 const rewire = require('rewire')
 const scaleHelper = rewire('./scale_helper.js')
@@ -14,7 +14,7 @@ describe('scale helper tests', () => {
       const scaleUpRunners = scaleHelper.__get__('scaleUpRunners')
       const idle = false
       const count = 3
-      const stub = sinon.stub(createVMHelper, 'createVm').returns(Promise.resolve())
+      const stub = sandbox.stub(createVMHelper, 'createVm').returns(Promise.resolve())
 
       await scaleUpRunners(idle, count)
 
@@ -24,47 +24,108 @@ describe('scale helper tests', () => {
       })
       stub.getCalls().length.should.equals(count)
 
-      stub.restore()
+      sandbox.restore()
     })
   })
 
   describe('When calling scale down runners', () => {
-    it('Should scale down runners', async () => {
-      const scaleDownRunners = scaleHelper.__get__('scaleDownRunners')
+    const scaleDownRunners = scaleHelper.__get__('scaleDownRunners')
+
+    afterEach(function () {
+      sandbox.restore()
+    })
+
+    it('should scale down runners when force is used', async () => {
       const idle = false
       const count = 2
+      const busyCount = 2
       const force = true
-      const vm1 = {
-        name: 'vm1',
-        delete: async function () {}
-      }
-      const vm2 = {
-        name: 'vm1',
-        delete: async function () {}
-      }
-
-      const mockVM1 = sinon.mock(vm1).expects('delete').once()
-      const mockVM2 = sinon.mock(vm2).expects('delete').once()
-
-      const vms = [vm1, vm2]
-      const stubGetRunnerVMs = sinon
-        .stub(getVMHelper, 'getRunnerVMs')
-        .returns(Promise.resolve(vms))
-      const stubGetRunnerGitHubStates = sinon
-        .stub(gitHubHelper, 'getRunnerGitHubStates')
-        .returns(Promise.resolve())
-      const stubGetRunnerGitHubStateByName = sinon
-        .stub(gitHubHelper, 'getRunnerGitHubStateByName')
-        .returns()
+      const vms = makeFakeVMs(count)
+      stubExternalDependencies(vms, busyCount)
 
       await scaleDownRunners(idle, count, force)
 
-      mockVM1.verify()
-      mockVM2.verify()
+      countFakeVmsDeleted(vms).should.equals(count)
+    })
 
-      stubGetRunnerVMs.restore()
-      stubGetRunnerGitHubStates.restore()
-      stubGetRunnerGitHubStateByName.restore()
+    it('should scale down runners according github status when force is not used', async () => {
+      const idle = false
+      const count = 2
+      const busyCount = 1
+      const force = false
+      const vms = makeFakeVMs(count)
+      stubExternalDependencies(vms, busyCount)
+
+      await scaleDownRunners(idle, count, force)
+
+      countFakeVmsDeleted(vms).should.equals(count - busyCount)
+    })
+  })
+
+  describe('When get target runner count delta', () => {
+    const getTargetRunnerCountDelta = scaleHelper.__get__('getTargetRunnerCountDelta')
+
+    afterEach(function () {
+      sandbox.restore()
+    })
+
+    it('should return positive when scaling up', async () => {
+      const delta = await getTargetRunnerCountDeltaWrapped(0, 1, getTargetRunnerCountDelta)
+      delta.should.equals(1)
+    })
+    it('should return negative when scaling down', async () => {
+      const delta = await getTargetRunnerCountDeltaWrapped(1, 0, getTargetRunnerCountDelta)
+      delta.should.equals(-1)
     })
   })
 })
+
+async function getTargetRunnerCountDeltaWrapped (givenRunnerCount, targetRunnerCount, getTargetRunnerCountDelta) {
+  sandbox.stub(getVMHelper, 'getRunnerVMs').resolves(new Array(givenRunnerCount))
+  const getTargetRunnersCountStub = sandbox.stub().returns(targetRunnerCount)
+  scaleHelper.__set__('getTargetRunnersCount', getTargetRunnersCountStub)
+  const delta = await getTargetRunnerCountDelta(true)
+  return delta
+}
+
+function stubExternalDependencies (vms, busyCount) {
+  sandbox.stub(getVMHelper, 'getRunnerVMs').resolves(vms)
+
+  const mergedGithubState = []
+  for (let index = 0; index < busyCount; index++) {
+    mergedGithubState.push({
+      name: vms[index].name,
+      status: 'busy'
+    })
+  }
+  sandbox.stub(gitHubHelper, 'getRunnerGitHubStates').resolves(mergedGithubState)
+}
+
+function makeFakeVMs (count) {
+  const vms = []
+  for (let index = 0; index < count; index++) {
+    vms.push({
+      name: `vm-${index}`,
+      delete: sandbox.fake.resolves()
+    })
+  }
+  return vms
+}
+
+function countFakeVmsDeleted (fakeVMs) {
+  var count = 0
+  fakeVMs.forEach(fakeVM => {
+    const deleteCallCount = fakeVM.delete.getCalls().length
+    switch (deleteCallCount) {
+      case 1:
+        count++
+        break
+      case 0:
+        // no-op
+        break
+      default:
+        throw Error('Illegal delete count number')
+    }
+  })
+  return count
+}
