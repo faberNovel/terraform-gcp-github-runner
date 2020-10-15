@@ -45,9 +45,6 @@ async function healthCheck () {
 }
 
 function validatePayload (payload) {
-  if (!payload.filter) {
-    throw new Error('Attribute \'filter\' missing from payload')
-  }
   if (!payload.action) {
     throw new Error('Attribute \'action\' missing from payload')
   }
