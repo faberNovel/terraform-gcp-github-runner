@@ -5,11 +5,10 @@
 extract_google_params_from_json_file() {
   local key="$1"
   local file_path="$2"
-  echo $(jq -r ".google.$key" $file_path)
+  jq -r ".google.$key" "$file_path"
 }
 
 # Exit immediately if a command returns a non-zero status
-saved_options=$(set +o)
 set -e
 
 if [ -z "$1" ]; then
@@ -18,20 +17,18 @@ if [ -z "$1" ]; then
 fi
 echo "Parsing $1 file to load gcp env and auth as https://cloud.google.com/docs/authentication/getting-started#setting_the_environment_variable"
 
-credentials_json_b64=$(extract_google_params_from_json_file credentials_json_b64 $1)
-credentials_json=$(echo $credentials_json_b64 | base64 -d)
-echo $credentials_json > auth.json
+credentials_json_b64=$(extract_google_params_from_json_file credentials_json_b64 "$1")
+credentials_json=$(echo "$credentials_json_b64" | base64 -d)
+echo "$credentials_json" > auth.json
 auth_path=$(realpath auth.json)
 
-google_region=$(extract_google_params_from_json_file region $1)
-google_zone=$(extract_google_params_from_json_file zone $1)
-google_env=$(extract_google_params_from_json_file env $1)
-google_project=$(extract_google_params_from_json_file project $1)
+google_region=$(extract_google_params_from_json_file region "$1")
+google_zone=$(extract_google_params_from_json_file zone "$1")
+google_env=$(extract_google_params_from_json_file env "$1")
+google_project=$(extract_google_params_from_json_file project "$1")
 
 export GOOGLE_APPLICATION_CREDENTIALS=$auth_path
 export GOOGLE_REGION=$google_region
 export GOOGLE_ZONE=$google_zone
 export GOOGLE_ENV=$google_env
 export GOOGLE_PROJECT=$google_project
-
-eval "$saved_options"

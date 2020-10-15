@@ -95,6 +95,11 @@ resource "google_project_iam_member" "start_and_stop_cloudfunctions_invoker" {
   member = "serviceAccount:${google_service_account.start_and_stop.email}"
 }
 
+resource "google_project_iam_member" "start_and_stop_iam_service_account_user" {
+  role   = "roles/iam.serviceAccountUser"
+  member = "serviceAccount:${google_service_account.start_and_stop.email}"
+}
+
 resource "google_service_account" "runner" {
   account_id   = "runner-user"
   display_name = "Runner user"
@@ -112,5 +117,10 @@ resource "google_project_iam_member" "runner_cloudfunctions_invoker" {
 
 resource "google_project_iam_member" "runner_logging_logwriter" {
   role   = "roles/logging.logWriter"
+  member = "serviceAccount:${google_service_account.runner.email}"
+}
+
+resource "google_project_iam_member" "runner_monitoring_metricwriter" {
+  role   = "roles/monitoring.metricWriter"
   member = "serviceAccount:${google_service_account.runner.email}"
 }

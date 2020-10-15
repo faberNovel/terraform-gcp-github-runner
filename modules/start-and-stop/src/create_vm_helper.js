@@ -1,21 +1,24 @@
 const Compute = require('@google-cloud/compute')
 const Fs = require('fs')
 const { v4: uuidv4 } = require('uuid')
+const chalk = require('chalk')
 const compute = new Compute()
 const zone = compute.zone(process.env.GOOGLE_ZONE)
 
-module.exports.createVm = async function createVm (prefix, isIdle) {
-  console.log(`create idle:${isIdle} VM ...`)
-  const [vm, operation] = await zone.createVM(createVmName(prefix), createVmConfig(isIdle, process.env.GOOGLE_ENV))
+async function createVm (isIdle) {
+  console.info(`create idle:${isIdle} VM ...`)
+  const [vm, operation] = await zone.createVM(createVmName(), createVmConfig(isIdle, process.env.GOOGLE_ENV))
   await operation.promise()
-  console.log(`VM ${vm.name} created`)
+  console.info(chalk.green(`VM ${vm.name} created`))
   return vm
 }
 
-function createVmName (prefix) {
-  const runnerId = uuidv4()
-  const vmName = `${prefix}-${runnerId}`
-  return vmName
+function getRunnerNamePrefix () {
+  return `vm-gcp-${process.env.GOOGLE_ENV}`
+}
+
+function createVmName () {
+  return `${getRunnerNamePrefix()}-${uuidv4()}`
 }
 
 function createVmConfig (isIdle, env) {
@@ -29,7 +32,7 @@ function createVmConfig (isIdle, env) {
         boot: true,
         autoDelete: true,
         initializeParams: {
-          sourceImage: 'https://www.googleapis.com/compute/v1/projects/github-runners-dev/global/images/ubuntu-runner'
+          sourceImage: 'https://www.googleapis.com/compute/v1/projects/github-runners-dev/global/images/debian-runner'
         }
       }
     ],
@@ -73,3 +76,6 @@ function createVmConfig (isIdle, env) {
   }
   return config
 }
+
+module.exports.createVm = createVm
+module.exports.getRunnerNamePrefix = getRunnerNamePrefix

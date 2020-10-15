@@ -14,6 +14,7 @@
   },
   "dependencies": {
     "@google-cloud/compute": "^2.1.0",
+    "chalk": "^4.1.0",
     "google-auth-library": "^6.1.0",
     "uuid": "^8.3.0"
   },
