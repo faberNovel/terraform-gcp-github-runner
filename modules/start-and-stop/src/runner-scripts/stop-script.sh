@@ -1,22 +1,6 @@
 #!/bin/bash
 
-## Catching error, log it, and exit
-trap 'catch $? $LINENO' ERR
-
-catch() {
-  log_error "error $1 occurred on line $2"
-  exit 1    
-}
-
-log_debug() {
-  gcloud logging write startup-script "$HOSTNAME : $1" --severity=DEBUG
-}
-
-log_error() {
-  gcloud logging write startup-script "$HOSTNAME : $1" --severity=ERROR
-}
-
-log_debug "start stop script"
+echo "start stop script"
 
 RUNNER_USER="runner"
 
@@ -29,9 +13,9 @@ REMOVE_TOKEN_RESULT=$(curl "$FUNCTION_URL" -H "Authorization: Bearer $(gcloud au
 REMOVE_TOKEN=$(jq -r .token <<< "$REMOVE_TOKEN_RESULT")
 
 if [ -n "$REMOVE_TOKEN" ]; then
-  log_debug "remove token fetched with success"
+  echo "remove token fetched with success"
 else
-  log_error "error fetching remove token"
+  echo "error fetching remove token" >&2
 fi
 
 ## Runner
@@ -40,6 +24,6 @@ sudo -u $RUNNER_USER ./config.sh remove --token "$REMOVE_TOKEN"
 cd /home/$RUNNER_USER || exit 1
 rm -rf actions-runner
 
-log_debug "end stop with success"
+echo "end stop with success"
 
 exit 0
