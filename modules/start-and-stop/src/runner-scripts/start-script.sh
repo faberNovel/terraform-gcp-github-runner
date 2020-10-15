@@ -18,7 +18,7 @@ log_error() {
 
 log_debug "start startup script"
 
-RUNNER_USER="ubuntu"
+RUNNER_USER="runner"
 
 ## Start stack driver
 sudo service stackdriver-agent start

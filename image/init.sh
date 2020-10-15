@@ -5,11 +5,13 @@ set -e
 # Hack to ensure VM is well started
 sleep 15
 
-RUNNER_USER="ubuntu"
+RUNNER_USER="runner"
 
-sudo apt-get -y update
+# Add runner user with home folder
+sudo useradd -m $RUNNER_USER
 
 ## Minimum tools
+sudo apt-get -y update
 sudo apt-get -y install \
     git \
     curl \
@@ -22,9 +24,9 @@ sudo apt-get -y install \
     curl \
     gnupg-agent \
     software-properties-common
-curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+curl -fsSL https://download.docker.com/linux/debian/gpg | sudo apt-key add -
 sudo add-apt-repository \
-   "deb [arch=amd64] https://download.docker.com/linux/ubuntu \
+   "deb [arch=amd64] https://download.docker.com/linux/debian \
    $(lsb_release -cs) \
    stable"
 sudo apt-get -y update
@@ -46,7 +48,7 @@ sudo -u $RUNNER_USER touch $CLEANER_FILE
 true > $CLEANER_FILE
 cat << EOF > $CLEANER_FILE
 if [ $(id -u) -ne 0 ] ; then echo\"Please run as root\" ; exit 1 ; fi
-rm -r /home/ubuntu/actions-runner/_work/_temp
+rm -r /home/runner/actions-runner/_work/_temp
 docker image prune -a -f
 EOF
 echo "0 */6 * * * sudo sh /home/$RUNNER_USER/$CLEANER_FILE >> /home/$RUNNER_USER/cron-cleaner-log 2>&1" | sudo -u $RUNNER_USER crontab -

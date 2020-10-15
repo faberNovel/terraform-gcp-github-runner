@@ -18,6 +18,8 @@ log_error() {
 
 log_debug "start stop script"
 
+RUNNER_USER="runner"
+
 ## Fetch remove token
 ZONE=$(curl -H Metadata-Flavor:Google http://metadata/computeMetadata/v1/instance/zone)
 FUNCTION_URL=$(gcloud compute instances describe "$HOSTNAME" --zone "$ZONE" --flatten="metadata[github-api-trigger-url]" --format=object)
@@ -33,9 +35,9 @@ else
 fi
 
 ## Runner
-cd /home/ubuntu/actions-runner || exit 1
-sudo -u ubuntu ./config.sh remove --token "$REMOVE_TOKEN"
-cd /home/ubuntu || exit 1
+cd "/home/$RUNNER_USER/actions-runner" || exit 1
+sudo -u $RUNNER_USER ./config.sh remove --token "$REMOVE_TOKEN"
+cd /home/$RUNNER_USER || exit 1
 rm -rf actions-runner
 
 log_debug "end stop with success"
