@@ -7,9 +7,9 @@ module.exports.scaleIdleRunners = async function scaleIdleRunners () {
   const idle = true
   const targetRunnerCountDelta = await getTargetRunnerCountDelta(idle)
   if (targetRunnerCountDelta > 0) {
-    scaleUpRunners(idle, targetRunnerCountDelta)
+    await scaleUpRunners(idle, targetRunnerCountDelta)
   } else if (targetRunnerCountDelta < 0) {
-    scaleDownRunners(idle, Math.abs(targetRunnerCountDelta), true)
+    await scaleDownRunners(idle, Math.abs(targetRunnerCountDelta), true)
   } else {
     console.info(chalk.green('idle runners reached, no scale to apply'))
   }
@@ -19,14 +19,14 @@ module.exports.scaleUpNonIdleRunners = async function scaleUpNonIdleRunners () {
   const idle = false
   const targetRunnerCountDelta = await getTargetRunnerCountDelta(idle)
   if (targetRunnerCountDelta > 0) {
-    scaleUpRunners(idle, targetRunnerCountDelta)
+    await scaleUpRunners(idle, targetRunnerCountDelta)
   }
 }
 
 module.exports.scaleDownNonIdleRunners = async function scaleDownNonIdleRunners (force) {
   const idle = false
   const runnerVms = await GetVMHelper.getRunnerVMs(idle)
-  scaleDownRunners(idle, runnerVms.length, force)
+  await scaleDownRunners(idle, runnerVms.length, force)
 }
 
 function getTargetRunnersCount (idle) {
