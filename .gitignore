@@ -1,8 +1,5 @@
 .terraform
 **.DS_Store
-backend-dev.tfvars.json
-backend-prod.tfvars.json
+backend-*.tfvars.json
 github.auto.tfvars.json
-google-dev.tfvars.json
-google-prod.tfvars.json
-google-gitlab.tfvars.json
+google-*.tfvars.json
