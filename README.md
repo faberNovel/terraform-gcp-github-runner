@@ -19,6 +19,9 @@ To address a specific GCP projet:
 * Generate a private key, pass it in `b64` in terraform variable `secrets.github_key_pem_b64`.
 * Pass the app installation id in terraform as `github.app_installation_id` and the app id as `github.app_id`.
 
+## Architecture
+![Architecture](docs/components-scheme.svg)
+
 <!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
 ## Requirements
 
