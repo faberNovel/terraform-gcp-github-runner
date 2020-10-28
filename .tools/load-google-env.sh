@@ -45,7 +45,7 @@ credentials_json_b64=$(extract_params_from_json_file .google.credentials_json_b6
 credentials_json=$(echo "$credentials_json_b64" | base64 -d)
 echo "$credentials_json" > auth.json
 auth_path=$(realpath auth.json)
-export GOOGLE_APPLICATION_CREDENTIALS=$auth_path
+export GOOGLE_APPLICATION_CREDENTIALS="$auth_path"
 
 # Setup project envs vars
 extract_and_export ".google.region" "$json_file_path" "GOOGLE_REGION"
