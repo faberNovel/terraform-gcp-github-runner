@@ -28,7 +28,8 @@ if [ -z "$packer_action" ]; then
 fi
 
 env_file_path=$(realpath "$env_file")
-project_root_path=$(realpath "$(dirname "$0")/..")
+script_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+project_root_path=$(realpath "$script_dir/..")
 packer_project_path=$project_root_path/image
 
 # shellcheck source=.tools/load-default-terraform-env.sh

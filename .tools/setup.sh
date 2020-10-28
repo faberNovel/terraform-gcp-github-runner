@@ -12,7 +12,8 @@ Warning : Values are evaluated from best effort parsing of terraform vars files.
 locals terraform vars or constants, this script could need update in the future.
 EOF
 
-project_root_path=$(realpath "$(dirname "$0")/..")
+script_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+project_root_path=$(realpath "$script_dir/..")
 google_path=$project_root_path/google-dev.tfvars.json
 github_path=$project_root_path/github.auto.tfvars.json
 
