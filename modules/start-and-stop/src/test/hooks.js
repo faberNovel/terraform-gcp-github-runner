@@ -2,7 +2,7 @@ const sinon = require('sinon')
 
 exports.mochaHooks = {
   beforeAll () {
-    console.log('Starting tests, console will be disable')
+    console.log('Starting tests, console will be disabled')
     sinon.stub(console, 'log') // disable console.log
     sinon.stub(console, 'info') // disable console.info
     sinon.stub(console, 'warn') // disable console.warn
