@@ -9,6 +9,11 @@ const getVMHelper = require('./get_vm_helper.js')
 chai.should()
 
 describe('scale helper tests', () => {
+  afterEach(function () {
+    sandbox.verify()
+    sandbox.restore()
+  })
+
   describe('When calling scale up runners', () => {
     it('Should scale up runners', async () => {
       const scaleUpRunners = scaleHelper.__get__('scaleUpRunners')
@@ -23,17 +28,11 @@ describe('scale helper tests', () => {
         idleParam.should.equals(idle)
       })
       stub.getCalls().length.should.equals(count)
-
-      sandbox.restore()
     })
   })
 
   describe('When calling scale down runners', () => {
     const scaleDownRunners = scaleHelper.__get__('scaleDownRunners')
-
-    afterEach(function () {
-      sandbox.restore()
-    })
 
     it('should scale down runners when force is used', async () => {
       const idle = false
@@ -64,10 +63,6 @@ describe('scale helper tests', () => {
 
   describe('When get target runner count delta', () => {
     const getTargetRunnerCountDelta = scaleHelper.__get__('getTargetRunnerCountDelta')
-
-    afterEach(function () {
-      sandbox.restore()
-    })
 
     it('should return positive when scaling up', async () => {
       const delta = await getTargetRunnerCountDeltaWrapped(0, 1, getTargetRunnerCountDelta)
@@ -104,28 +99,19 @@ function stubExternalDependencies (vms, busyCount) {
 function makeFakeVMs (count) {
   const vms = []
   for (let index = 0; index < count; index++) {
-    vms.push({
+    const vm = {
       name: `vm-${index}`,
-      delete: sandbox.fake.resolves()
-    })
+      delete: function () {}
+    }
+    const mockVm = sandbox.mock(vm)
+    vm.deleteMock = mockVm.expects('delete').resolves().atLeast(0).atMost(1)
+    vms.push(vm)
   }
   return vms
 }
 
 function countFakeVmsDeleted (fakeVMs) {
-  var count = 0
-  fakeVMs.forEach(fakeVM => {
-    const deleteCallCount = fakeVM.delete.getCalls().length
-    switch (deleteCallCount) {
-      case 1:
-        count++
-        break
-      case 0:
-        // no-op
-        break
-      default:
-        throw Error('Illegal delete count number')
-    }
-  })
-  return count
+  return fakeVMs.reduce((count, fakeVM) => {
+    return count + fakeVM.deleteMock.callCount
+  }, 0)
 }
