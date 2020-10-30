@@ -10,7 +10,10 @@
     "run": "node -e 'require(\"./start_and_stop.js\").startAndStop()'",
     "predev": "bash ../../../.tools/setup.sh",
     "dev": "node -r dotenv/config -e 'require(\"./start_and_stop.js\").dev()'",
-    "test": "mocha start_and_stop.test.js"
+    "test": "DOTENV_CONFIG_PATH=./test/.test.env mocha *.test.js"
+  },
+  "mocha": {
+    "require": "dotenv/config, test/hooks.js"
   },
   "dependencies": {
     "@google-cloud/compute": "^2.1.0",
@@ -21,14 +24,17 @@
   "devDependencies": {
     "dotenv": "^8.2.0",
     "chai": "^4.2.0",
+    "chai-string": "^1.5.0",
     "chai-as-promised": "^7.1.1",
     "mocha": "^8.1.1",
     "sinon": "^9.0.3",
+    "rewire": "^5.0.0",
     "eslint": "^7.7.0",
     "eslint-config-standard": "^14.1.1",
     "eslint-plugin-import": "^2.22.0",
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-promise": "^4.2.1",
-    "eslint-plugin-standard": "^4.0.1"
+    "eslint-plugin-standard": "^4.0.1",
+    "eslint-plugin-chai-friendly": "^0.6.0"
   }
 }
