@@ -28,6 +28,7 @@ resource "google_cloudfunctions_function" "start_and_stop" {
   environment_variables = {
     "GOOGLE_ZONE"            = var.google.zone
     "GOOGLE_ENV"             = var.google.env
+    "GOOGLE_PROJECT"         = var.google.project
     "RUNNER_MACHINE_TYPE"    = var.runner.type
     "RUNNER_IDLE_COUNT"      = var.runner.idle_count
     "RUNNER_TOTAL_COUNT"     = var.runner.total_count

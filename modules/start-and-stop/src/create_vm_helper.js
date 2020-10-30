@@ -32,7 +32,7 @@ function createVmConfig (isIdle, env) {
         boot: true,
         autoDelete: true,
         initializeParams: {
-          sourceImage: 'https://www.googleapis.com/compute/v1/projects/github-runners-dev/global/images/debian-runner'
+          sourceImage: `https://www.googleapis.com/compute/v1/projects/${process.env.GOOGLE_PROJECT}/global/images/debian-runner`
         }
       }
     ],
