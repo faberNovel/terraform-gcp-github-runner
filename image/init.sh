@@ -49,9 +49,9 @@ true > $CLEANER_FILE
 cat << EOF > $CLEANER_FILE
 if [ $(id -u) -ne 0 ] ; then echo\"Please run as root\" ; exit 1 ; fi
 rm -r /home/runner/actions-runner/_work/_temp
-docker image prune -a -f
+docker system prune -a -f
 EOF
-echo "0 */6 * * * sudo sh /home/$RUNNER_USER/$CLEANER_FILE >> /home/$RUNNER_USER/cron-cleaner-log 2>&1" | sudo -u $RUNNER_USER crontab -
+echo "0 1 * * * sudo sh /home/$RUNNER_USER/$CLEANER_FILE >> /home/$RUNNER_USER/cron-cleaner-log 2>&1" | sudo -u $RUNNER_USER crontab -
 
 ## Runner
 cd /home/$RUNNER_USER
