@@ -1,1 +1,0 @@
-0 */6 * * * sudo sh /home/ubuntu/cleaner.sh >> /home/ubuntu/cron-cleaner-log 2>&1

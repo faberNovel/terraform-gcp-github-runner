@@ -1,0 +1,4 @@
+src/node_modules
+src/.env
+src/auth.json
+start_and_stop.zip

@@ -1,8 +1,8 @@
 provider "google" {
   credentials = base64decode(var.google.credentials_json_b64)
   project     = var.google.project
-  region      = "us-central1"
-  zone        = "us-central1-c"
+  region      = var.google.region
+  zone        = var.google.zone
 }
 
 resource "google_project_service" "gcp_services" {
@@ -24,22 +24,20 @@ terraform {
   backend "remote" {}
 }
 
-module "runners" {
-  source = "./modules/runners"
-  runner = var.runner
-  env    = var.google.env
-  github = var.github
+module "start_and_stop" {
+  source                 = "./modules/start-and-stop"
+  google                 = var.google
+  runner                 = var.runner
+  github_api_trigger_url = module.github_api.github_api_trigger_url
+  github_org             = var.github.organisation
 
   depends_on = [google_project_service.gcp_services]
 }
 
-module "start_and_stop" {
-  source = "./modules/start-and-stop"
-  google = {
-    env     = var.google.env
-    project = var.google.project
-  }
-  secret_name_github_json = module.secrets.secret_name_github_json
+module "github_api" {
+  source             = "./modules/github-api"
+  secret_github_json = module.secrets.secret_github_json
+  google             = var.google
 
   depends_on = [google_project_service.gcp_services]
 }

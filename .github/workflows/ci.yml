@@ -6,6 +6,9 @@ jobs:
     runs-on: [self-hosted, linux, docker]
     container:
       image: docker://node:12
+    strategy:
+      matrix:
+        js_src: ["modules/start-and-stop/src", "modules/github-api/src"]  
       
     steps:
       - name: Checkout
@@ -13,7 +16,7 @@ jobs:
 
       - name: Test js
         env:
-          JS_SRC: "modules/start-and-stop/src"
+          JS_SRC: ${{ matrix.js_src }}
         run: |
           npm install --prefix $JS_SRC 
           npm run --prefix $JS_SRC test
@@ -30,12 +33,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2.1.0
-
-      - name: Install Terraform dependencies
-        run: |
-          apk add nodejs=~12
-          apk add npm
-          npm install --prefix "modules/runners/scripts"
 
       - name: Setup env
         env:
@@ -61,4 +58,36 @@ jobs:
       - name: Terraform run 
         run: |
           terraform plan -lock=false
-      
+        
+  test-packer:
+    runs-on: [self-hosted, linux, docker]
+    container:
+      image: docker://hashicorp/packer
+            
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2.1.0
+        
+      - name: Setup env
+        env:
+          GOOGLE_TFVARS_JSON: ${{ secrets.GOOGLE_DEV_TFVARS_JSON }}
+        run: |
+          echo $GOOGLE_TFVARS_JSON > google.auto.tfvars.json
+        
+      - name: Packer validate
+        run: |
+          apk add jq
+          bash image/packer.sh --env-file google.auto.tfvars.json --packer-action validate
+
+  lint-bash:
+    runs-on: [self-hosted, linux, docker]
+    container:
+      image: docker://koalaman/shellcheck-alpine
+            
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2.1.0
+        
+      - name: Shellcheck
+        run: |
+          shellcheck **/*.sh -x
