@@ -50,7 +50,7 @@ resource "google_pubsub_topic" "start_and_stop" {
 
 resource "google_cloud_scheduler_job" "start_job" {
   name      = "start-job"
-  schedule  = "0 8 * * *"
+  schedule  = "0 8 * * 1-5"
   time_zone = "Europe/Paris"
 
   pubsub_target {
@@ -61,7 +61,7 @@ resource "google_cloud_scheduler_job" "start_job" {
 
 resource "google_cloud_scheduler_job" "stop_job" {
   name      = "stop-job"
-  schedule  = "0 19 * * *"
+  schedule  = "0 19 * * 1-5"
   time_zone = "Europe/Paris"
 
   pubsub_target {
@@ -72,7 +72,7 @@ resource "google_cloud_scheduler_job" "stop_job" {
 
 resource "google_cloud_scheduler_job" "force_stop_job" {
   name      = "force-stop-job"
-  schedule  = "0 20 * * *"
+  schedule  = "0 20 * * 1-5"
   time_zone = "Europe/Paris"
 
   pubsub_target {
