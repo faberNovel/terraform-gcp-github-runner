@@ -22,19 +22,19 @@
     "uuid": "^8.3.0"
   },
   "devDependencies": {
-    "dotenv": "^8.2.0",
     "chai": "^4.2.0",
-    "chai-string": "^1.5.0",
     "chai-as-promised": "^7.1.1",
-    "mocha": "^8.1.1",
-    "sinon": "^9.0.3",
-    "rewire": "^5.0.0",
+    "chai-string": "^1.5.0",
+    "dotenv": "^8.2.0",
     "eslint": "^7.7.0",
     "eslint-config-standard": "^14.1.1",
+    "eslint-plugin-chai-friendly": "^0.6.0",
     "eslint-plugin-import": "^2.22.0",
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-promise": "^4.2.1",
     "eslint-plugin-standard": "^4.0.1",
-    "eslint-plugin-chai-friendly": "^0.6.0"
+    "mocha": "^8.1.1",
+    "rewire": "^5.0.0",
+    "sinon": "^9.0.3"
   }
 }
