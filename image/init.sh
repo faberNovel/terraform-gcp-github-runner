@@ -41,17 +41,16 @@ sudo bash add-monitoring-agent-repo.sh
 sudo apt-get -y update
 sudo apt-get install -y 'stackdriver-agent=6.*'
 
-## Auto clean
+## Auto clean as root
 cd "/home/$RUNNER_USER"
 CLEANER_FILE="cleaner.sh"
-sudo -u $RUNNER_USER touch $CLEANER_FILE
+sudo touch $CLEANER_FILE
 true > $CLEANER_FILE
 cat << EOF > $CLEANER_FILE
-if [ $(id -u) -ne 0 ] ; then echo\"Please run as root\" ; exit 1 ; fi
 rm -r /home/runner/actions-runner/_work/_temp
 docker system prune -a -f
 EOF
-echo "0 1 * * * sudo sh /home/$RUNNER_USER/$CLEANER_FILE >> /home/$RUNNER_USER/cron-cleaner-log 2>&1" | sudo -u $RUNNER_USER crontab -
+echo "0 1 * * * sh /home/$RUNNER_USER/$CLEANER_FILE >> /home/$RUNNER_USER/cron-cleaner-log 2>&1" | sudo crontab
 
 ## Runner
 cd /home/$RUNNER_USER

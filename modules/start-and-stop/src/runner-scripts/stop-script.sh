@@ -22,7 +22,6 @@ fi
 cd "/home/$RUNNER_USER/actions-runner" || exit 1
 sudo -u $RUNNER_USER ./config.sh remove --token "$REMOVE_TOKEN"
 cd /home/$RUNNER_USER || exit 1
-rm -rf actions-runner
 
 echo "end stop with success"
 
