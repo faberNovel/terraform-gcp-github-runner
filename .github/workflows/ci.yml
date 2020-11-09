@@ -8,7 +8,7 @@ jobs:
       image: docker://node:12
     strategy:
       matrix:
-        js_src: ["modules/start-and-stop/src", "modules/github-api/src"]  
+        js_src: ["modules/start-and-stop/src", "modules/github-api/src", "modules/github-hook/function"]  
       
     steps:
       - name: Checkout
