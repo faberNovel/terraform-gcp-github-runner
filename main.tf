@@ -48,3 +48,7 @@ module "secrets" {
 
   depends_on = [google_project_service.gcp_services]
 }
+
+module "github_hook" {
+  source = "./modules/github-hook"
+}
