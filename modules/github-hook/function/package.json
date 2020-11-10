@@ -3,7 +3,7 @@
   "scripts": {
     "build": "tsc",
     "lint": "eslint src/**",
-    "test": "echo \"no test available\"",
+    "test": "echo \"no-op\"",
     "dev": "npm run build && node -e 'require(\"./lib/github_hook.js\").dev()'"
   },
   "engines": {

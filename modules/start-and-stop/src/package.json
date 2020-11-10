@@ -7,6 +7,7 @@
     "node": "12"
   },
   "scripts": {
+    "build": "echo \"no-op\"",
     "run": "node -e 'require(\"./start_and_stop.js\").startAndStop()'",
     "predev": "bash ../../../.tools/setup.sh",
     "dev": "node -r dotenv/config -e 'require(\"./start_and_stop.js\").dev()'",

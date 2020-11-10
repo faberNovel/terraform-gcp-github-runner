@@ -2,33 +2,11 @@ name: CI
 on: [push]
 
 jobs:
-  test-js:
+  ci:
     runs-on: [self-hosted, linux, docker]
     container:
-      image: docker://node:12
-    strategy:
-      matrix:
-        js_src: ["modules/start-and-stop/src", "modules/github-api/src", "modules/github-hook/function"]  
-      
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2.1.0
-
-      - name: Test js
-        env:
-          JS_SRC: ${{ matrix.js_src }}
-        run: |
-          npm install --prefix $JS_SRC 
-          npm run --prefix $JS_SRC test
-          npm run --prefix $JS_SRC lint
-
-  test-tf:
-    runs-on: [self-hosted, linux, docker]
-    container:
-      image: docker://hashicorp/terraform:0.13.3
-    env:
-      TF_CLI_CONFIG_FILE: "terraformrc"
-      BACKEND_FILE_PATH: "backend.tfvars.json"
+      image: docker://docker:stable-git
+      options: --name=runner 
     
     steps:
       - name: Checkout
@@ -41,53 +19,10 @@ jobs:
           GOOGLE_TFVARS_JSON: ${{ secrets.GOOGLE_DEV_TFVARS_JSON }}
           APP_GITHUB_TFVARS_JSON: ${{ secrets.APP_GITHUB_TFVARS_JSON }}
         run: |
-          echo $TF_CLI_CONFIG_FILE_CONTENT > $TF_CLI_CONFIG_FILE
-          echo $BACKEND_DEV_TFVARS_JSON > $BACKEND_FILE_PATH
-          echo $GOOGLE_TFVARS_JSON > google.auto.tfvars.json
-          echo $APP_GITHUB_TFVARS_JSON > github.auto.tfvars.json
-
-      - name: Terraform init
-        run: |
-          terraform init -backend-config=$BACKEND_FILE_PATH
-
-      - name: Terraform checks 
-        run: |
-          terraform fmt -check -recursive
-          terraform validate
-
-      - name: Terraform run 
-        run: |
-          terraform plan -lock=false
-        
-  test-packer:
-    runs-on: [self-hosted, linux, docker]
-    container:
-      image: docker://hashicorp/packer
-            
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2.1.0
-        
-      - name: Setup env
-        env:
-          GOOGLE_TFVARS_JSON: ${{ secrets.GOOGLE_DEV_TFVARS_JSON }}
-        run: |
-          echo $GOOGLE_TFVARS_JSON > google.auto.tfvars.json
-        
-      - name: Packer validate
-        run: |
-          apk add jq
-          bash image/packer.sh --env-file google.auto.tfvars.json --packer-action validate
-
-  lint-bash:
-    runs-on: [self-hosted, linux, docker]
-    container:
-      image: docker://koalaman/shellcheck-alpine
-            
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2.1.0
-        
-      - name: Shellcheck
-        run: |
-          shellcheck **/*.sh -x
+          echo $TF_CLI_CONFIG_FILE_CONTENT > terraformrc
+          echo $BACKEND_DEV_TFVARS_JSON > backend.tfvars.json
+          echo $GOOGLE_TFVARS_JSON > google.tfvars.json
+          echo $APP_GITHUB_TFVARS_JSON > github.auto.tfvars.json        
+      
+      - name: Run all tests
+        run: sh .tools/ci/run-all.sh
