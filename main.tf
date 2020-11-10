@@ -51,4 +51,5 @@ module "secrets" {
 
 module "github_hook" {
   source = "./modules/github-hook"
+  google = var.google
 }

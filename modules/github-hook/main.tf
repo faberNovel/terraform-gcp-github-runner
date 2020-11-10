@@ -1,6 +1,6 @@
 data "archive_file" "github_hook_zip" {
   type        = "zip"
-  source_dir  = "${path.module}/src/"
+  source_dir  = "${path.module}/function/lib/"
   output_path = "${path.module}/github_hook.zip"
 }
 
