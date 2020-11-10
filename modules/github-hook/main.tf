@@ -1,6 +1,6 @@
 data "archive_file" "github_hook_zip" {
   type        = "zip"
-  source_dir  = "${path.module}/function/lib/"
+  source_dir  = "${path.module}/function/"
   output_path = "${path.module}/github_hook.zip"
 }
 
@@ -24,6 +24,7 @@ resource "google_cloudfunctions_function" "github_hook" {
   source_archive_object = google_storage_bucket_object.github_hook_zip.name
   service_account_email = google_service_account.github_hook.email
   trigger_http          = true
+  entry_point           = "githubHook"
 }
 
 resource "google_service_account" "github_hook" {

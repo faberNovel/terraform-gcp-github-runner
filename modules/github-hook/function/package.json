@@ -1,5 +1,6 @@
 {
   "name": "github_hook",
+  "main": "lib/github_hook.js",  
   "scripts": {
     "build": "tsc",
     "lint": "eslint src/**",
