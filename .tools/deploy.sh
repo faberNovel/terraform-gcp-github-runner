@@ -5,7 +5,7 @@ set -e
 # Printing script usage
 program_name=$0
 usage () {
-  echo "usage: $program_name --google-env-file google-env-file.json --backend-config-file backend.json"
+  echo "usage: $program_name { dev | prod | --google-env-file google-env-file.json --backend-config-file backend.json }"
   exit 1
 }
 
@@ -14,9 +14,21 @@ while true; do
   case "$1" in
     --google-env-file ) google_env_file="$2"; shift 2 ;;
     --backend-config-file ) backend_config_file="$2"; shift 2 ;;
+    dev ) dev=true; shift 1 ;;
+    prod ) prod=true; shift 1;;
     * ) break ;;
   esac
 done
+
+if [ "$dev" = true ]; then
+    google_env_file="google-dev.tfvars.json"
+    backend_config_file="backend-dev.tfvars.json"
+fi
+
+if [ "$prod" = true ]; then
+    google_env_file="google-prod-eu.tfvars.json"
+    backend_config_file="backend-prod-eu.tfvars.json"
+fi
 
 # Checking script params
 if [ -z "$google_env_file" ]; then
