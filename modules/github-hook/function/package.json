@@ -2,6 +2,7 @@
   "name": "github_hook",
   "scripts": {
     "build": "tsc",
+    "lint": "eslint src/**",
     "dev": "npm run build && node -e 'require(\"./lib/github_hook.js\").dev()'"
   },
   "engines": {
