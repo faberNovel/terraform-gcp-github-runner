@@ -8,6 +8,7 @@
   },
   "scripts": {
     "run": "node -e 'require(\"./github_api.js\").githubApi()'",
+    "lint": "eslint *.js",
     "predev": "bash ../../../.tools/setup.sh",
     "dev": "node -r dotenv/config -e 'require(\"./github_api.js\").dev()'",
     "test": "mocha github_api.test.js"

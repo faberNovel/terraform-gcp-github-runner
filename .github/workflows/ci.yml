@@ -20,7 +20,7 @@ jobs:
         run: |
           npm install --prefix $JS_SRC 
           npm run --prefix $JS_SRC test
-          npx eslint $JS_SRC
+          npm run --prefix $JS_SRC lint
 
   test-tf:
     runs-on: [self-hosted, linux, docker]
