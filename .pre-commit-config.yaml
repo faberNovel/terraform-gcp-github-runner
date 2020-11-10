@@ -9,8 +9,9 @@ repos:
   rev: 'v7.9.0'
   hooks:
     - id: eslint
+      files: \.[jt]sx?$  # *.js, *.jsx, *.ts and *.tsx
+      types: [file]
       args: [--fix]
-      exclude: 'modules/runners/scripts/*'
 
 - repo: git://github.com/detailyang/pre-commit-shell
   rev: v1.0.6

@@ -54,6 +54,9 @@ fi
 echo "Deploying runner image using packer done"
 cd "$project_root_path"
 
+# Compile TS
+npm run --prefix ./modules/github-hook/function build 
+
 # Deploy terraform
 echo "Deploying infra using terraform..."
 terraform init -backend-config="$backend_config_file_path"
