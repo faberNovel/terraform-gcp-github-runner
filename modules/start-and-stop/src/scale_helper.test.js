@@ -90,7 +90,8 @@ function stubExternalDependencies (vms, busyCount) {
   for (let index = 0; index < busyCount; index++) {
     mergedGithubState.push({
       name: vms[index].name,
-      status: 'busy'
+      status: 'online',
+      busy: true
     })
   }
   sandbox.stub(gitHubHelper, 'getRunnerGitHubStates').resolves(mergedGithubState)
