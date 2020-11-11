@@ -5,33 +5,32 @@ const { expect } = require('chai')
 chai.should()
 
 describe('Testing github helper', () => {
-  describe('when getting runner github status', () => {
-    it('should return runner status', async () => {
-      const runnerName = 'runner'
-      const runnerStatus = 'busy'
-      const status = githubHelper.getRunnerGitHubStateByName(generateRunnersGitHub(runnerName, runnerStatus), runnerName)
-      status.should.equals(runnerStatus)
+  describe('when getting runner github busy state', () => {
+    it('should return runner busy state', async () => {
+      const runnerName = 'busy-runner'
+      const isBusy = githubHelper.isRunnerBusy(generateRunnersGitHub(), runnerName)
+      isBusy.should.equals(true)
     })
   })
-  describe('when getting unknown runner github status, undefined is returned', () => {
-    it('should return undefined', async () => {
-      const runnerName = 'runner'
-      const runnerStatus = 'busy'
-      const status = githubHelper.getRunnerGitHubStateByName(generateRunnersGitHub(runnerName, runnerStatus), 'azerty')
-      expect(status).to.be.undefined
+  describe('when getting unknown runner github status, null is returned', () => {
+    it('should return null', async () => {
+      const isBusy = githubHelper.isRunnerBusy(generateRunnersGitHub(), 'unknown-runner')
+      expect(isBusy).to.be.null
     })
   })
 })
 
-function generateRunnersGitHub (runnerName, runnerStatus) {
+function generateRunnersGitHub () {
   return [
     {
-      name: runnerName,
-      status: runnerStatus
+      name: 'busy-runner',
+      status: 'online',
+      busy: true
     },
     {
-      name: `${runnerName}-1`,
-      status: `${runnerStatus}-1`
+      name: 'idle-runner',
+      status: 'online',
+      busy: false
     }
   ]
 }
