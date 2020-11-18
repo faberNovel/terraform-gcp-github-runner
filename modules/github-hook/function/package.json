@@ -1,11 +1,12 @@
 {
   "name": "github_hook",
-  "main": "lib/github_hook.js",  
+  "main": "lib/github_hook.js",
   "scripts": {
     "build": "tsc",
     "lint": "eslint src/**",
     "test": "echo \"no-op\"",
-    "dev": "npm run build && node -e 'require(\"./lib/github_hook.js\").dev()'"
+    "predev": "bash ../../../.tools/setup.sh",
+    "dev": "npm run build && node -r dotenv/config -e 'require(\"./lib/github_hook.js\").dev()'"
   },
   "engines": {
     "node": "12"
@@ -25,6 +26,8 @@
   },
   "private": true,
   "dependencies": {
-    "@google-cloud/functions-framework": "^1.7.1"
+    "@google-cloud/functions-framework": "^1.7.1",
+    "@google-cloud/secret-manager": "^3.2.2",
+    "dotenv": "^8.2.0"
   }
 }

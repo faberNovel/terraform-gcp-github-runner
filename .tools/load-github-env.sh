@@ -24,6 +24,7 @@ app_id=$(extract_github_params_from_json_file app_id "$1")
 installation_id=$(extract_github_params_from_json_file app_installation_id "$1")
 client_id=$(extract_github_params_from_json_file client_id "$1")
 client_secret=$(extract_github_params_from_json_file client_secret "$1")
+webhook_secret=$(extract_github_params_from_json_file webhook_secret "$1")
 
 export GITHUB_ORG=$org
 export GITHUB_KEY_B64=$key
@@ -31,3 +32,4 @@ export GITHUB_APP_ID=$app_id
 export GITHUB_INSTALLATION_ID=$installation_id
 export GITHUB_CLIENT_ID=$client_id
 export GITHUB_CLIENT_SECRET=$client_secret
+export GITHUB_WEBHOOK_SECRET=$webhook_secret

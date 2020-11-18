@@ -25,11 +25,30 @@ resource "google_cloudfunctions_function" "github_hook" {
   service_account_email = google_service_account.github_hook.email
   trigger_http          = true
   entry_point           = "githubHook"
+  ingress_settings      = "ALLOW_ALL"
+
+  environment_variables = {
+    "SECRET_GITHUB_JSON_RESOURCE_NAME" = var.secret_github_json.resource_name
+  }
+}
+
+resource "google_cloudfunctions_function_iam_member" "github_hook_invoker" {
+  project        = google_cloudfunctions_function.github_hook.project
+  region         = google_cloudfunctions_function.github_hook.region
+  cloud_function = google_cloudfunctions_function.github_hook.name
+
+  role   = "roles/cloudfunctions.invoker"
+  member = "allUsers"
 }
 
 resource "google_service_account" "github_hook" {
   account_id   = "github-hook-user"
   display_name = "GitHub hook User"
+}
+
+resource "google_project_iam_member" "github_hook_secretmanager_secretaccessor" {
+  role   = "roles/secretmanager.secretAccessor"
+  member = "serviceAccount:${google_service_account.github_hook.email}"
 }
 
 output "github_hook_trigger_url" {

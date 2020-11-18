@@ -50,8 +50,9 @@ module "secrets" {
 }
 
 module "github_hook" {
-  source = "./modules/github-hook"
-  google = var.google
+  source             = "./modules/github-hook"
+  google             = var.google
+  secret_github_json = module.secrets.secret_github_json
 }
 
 output "github_webhook_url" {
