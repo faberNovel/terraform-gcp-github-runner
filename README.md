@@ -45,6 +45,8 @@ To address a specific GCP projet:
 
 ## Outputs
 
-No output.
+| Name | Description |
+|------|-------------|
+| github\_webhook\_url | n/a |
 
 <!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->

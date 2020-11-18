@@ -53,3 +53,7 @@ module "github_hook" {
   source = "./modules/github-hook"
   google = var.google
 }
+
+output "github_webhook_url" {
+  value = module.github_hook.github_hook_trigger_url
+}
