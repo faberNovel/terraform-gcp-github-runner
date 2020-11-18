@@ -16,6 +16,7 @@
     "@types/express": "^4.17.9",
     "@types/mocha": "^8.0.4",
     "@types/rewire": "^2.5.28",
+    "@types/sinon": "^9.0.8",
     "@typescript-eslint/eslint-plugin": "^4.6.1",
     "@typescript-eslint/parser": "^4.6.1",
     "chai": "^4.2.0",
@@ -29,6 +30,7 @@
     "mocha": "^8.2.1",
     "node-mocks-http": "^1.9.0",
     "nodemon": "^2.0.6",
+    "sinon": "^9.2.1",
     "ts-node": "^9.0.0",
     "typescript": "^3.8.0"
   },

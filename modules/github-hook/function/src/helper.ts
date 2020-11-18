@@ -1,6 +1,6 @@
 import { SecretManagerServiceClient } from '@google-cloud/secret-manager'
 
-export async function getGithubWebhookSecret (): Promise<String> {
+export async function getGithubWebhookSecret (): Promise<string> {
   console.log('Loading github webhook secret...')
   try {
     const githubWebhookSecret = getGithubWebhookSecretFromProcessEnv()
@@ -12,12 +12,16 @@ export async function getGithubWebhookSecret (): Promise<String> {
   }
 }
 
-function getGithubWebhookSecretFromProcessEnv (): String {
+function getGithubWebhookSecretFromProcessEnv (): string {
   console.log('Loading github webhook secret from process env')
-  return process.env.GITHUB_WEBHOOK_SECRET as string
+  const value = process.env.GITHUB_WEBHOOK_SECRET
+  if (!value) {
+    throw Error('GITHUB_WEBHOOK_SECRET is undefined')
+  }
+  return value
 }
 
-async function getGithubWebhookSecretFromGoogleSecrets (): Promise<String> {
+async function getGithubWebhookSecretFromGoogleSecrets (): Promise<string> {
   console.log('Loading github webhook secret from google secrets')
   const client = new SecretManagerServiceClient()
   const version = (await client.accessSecretVersion({
