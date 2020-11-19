@@ -8,42 +8,40 @@ export const githubHook: HttpFunction = async (req: Request, res: Response) => {
   console.log(`body : ${JSON.stringify(req.body)}`)
   console.log(`headers : ${JSON.stringify(req.headers)}`)
 
-  const isRequestValid = await validateRequest(request)
-  if (!isRequestValid) {
-    res.status(403).send('Illegal request')
+  try {
+    await validateRequest(request)
+  } catch (error) {
+    console.error(error)
+    res.status(400).send('Bad request')
     return
   }
 
-  res.send('Hello, World')
+  res.status(200).send('Request processed')
 }
 
-export async function validateRequest (req: Request): Promise<Boolean> {
+export async function validateRequest (req: Request) {
   if (req.method !== 'POST') {
-    return Promise.resolve(false)
+    throw new Error('Invalid method')
   }
-  return authenticateRequest(req)
+  await authenticateRequest(req)
 }
 
-async function authenticateRequest (req: Request): Promise<Boolean> {
+async function authenticateRequest (req: Request) {
   const signatureHeader = req.get('x-hub-signature')
   if (!signatureHeader) {
-    console.log('no x-hub-signature header')
-    return Promise.resolve(false)
+    throw new Error('no x-hub-signature header')
   }
   const payload = JSON.stringify(req.body)
   if (!payload) {
-    console.log('no body')
-    return Promise.resolve(false)
+    throw new Error('no body')
   }
   const secret = await getGithubWebhookSecret()
   const hmac = crypto.createHmac('sha1', secret)
   const digest = Buffer.from('sha1=' + hmac.update(payload).digest('hex'), 'utf8')
   const checksum = Buffer.from(signatureHeader, 'utf8')
   if (checksum.length !== digest.length || !crypto.timingSafeEqual(digest, checksum)) {
-    console.log('signature does not match')
-    return Promise.resolve(false)
+    throw new Error('signature does not match')
   }
-  return Promise.resolve(true)
 }
 
 export function generateSignature (secret: string, payload: string): string {
