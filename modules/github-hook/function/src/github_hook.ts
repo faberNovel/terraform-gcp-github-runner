@@ -4,17 +4,24 @@ import { getGithubWebhookSecret } from './helper'
 import * as crypto from 'crypto'
 
 export const githubHook: HttpFunction = async (req: Request, res: Response) => {
-  console.log(`method : ${req.method}`)
-  console.log(`body : ${JSON.stringify(req.body)}`)
-  console.log(`headers : ${JSON.stringify(req.headers)}`)
-
   try {
     await validateRequest(req)
   } catch (error) {
-    console.error(error)
+    console.info('event is not valid')
+    console.info(error)
     res.status(400).send('Bad request')
     return
   }
+
+  console.log(`body : ${JSON.stringify(req.body)}`)
+
+  if (!isRequestAQueuedCheckRun(req)) {
+    console.info('event is not a queued check_run')
+    res.status(200).send('Request is not queued check run')
+    return
+  }
+
+  console.info('event is a queued check_run')
 
   res.status(200).send('Request processed')
 }
@@ -42,6 +49,23 @@ async function authenticateRequest (req: Request) {
   if (checksum.length !== digest.length || !crypto.timingSafeEqual(digest, checksum)) {
     throw new Error('signature does not match')
   }
+}
+
+function isRequestAQueuedCheckRun (request: Request): Boolean {
+  const body = request.body
+  if (body.action !== 'created') {
+    console.debug(`event action is not created (${body.action})`)
+    return false
+  }
+  if (!body.check_run) {
+    console.debug('event check_run is not present')
+    return false
+  }
+  if (body.check_run.status !== 'queued') {
+    console.debug(`status event check_run is not queued (${body.workflow_run.status})`)
+    return false
+  }
+  return true
 }
 
 export function generateSignature (secret: string, payload: string): string {
