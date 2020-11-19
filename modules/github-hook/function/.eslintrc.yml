@@ -2,6 +2,7 @@ env:
   commonjs: true
   es2021: true
   node: true
+  mocha: true
 extends:
   - standard
 parser: '@typescript-eslint/parser'
