@@ -1,5 +1,5 @@
 import type { HttpFunction } from '@google-cloud/functions-framework/build/src/functions'
-import { Response, Request, request } from 'express'
+import { Response, Request } from 'express'
 import { getGithubWebhookSecret } from './helper'
 import * as crypto from 'crypto'
 
@@ -9,7 +9,7 @@ export const githubHook: HttpFunction = async (req: Request, res: Response) => {
   console.log(`headers : ${JSON.stringify(req.headers)}`)
 
   try {
-    await validateRequest(request)
+    await validateRequest(req)
   } catch (error) {
     console.error(error)
     res.status(400).send('Bad request')
