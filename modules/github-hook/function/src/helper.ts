@@ -27,7 +27,13 @@ async function getGithubWebhookSecretFromGoogleSecrets (): Promise<string> {
   const version = (await client.accessSecretVersion({
     name: process.env.SECRET_GITHUB_JSON_RESOURCE_NAME
   }))[0]
-  const jsonPayload = version!.payload!.data as string
+  if (!version!.payload) {
+    throw new Error('Error loading secret value')
+  }
+  const jsonPayload = version.payload.data as string
   const githubSecrets = JSON.parse(jsonPayload)
+  if (!githubSecrets.webhook_secret) {
+    throw new Error('Missing property webhook_secret from secret')
+  }
   return githubSecrets.webhook_secret
 }

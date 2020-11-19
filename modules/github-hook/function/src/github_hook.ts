@@ -21,7 +21,7 @@ export const githubHook: HttpFunction = async (req: Request, res: Response) => {
 
 export async function validateRequest (req: Request) {
   if (req.method !== 'POST') {
-    throw new Error('Invalid method')
+    throw new Error(`Invalid method ${req.method}`)
   }
   await authenticateRequest(req)
 }
