@@ -24,5 +24,6 @@ variable "github" {
     client_id           = string
     client_secret       = string
     key_pem_b64         = string
+    webhook_secret      = string
   })
 }
