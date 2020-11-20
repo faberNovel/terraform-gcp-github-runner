@@ -3,27 +3,28 @@ import { Response, Request } from 'express'
 import { getGithubWebhookSecret } from './helper'
 import * as crypto from 'crypto'
 
+const GITHUB_ACTION_APP_ID = 15368
+
 export const githubHook: HttpFunction = async (req: Request, res: Response) => {
   try {
     await validateRequest(req)
   } catch (error) {
     console.info('event is not valid')
     console.info(error)
-    res.status(400).send('Bad request')
+    res.sendStatus(400)
     return
   }
 
-  console.log(`body : ${JSON.stringify(req.body)}`)
-
-  if (!isRequestAQueuedCheckRun(req)) {
+  if (!isRequestAQueuedCheckRunFromGitHubAction(req)) {
     console.info('event is not a queued check_run')
-    res.status(200).send('Request is not queued check run')
+    res.sendStatus(403)
     return
   }
 
-  console.info('event is a queued check_run')
+  const checkRunPayload = createCheckRunPayload(req)
+  console.info(`event is a queued check_run : ${JSON.stringify(checkRunPayload)}`)
 
-  res.status(200).send('Request processed')
+  res.sendStatus(202)
 }
 
 export async function validateRequest (req: Request) {
@@ -51,7 +52,7 @@ async function authenticateRequest (req: Request) {
   }
 }
 
-function isRequestAQueuedCheckRun (request: Request): Boolean {
+function isRequestAQueuedCheckRunFromGitHubAction (request: Request): Boolean {
   const body = request.body
   if (body.action !== 'created') {
     console.debug(`event action is not created (${body.action})`)
@@ -65,7 +66,26 @@ function isRequestAQueuedCheckRun (request: Request): Boolean {
     console.debug(`status event check_run is not queued (${body.workflow_run.status})`)
     return false
   }
+  if (!body.check_run.app) {
+    console.debug('event app is not present')
+    return false
+  }
+  if (body.check_run.app.id !== GITHUB_ACTION_APP_ID) {
+    console.debug('event was not trigger by github action')
+    return false
+  }
   return true
+}
+
+function createCheckRunPayload (request: Request): CheckRunPayload {
+  const checkRun = request.body.check_run
+  const repository = request.body.repository
+  return new CheckRunPayload(
+    checkRun.id,
+    checkRun.started_at,
+    repository.name,
+    repository.owner.login
+  )
 }
 
 export function generateSignature (secret: string, payload: string): string {
@@ -76,4 +96,13 @@ export function generateSignature (secret: string, payload: string): string {
 
 export async function dev () {
   console.log('hello-world')
+}
+
+class CheckRunPayload {
+  constructor (
+    readonly checkRunId: bigint,
+    readonly startedAt: string,
+    readonly repository: string,
+    readonly owner: String
+  ) {}
 }
