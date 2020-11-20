@@ -36,12 +36,12 @@ module.exports.deleteRunnerGitHub = async function deleteRunnerGitHub (gitHubRun
   return res.data.runners
 }
 
-module.exports.isRunnerBusy = function isRunnerBusy (githubRunners, name) {
+module.exports.getGitHubRunner = function (githubRunners, vmName) {
   const [githubRunner] = githubRunners.filter(runner => {
-    return runner.name === name
+    return runner.name === vmName
   })
   if (githubRunner === undefined) {
     return null
   }
-  return githubRunner.busy
+  return githubRunner
 }

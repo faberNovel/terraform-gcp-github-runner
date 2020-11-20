@@ -8,14 +8,15 @@ describe('Testing github helper', () => {
   describe('when getting runner github busy state', () => {
     it('should return runner busy state', async () => {
       const runnerName = 'busy-runner'
-      const isBusy = githubHelper.isRunnerBusy(generateRunnersGitHub(), runnerName)
+      const runner = githubHelper.getGitHubRunner(generateRunnersGitHub(), runnerName)
+      const isBusy = runner && runner.busy
       isBusy.should.equals(true)
     })
   })
   describe('when getting unknown runner github status, null is returned', () => {
     it('should return null', async () => {
-      const isBusy = githubHelper.isRunnerBusy(generateRunnersGitHub(), 'unknown-runner')
-      expect(isBusy).to.be.null
+      const runner = githubHelper.getGitHubRunner(generateRunnersGitHub(), 'unknown-runner')
+      expect(runner).to.be.null
     })
   })
 })

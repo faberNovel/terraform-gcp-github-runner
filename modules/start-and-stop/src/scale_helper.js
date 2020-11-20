@@ -66,12 +66,17 @@ async function scaleDownRunners (idle, count, force) {
   const runnerVMsToDelete = runnerVMs.slice(-count)
   await Promise.all(runnerVMsToDelete.map(async (runnerVM) => {
     console.info(`trying to delete runner : ${runnerVM.name}`)
-    const isBusy = GitHubHelper.isRunnerBusy(runnerGitHubStates, runnerVM.name)
+    const gitHubRunner = GitHubHelper.getGitHubRunner(runnerGitHubStates, runnerVM.name)
+    const isBusy = gitHubRunner && gitHubRunner.busy
     console.info(`GitHub runner is busy : ${isBusy}`)
     if (isBusy === true && force === false) {
       console.info(`runner busy, not deleting : ${runnerVM.name}`)
     } else {
       console.info(`deleting instance : ${runnerVM.name}`)
+      if (gitHubRunner !== null) {
+        console.info('directly removing runner to block new job to be assigned to the runner')
+        GitHubHelper.deleteRunnerGitHub(gitHubRunner.id)
+      }
       await runnerVM.delete()
     }
     Promise.resolve(`trying to delete instance end : ${runnerVM.name}`)
