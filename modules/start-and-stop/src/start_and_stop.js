@@ -15,6 +15,8 @@ module.exports.startAndStop = async (data, context) => {
       await stopRunners(force)
     } else if (payload.action === 'healthcheck') {
       await healthCheck()
+    } else if (payload.action === 'renew_idle_runners') {
+      await renewIdleRunners()
     }
     return Promise.resolve('startAndStop end')
   } catch (err) {
@@ -40,6 +42,10 @@ async function healthCheck () {
   await HealthCheckHelper.removeDisconnectedGcpRunners()
   await HealthCheckHelper.removeOfflineGitHubRunners()
   await startRunners()
+}
+
+async function renewIdleRunners () {
+  await ScaleHelper.renewIdleRunners()
 }
 
 function validatePayload (payload) {
