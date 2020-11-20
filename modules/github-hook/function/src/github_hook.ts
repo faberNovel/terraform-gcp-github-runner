@@ -24,6 +24,12 @@ export const githubHook: HttpFunction = async (req: Request, res: Response) => {
   const checkRunPayload = createCheckRunPayload(req)
   console.info(`event is a queued check_run : ${JSON.stringify(checkRunPayload)}`)
 
+  if (checkRunPayload.repository.toLowerCase().includes('ios')) {
+    console.info('looks like a iOS workflow, ingoring...')
+    res.sendStatus(202)
+    return
+  }
+
   res.sendStatus(202)
 }
 
