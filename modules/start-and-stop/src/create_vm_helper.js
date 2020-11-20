@@ -64,6 +64,10 @@ function createVmConfig (isIdle, env) {
           key: 'github-org'
         },
         {
+          value: process.env.RUNNER_TAINT_LABELS,
+          key: 'taint-labels'
+        },
+        {
           value: startScript,
           key: 'startup-script'
         },

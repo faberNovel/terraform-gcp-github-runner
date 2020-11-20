@@ -29,6 +29,7 @@ resource "google_cloudfunctions_function" "start_and_stop" {
     "GOOGLE_ZONE"            = var.google.zone
     "GOOGLE_ENV"             = var.google.env
     "GOOGLE_PROJECT"         = var.google.project
+    "RUNNER_TAINT_LABELS"    = var.runner.taint_labels
     "RUNNER_MACHINE_TYPE"    = var.runner.type
     "RUNNER_IDLE_COUNT"      = var.runner.idle_count
     "RUNNER_TOTAL_COUNT"     = var.runner.total_count

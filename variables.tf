@@ -1,8 +1,9 @@
 variable "runner" {
   type = object({
-    total_count = number
-    idle_count  = number
-    type        = string
+    total_count  = number
+    idle_count   = number
+    type         = string
+    taint_labels = bool
   })
 }
 
