@@ -25,6 +25,7 @@ resource "google_cloudfunctions_function" "start_and_stop" {
   source_archive_object = google_storage_bucket_object.start_and_stop_zip.name
   entry_point           = "startAndStop"
   service_account_email = google_service_account.start_and_stop.email
+  max_instances         = 1
 
   environment_variables = {
     "GOOGLE_ZONE"            = var.google.zone
