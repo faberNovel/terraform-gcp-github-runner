@@ -3,7 +3,7 @@ const CreateVMHelper = require('./create_vm_helper.js')
 const GitHubHelper = require('./github_helper')
 const chalk = require('chalk')
 
-module.exports.scaleIdleRunners = async function scaleIdleRunners () {
+async function scaleIdleRunners () {
   const idle = true
   const targetRunnerCountDelta = await getTargetRunnerCountDelta(idle)
   if (targetRunnerCountDelta > 0) {
@@ -15,7 +15,15 @@ module.exports.scaleIdleRunners = async function scaleIdleRunners () {
   }
 }
 
-module.exports.scaleUpNonIdleRunners = async function scaleUpNonIdleRunners () {
+async function renewIdleRunners () {
+  const idle = true
+  const force = true
+  const targetCount = getTargetRunnersCount(idle)
+  await scaleDownRunners(idle, targetCount, force)
+  await scaleUpRunners(idle, targetCount)
+}
+
+async function scaleUpNonIdleRunners () {
   const idle = false
   const targetRunnerCountDelta = await getTargetRunnerCountDelta(idle)
   if (targetRunnerCountDelta > 0) {
@@ -23,7 +31,7 @@ module.exports.scaleUpNonIdleRunners = async function scaleUpNonIdleRunners () {
   }
 }
 
-module.exports.scaleDownNonIdleRunners = async function scaleDownNonIdleRunners (force) {
+async function scaleDownNonIdleRunners (force) {
   const idle = false
   const runnerVms = await GetVMHelper.getRunnerVMs(idle)
   await scaleDownRunners(idle, runnerVms.length, force)
@@ -75,7 +83,11 @@ async function scaleDownRunners (idle, count, force) {
       console.info(`deleting instance : ${runnerVM.name}`)
       if (gitHubRunner !== null) {
         console.info('directly removing runner to block new job to be assigned to the runner')
-        GitHubHelper.deleteRunnerGitHub(gitHubRunner.id)
+        try {
+          await GitHubHelper.deleteRunnerGitHub(gitHubRunner.id)
+        } catch (error) {
+          console.error(error)
+        }
       }
       await runnerVM.delete()
     }
@@ -83,3 +95,10 @@ async function scaleDownRunners (idle, count, force) {
   }))
   console.info(chalk.green(`scale down runners idle:${idle}, force:${force} end`))
 }
+
+module.exports.scaleIdleRunners = scaleIdleRunners
+module.exports.scaleUpNonIdleRunners = scaleUpNonIdleRunners
+module.exports.scaleDownNonIdleRunners = scaleDownNonIdleRunners
+module.exports.getTargetRunnerCountDelta = getTargetRunnerCountDelta
+module.exports.scaleDownRunners = scaleDownRunners
+module.exports.renewIdleRunners = renewIdleRunners

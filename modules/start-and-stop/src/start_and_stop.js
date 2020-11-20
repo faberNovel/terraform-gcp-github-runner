@@ -1,7 +1,6 @@
 const HealthCheckHelper = require('./healthcheck.js')
 const ScaleHelper = require('./scale_helper.js')
 const chalk = require('chalk')
-const gitHubHelper = require('./github_helper')
 
 module.exports.startAndStop = async (data, context) => {
   try {
@@ -25,11 +24,7 @@ module.exports.startAndStop = async (data, context) => {
 }
 
 module.exports.dev = async () => {
-  // await healthCheck()
-  // await startRunners()
-  // await stopRunners(true)
-  const status = await gitHubHelper.getRunnerGitHubStates()
-  console.log(status)
+  await ScaleHelper.renewIdleRunners()
 }
 
 async function startRunners () {
