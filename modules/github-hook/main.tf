@@ -2,6 +2,7 @@ data "archive_file" "github_hook_zip" {
   type        = "zip"
   source_dir  = "${path.module}/function/"
   output_path = "${path.module}/github_hook.zip"
+  excludes    = [".env", "auth.json"]
 }
 
 resource "google_storage_bucket" "github_hook_bucket" {

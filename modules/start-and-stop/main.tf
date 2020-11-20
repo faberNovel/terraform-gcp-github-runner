@@ -2,6 +2,7 @@ data "archive_file" "start_and_stop_zip" {
   type        = "zip"
   source_dir  = "${path.module}/src/"
   output_path = "${path.module}/start_and_stop.zip"
+  excludes    = [".env", "auth.json"]
 }
 
 resource "google_storage_bucket" "start_and_stop_bucket" {
