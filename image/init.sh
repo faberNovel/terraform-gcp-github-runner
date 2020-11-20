@@ -55,7 +55,6 @@ echo "0 1 * * * sh /home/$RUNNER_USER/$CLEANER_FILE >> /home/$RUNNER_USER/cron-c
 ## Runner
 cd /home/$RUNNER_USER
 sudo -u $RUNNER_USER mkdir actions-runner && cd "$_"
-sudo -u $RUNNER_USER curl -O -L https://github.com/actions/runner/releases/download/v2.169.1/actions-runner-linux-x64-2.169.1.tar.gz
-sudo -u $RUNNER_USER tar xzf ./actions-runner-linux-x64-2.169.1.tar.gz
-
+sudo -u $RUNNER_USER curl -O -L https://github.com/actions/runner/releases/download/v2.274.2/actions-runner-linux-x64-2.274.2.tar.gz
+sudo -u $RUNNER_USER tar xzf ./actions-runner-linux-x64-2.274.2.tar.gz
 exit 0
