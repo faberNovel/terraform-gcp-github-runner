@@ -26,7 +26,12 @@ module.exports.startAndStop = async (data, context) => {
 }
 
 module.exports.dev = async () => {
-  await ScaleHelper.renewIdleRunners()
+  try {
+    await ScaleHelper.renewIdleRunners()
+    console.log('ok')
+  } catch (error) {
+    console.log(`error = ${error}`)
+  }
 }
 
 async function startRunners () {

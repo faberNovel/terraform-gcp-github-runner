@@ -4,12 +4,24 @@ const { v4: uuidv4 } = require('uuid')
 const chalk = require('chalk')
 const compute = new Compute()
 const zone = compute.zone(process.env.GOOGLE_ZONE)
+const githubHelper = require('./github_helper.js')
+const pWaitFor = require('p-wait-for')
 
 async function createVm (isIdle) {
   console.info(`create idle:${isIdle} VM ...`)
   const [vm, operation] = await zone.createVM(createVmName(), createVmConfig(isIdle, process.env.GOOGLE_ENV))
   await operation.promise()
-  console.info(chalk.green(`VM ${vm.name} created`))
+  console.info(`Waiting VM to be RUNNING State`)
+  await vm.waitFor(`RUNNING`)
+  console.info(`Waiting VM to be connected to GitHub API`)
+  await pWaitFor(
+    () => githubHelper.isRunnerGitHubStateOnline(vm.name),
+    {
+      interval: 10_000,
+      timeout: 60_000 * 2
+    }
+  )
+  console.info(chalk.green(`VM ${vm.name} created, up, and running`))
   return vm
 }
 
