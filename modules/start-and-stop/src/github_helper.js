@@ -60,15 +60,15 @@ async function getRunnerGitHubStateByName (name) {
 async function isRunnerGitHubStateOnline (name) {
   const runnerGitHubState = await getRunnerGitHubStateByName(name)
   if (runnerGitHubState === null) {
-    console.log('runner github status is unknown')
+    console.log(`runner ${name} github status is unknown`)
     return Promise.resolve(false)
   }
   const gitHubStatus = runnerGitHubState.status
   if (gitHubStatus !== 'online') {
-    console.log(`runner github status is ${gitHubStatus}`)
+    console.log(`runner ${name} github status is ${gitHubStatus}`)
     return Promise.resolve(false)
   }
-  console.log('runner github status is online')
+  console.log(`runner ${name} github status is online`)
   return Promise.resolve(true)
 }
 

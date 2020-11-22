@@ -1,6 +1,7 @@
 const GetVMHelper = require('./get_vm_helper.js')
 const CreateVMHelper = require('./create_vm_helper.js')
 const GitHubHelper = require('./github_helper')
+const deleteVmHelper = require('./delete_vm_helper')
 const chalk = require('chalk')
 
 async function scaleIdleRunners () {
@@ -80,16 +81,7 @@ async function scaleDownRunners (idle, count, force) {
     if (isBusy === true && force === false) {
       console.info(`runner busy, not deleting : ${runnerVM.name}`)
     } else {
-      console.info(`deleting instance : ${runnerVM.name}`)
-      if (gitHubRunner !== null) {
-        console.info('directly removing runner to block new job to be assigned to the runner')
-        try {
-          await GitHubHelper.deleteRunnerGitHub(gitHubRunner.id)
-        } catch (error) {
-          console.error(error)
-        }
-      }
-      await runnerVM.delete()
+      await deleteVmHelper.deleteVm(runnerVM.name)
     }
     Promise.resolve(`trying to delete instance end : ${runnerVM.name}`)
   }))
