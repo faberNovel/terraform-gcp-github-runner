@@ -18,12 +18,19 @@ else
 fi
 export TF_CLI_CONFIG_FILE="terraformrc"
 
+# Read versions
+node_version=$(head -n 1 .nvmrc)
+terraform_version=$(head -n 1 .terraform-version)
+
+echo "node version : $node_version"
+echo "terraform version : $terraform_version"
+
 # Run JS tests
 echo "Build and test JS/TS"
 js_cmd="docker run \
 $volume_options --entrypoint /bin/bash --rm \
 --env CI \
-node:12 .tools/ci/test-js.sh"
+node:$node_version .tools/ci/test-js.sh"
 echo "$js_cmd"
 eval "$js_cmd"
 
@@ -32,7 +39,7 @@ echo "Build and test TF"
 tf_cmd="docker run \
 $volume_options --entrypoint /bin/sh --rm \
 --env TF_CLI_CONFIG_FILE --env CI \
-hashicorp/terraform:0.13.3 .tools/ci/test-tf.sh"
+hashicorp/terraform:$terraform_version .tools/ci/test-tf.sh"
 echo "$tf_cmd"
 eval "$tf_cmd"
 

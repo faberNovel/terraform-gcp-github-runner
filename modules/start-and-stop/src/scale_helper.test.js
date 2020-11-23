@@ -5,6 +5,7 @@ const scaleHelper = rewire('./scale_helper.js')
 const createVMHelper = require('./create_vm_helper.js')
 const gitHubHelper = require('./github_helper')
 const getVMHelper = require('./get_vm_helper.js')
+const deleteVmHelper = require('./delete_vm_helper')
 
 chai.should()
 
@@ -85,14 +86,18 @@ async function getTargetRunnerCountDeltaWrapped (givenRunnerCount, targetRunnerC
 
 function stubExternalDependencies (vms, busyCount) {
   sandbox.stub(getVMHelper, 'getRunnerVMs').resolves(vms)
-
+  sandbox.stub(deleteVmHelper, 'deleteVm').callsFake(async vmName => {
+    await vms.filter(vm => vm.name === vmName)[0].delete()
+    return Promise.resolve()
+  })
   const mergedGithubState = []
   for (let index = 0; index < busyCount; index++) {
-    mergedGithubState.push({
+    const gitHubRunnerState = {
       name: vms[index].name,
       status: 'online',
       busy: true
-    })
+    }
+    mergedGithubState.push(gitHubRunnerState)
   }
   sandbox.stub(gitHubHelper, 'getRunnerGitHubStates').resolves(mergedGithubState)
 }
@@ -102,7 +107,7 @@ function makeFakeVMs (count) {
   for (let index = 0; index < count; index++) {
     const vm = {
       name: `vm-${index}`,
-      delete: function () {}
+      delete: async function () {}
     }
     const mockVm = sandbox.mock(vm)
     vm.deleteMock = mockVm.expects('delete').resolves().atLeast(0).atMost(1)

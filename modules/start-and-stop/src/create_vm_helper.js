@@ -11,7 +11,7 @@ async function createVm (isIdle) {
   console.info(`create idle:${isIdle} VM ...`)
   const [vm] = await zone.createVM(createVmName(), createVmConfig(isIdle, process.env.GOOGLE_ENV))
   console.info(`Waiting VM ${vm.name} to be RUNNING State`)
-  await vm.waitFor(`RUNNING`)
+  await vm.waitFor('RUNNING')
   console.info(`Waiting VM ${vm.name} to be connected to GitHub API`)
   await pWaitFor(
     () => githubHelper.isRunnerGitHubStateOnline(vm.name),

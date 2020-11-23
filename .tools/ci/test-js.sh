@@ -11,7 +11,7 @@ declare -a js_src_folders=("modules/start-and-stop/src" "modules/github-api/src"
 for js_src_folder in "${js_src_folders[@]}"
 do
     cd "$project_root_path/$js_src_folder"
-    npm install
+    npm ci
     npm run build
     npm run lint
     npm run test

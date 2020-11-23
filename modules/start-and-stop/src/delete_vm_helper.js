@@ -27,7 +27,7 @@ async function deleteVm (vmName) {
   console.info(`runner ${vmName} does not exists anymore`)
 }
 
-async function vmDoesNotExist(vm) {
+async function vmDoesNotExist (vm) {
   const [exists] = await vm.exists()
   console.info(`vm ${vm.name} exists = ${exists}`)
   return Promise.resolve(!exists)
