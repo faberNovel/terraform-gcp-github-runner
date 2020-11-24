@@ -32,7 +32,7 @@ describe('Testing delete runner helper', () => {
       const mockVm = sandbox.mock(runnerVm)
       mockVm.expects('delete').resolves().once()
       const getRunnerHelperMock = sandbox.mock(getRunnerHelper)
-      getRunnerHelperMock.expects('getRunnerVMByName').withExactArgs(runnerName).resolves(runnerVm).once()
+      getRunnerHelperMock.expects('getRunnerVmByName').withExactArgs(runnerName).resolves(runnerVm).once()
 
       await deleteRunnerHelper.deleteRunner(runnerName)
 

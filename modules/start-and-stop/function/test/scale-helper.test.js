@@ -77,7 +77,7 @@ describe('scale helper tests', () => {
 })
 
 async function getTargetRunnerCountDeltaWrapped (givenRunnerCount, targetRunnerCount, getTargetRunnerCountDelta) {
-  sandbox.stub(getVMHelper, 'getRunnerVMs').resolves(new Array(givenRunnerCount))
+  sandbox.stub(getVMHelper, 'getRunnersVms').resolves(new Array(givenRunnerCount))
   const getTargetRunnersCountStub = sandbox.stub().returns(targetRunnerCount)
   scaleHelper.__set__('getTargetRunnersCount', getTargetRunnersCountStub)
   const delta = await getTargetRunnerCountDelta(true)
@@ -85,7 +85,7 @@ async function getTargetRunnerCountDeltaWrapped (givenRunnerCount, targetRunnerC
 }
 
 function stubExternalDependencies (vms, busyCount) {
-  sandbox.stub(getVMHelper, 'getRunnerVMs').resolves(vms)
+  sandbox.stub(getVMHelper, 'getRunnersVms').resolves(vms)
   sandbox.stub(deleteVmHelper, 'deleteRunner').callsFake(async vmName => {
     await vms.filter(vm => vm.name === vmName)[0].delete()
     return Promise.resolve()

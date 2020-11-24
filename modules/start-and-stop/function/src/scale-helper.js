@@ -47,7 +47,7 @@ function getTargetRunnersCount (idle) {
 }
 
 async function getTargetRunnerCountDelta (idle) {
-  const runnerVms = await getVMHelper.getRunnerVMs(idle)
+  const runnerVms = await getVMHelper.getRunnersVms(idle)
   const targetRunnersCount = getTargetRunnersCount(idle)
   console.info(`runners(idle:${idle}) : current count=${runnerVms.length} -> target count=${targetRunnersCount}`)
   const targetRunnerCountDelta = targetRunnersCount - runnerVms.length
@@ -66,7 +66,7 @@ async function scaleUpRunners (idle, count) {
 
 async function scaleDownRunners (idle, count, force) {
   console.info(`scale down runners idle:${idle}, force:${force}, by ${count}...`)
-  const runnerVMs = await getVMHelper.getRunnerVMs(idle)
+  const runnerVMs = await getVMHelper.getRunnersVms(idle)
   if (runnerVMs.length === 0) {
     console.info('runners already 0, nothing to scale down')
     return

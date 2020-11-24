@@ -24,7 +24,7 @@ async function deleteRunnerFromGitHub (runnerName) {
 }
 
 async function deleteRunnerVm (runnerName) {
-  const runnerVm = await getRunnerHelper.getRunnerVMByName(runnerName)
+  const runnerVm = await getRunnerHelper.getRunnerVmByName(runnerName)
   const deleteRunnerVmPromise = runnerVm.delete()
   utils.logPromise(deleteRunnerVmPromise, `delete runner ${runnerName} VM`)
   await deleteRunnerVmPromise
