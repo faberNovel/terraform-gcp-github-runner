@@ -80,11 +80,11 @@ async function scaleUpRunners (idle, count) {
 
 async function scaleDownRunners (idle, count, force) {
   console.info(`scale down ${count} runners (idle:${idle}, force:${force})...`)
-  const runnerVMs = await getRunnerHelper.getRunnersVms(idle)
-  const runnerGitHubStates = await gitHubHelper.getRunnerGitHubStates()
-  const runnerVMsToDelete = runnerVMs.slice(-count)
-  await Promise.all(runnerVMsToDelete.map(async (runnerVM) => {
-    const gitHubRunner = gitHubHelper.parseGitHubRunnerStatus(runnerGitHubStates, runnerVM.name)
+  const runnersVms = await getRunnerHelper.getRunnersVms(idle)
+  const gitHubRunners = await gitHubHelper.getGitHubRunners()
+  const runnersVmsToDelete = runnersVms.slice(-count)
+  await Promise.all(runnersVmsToDelete.map(async (runnerVM) => {
+    const gitHubRunner = gitHubHelper.filterGitHubRunner(gitHubRunners, runnerVM.name)
     const isBusy = gitHubRunner && gitHubRunner.busy
     if (isBusy === true && force === false) {
       console.info(`not deleting runner ${runnerVM.name} because it is busy`)

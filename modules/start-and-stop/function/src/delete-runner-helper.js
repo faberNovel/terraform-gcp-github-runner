@@ -14,9 +14,9 @@ async function deleteRunner (runnerName) {
 }
 
 async function deleteRunnerFromGitHub (runnerName) {
-  const githubStatus = await githubHelper.getRunnerGitHubStateByName(runnerName)
+  const githubStatus = await githubHelper.getGitHubRunnerByName(runnerName)
   if (githubStatus !== null) {
-    await githubHelper.deleteRunnerGitHub(githubStatus.id)
+    await githubHelper.deleteGitHubRunner(githubStatus.id)
     console.info(`runner ${runnerName} deleted from GitHub`)
   } else {
     console.warn(chalk.yellow(`runner GitHub status for ${runnerName} is unknown`))

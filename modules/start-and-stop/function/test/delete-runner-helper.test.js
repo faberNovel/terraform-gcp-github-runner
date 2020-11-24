@@ -26,8 +26,8 @@ describe('Testing delete runner helper', () => {
       }
 
       const gitHubHelperMock = sandbox.mock(githubHelper)
-      gitHubHelperMock.expects('getRunnerGitHubStateByName').withExactArgs(runnerName).resolves(runnerGitHubStatus).once()
-      gitHubHelperMock.expects('deleteRunnerGitHub').withExactArgs(runnerGitHubId).resolves().once()
+      gitHubHelperMock.expects('getGitHubRunnerByName').withExactArgs(runnerName).resolves(runnerGitHubStatus).once()
+      gitHubHelperMock.expects('deleteGitHubRunner').withExactArgs(runnerGitHubId).resolves().once()
 
       const mockVm = sandbox.mock(runnerVm)
       mockVm.expects('delete').resolves().once()

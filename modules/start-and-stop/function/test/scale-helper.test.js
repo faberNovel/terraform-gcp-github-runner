@@ -99,7 +99,7 @@ function stubExternalDependencies (vms, busyCount) {
     }
     mergedGithubState.push(gitHubRunnerState)
   }
-  sandbox.stub(gitHubHelper, 'getRunnerGitHubStates').resolves(mergedGithubState)
+  sandbox.stub(gitHubHelper, 'getGitHubRunners').resolves(mergedGithubState)
 }
 
 function makeFakeVMs (count) {
