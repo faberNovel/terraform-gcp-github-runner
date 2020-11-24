@@ -1,30 +1,43 @@
-const githubHelper = require('./github-helper.js')
+const githubHelper = require('./github-helper')
 const pWaitFor = require('p-wait-for')
-const getVmHelper = require('./get-runner-helper.js')
+const getRunnerHelper = require('./get-runner-helper')
+const utils = require('./utils')
+const chalk = require('chalk')
 
-async function deleteVm (vmName) {
-  console.info(`delete runner ${vmName}`)
-  const githubStatus = await githubHelper.getRunnerGitHubStateByName(vmName)
+module.exports.deleteRunner = deleteRunner
+
+async function deleteRunner (runnerName) {
+  console.info(`start delete runner ${runnerName}...`)
+  await deleteRunnerFromGitHub(runnerName)
+  await deleteRunnerVm(runnerName)
+  console.info(chalk.green(`runner ${runnerName} is fully deleted`))
+}
+
+async function deleteRunnerFromGitHub (runnerName) {
+  const githubStatus = await githubHelper.getRunnerGitHubStateByName(runnerName)
   if (githubStatus !== null) {
-    console.info('directly removing runner to block new job to be assigned to the runner')
-    try {
-      await githubHelper.deleteRunnerGitHub(githubStatus.id)
-    } catch (error) {
-      console.error(error)
-    }
+    await githubHelper.deleteRunnerGitHub(githubStatus.id)
+    console.info(`runner ${runnerName} deleted from GitHub`)
+  } else {
+    console.warn(chalk.yellow(`runner GitHub status for ${runnerName} is unknown`))
   }
-  const vm = await getVmHelper.getRunnerVMByName(vmName)
-  console.info(`delete runner ${vmName} vm...`)
-  await vm.delete()
-  console.info(`runner ${vmName} is deleted, waiting it does not exist anymore`)
-  await pWaitFor(
-    () => vmDoesNotExist(vm),
+}
+
+async function deleteRunnerVm (runnerName) {
+  const runnerVm = await getRunnerHelper.getRunnerVMByName(runnerName)
+  const deleteRunnerVmPromise = runnerVm.delete()
+  utils.logPromise(deleteRunnerVmPromise, `delete runner ${runnerName} VM`)
+  await deleteRunnerVmPromise
+
+  const waitForVmDeletionPromise = pWaitFor(
+    () => vmDoesNotExist(runnerVm),
     {
-      interval: 5_000,
-      timeout: 60_000
+      interval: 5000,
+      timeout: 60000
     }
   )
-  console.info(`runner ${vmName} does not exists anymore`)
+  utils.logPromise(waitForVmDeletionPromise, `waiting runner ${runnerVm.name} vm to be fully deleted`)
+  await waitForVmDeletionPromise
 }
 
 async function vmDoesNotExist (vm) {
@@ -32,5 +45,3 @@ async function vmDoesNotExist (vm) {
   console.info(`vm ${vm.name} exists = ${exists}`)
   return Promise.resolve(!exists)
 }
-
-module.exports.deleteVm = deleteVm

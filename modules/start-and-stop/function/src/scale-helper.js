@@ -81,7 +81,7 @@ async function scaleDownRunners (idle, count, force) {
     if (isBusy === true && force === false) {
       console.info(`runner busy, not deleting : ${runnerVM.name}`)
     } else {
-      await deleteRunnerHelper.deleteVm(runnerVM.name)
+      await deleteRunnerHelper.deleteRunner(runnerVM.name)
     }
     Promise.resolve(`trying to delete instance end : ${runnerVM.name}`)
   }))

@@ -86,7 +86,7 @@ async function getTargetRunnerCountDeltaWrapped (givenRunnerCount, targetRunnerC
 
 function stubExternalDependencies (vms, busyCount) {
   sandbox.stub(getVMHelper, 'getRunnerVMs').resolves(vms)
-  sandbox.stub(deleteVmHelper, 'deleteVm').callsFake(async vmName => {
+  sandbox.stub(deleteVmHelper, 'deleteRunner').callsFake(async vmName => {
     await vms.filter(vm => vm.name === vmName)[0].delete()
     return Promise.resolve()
   })

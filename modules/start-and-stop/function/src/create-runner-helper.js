@@ -8,26 +8,15 @@ const githubHelper = require('./github-helper.js')
 const pWaitFor = require('p-wait-for')
 const utils = require('./utils')
 
+module.exports.createRunner = createRunner
+module.exports.getRunnerNamePrefix = getRunnerNamePrefix
+
 async function createRunner (isIdle) {
   const runnerName = createRunnerName()
-  const createVmPromise = zone.createVM(runnerName, createVmConfig(isIdle, process.env.GOOGLE_ENV))
-  utils.logPromise(createVmPromise, `create runner ${runnerName} (idle:${isIdle})`)
-  const [vm] = await createVmPromise
-
-  const awaitRunningStatePromise = vm.waitFor('RUNNING')
-  utils.logPromise(awaitRunningStatePromise, `waiting runner ${vm.name} VM to be in RUNNING State`)
-  await awaitRunningStatePromise
-
-  const githubApiConnectionPromise = pWaitFor(
-    () => githubHelper.isRunnerGitHubStateOnline(vm.name),
-    {
-      interval: 10_000,
-      timeout: 60_000 * 2
-    }
-  )
-  utils.logPromise(githubApiConnectionPromise, `waiting runner ${vm.name} to be connected to GitHub API`)
-  await githubApiConnectionPromise
-  console.info(chalk.green(`Runner ${vm.name} created, up, and connected to GitHub`))
+  console.info(`start create runner ${runnerName}...`)
+  const vm = await createRunnerVm(runnerName, isIdle)
+  await waitForRunnerConnectedToGitHub(vm)
+  console.info(chalk.green(`runner ${vm.name} created, up, and connected to GitHub`))
   return vm
 }
 
@@ -37,6 +26,30 @@ function getRunnerNamePrefix () {
 
 function createRunnerName () {
   return `${getRunnerNamePrefix()}-${uuidv4()}`
+}
+
+async function createRunnerVm (runnerName, isIdle) {
+  const createVmPromise = zone.createVM(runnerName, createVmConfig(isIdle, process.env.GOOGLE_ENV))
+  utils.logPromise(createVmPromise, `create runner ${runnerName} VM (idle:${isIdle})`)
+  const [vm] = await createVmPromise
+
+  const awaitRunningStatePromise = vm.waitFor('RUNNING')
+  utils.logPromise(awaitRunningStatePromise, `waiting runner ${vm.name} VM to be in RUNNING State`)
+  await awaitRunningStatePromise
+
+  return vm
+}
+
+async function waitForRunnerConnectedToGitHub (vm) {
+  const githubApiConnectionPromise = pWaitFor(
+    () => githubHelper.isRunnerGitHubStateOnline(vm.name),
+    {
+      interval: 10_000,
+      timeout: 60_000 * 2
+    }
+  )
+  utils.logPromise(githubApiConnectionPromise, `waiting runner ${vm.name} to be connected to GitHub API`)
+  await githubApiConnectionPromise
 }
 
 function createVmConfig (isIdle, env) {
@@ -98,6 +111,3 @@ function createVmConfig (isIdle, env) {
   }
   return config
 }
-
-module.exports.createRunner = createRunner
-module.exports.getRunnerNamePrefix = getRunnerNamePrefix
