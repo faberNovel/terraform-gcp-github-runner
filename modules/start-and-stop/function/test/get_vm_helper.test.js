@@ -1,6 +1,6 @@
 const sinon = require('sinon')
 const chai = require('chai')
-const getVMHelper = require('./get_vm_helper.js')
+const getVMHelper = require('../src/get_vm_helper.js')
 const Compute = require('@google-cloud/compute')
 
 chai.should()

@@ -1,7 +1,7 @@
 const chai = require('chai')
 const chaiAsPromised = require('chai-as-promised')
 const chaiString = require('chai-string')
-const createVMHelper = require('./create_vm_helper.js')
+const createVMHelper = require('../src/create_vm_helper.js')
 
 chai.use(chaiAsPromised)
 chai.use(chaiString)

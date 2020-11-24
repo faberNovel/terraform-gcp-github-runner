@@ -1,5 +1,5 @@
 const chai = require('chai')
-const githubHelper = require('./github_helper.js')
+const githubHelper = require('../src/github_helper.js')
 const { expect } = require('chai')
 
 chai.should()

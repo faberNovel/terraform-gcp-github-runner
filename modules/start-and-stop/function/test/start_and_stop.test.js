@@ -1,10 +1,10 @@
 const sinon = require('sinon')
 const chai = require('chai')
 const chaiAsPromised = require('chai-as-promised')
-const ScaleHelper = require('./scale_helper.js')
-const HealthCheck = require('./healthcheck.js')
+const ScaleHelper = require('../src/scale_helper.js')
+const HealthCheck = require('../src/healthcheck.js')
 const rewire = require('rewire')
-const startAndStop = rewire('./start_and_stop.js')
+const startAndStop = rewire('../src/start_and_stop.js')
 
 chai.use(chaiAsPromised)
 chai.should()
