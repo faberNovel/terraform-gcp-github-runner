@@ -48,7 +48,7 @@ async function scaleUpAllNonIdlesRunners () {
 async function scaleDownAllNonIdlesRunners (force) {
   console.info('scale down all non idle runners...')
   const idle = false
-  const runnerVms = await getRunnerHelper.getRunnerVMs(idle)
+  const runnerVms = await getRunnerHelper.getRunnersVms(idle)
   await scaleDownRunners(idle, runnerVms.length, force)
   console.info(chalk.green('scale down all non idle runners succeed'))
 }
@@ -92,5 +92,5 @@ async function scaleDownRunners (idle, count, force) {
       await deleteRunnerHelper.deleteRunner(runnerVM.name)
     }
   }))
-  console.info(chalk.green(`scale down runners idle:${idle}, force:${force} end`))
+  console.info(chalk.green(`scale down ${count} runners (idle:${idle}, force:${force}) succeed`))
 }

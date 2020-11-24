@@ -42,7 +42,7 @@ async function createRunnerVm (runnerName, isIdle) {
 
 async function waitForRunnerConnectedToGitHub (vm) {
   const githubApiConnectionPromise = pWaitFor(
-    () => githubHelper.isRunnerGitHubStateOnline(vm.name),
+    () => githubHelper.isGitHubRunnerOnline(vm.name),
     {
       interval: 10_000,
       timeout: 60_000 * 2
