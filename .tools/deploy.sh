@@ -67,7 +67,14 @@ echo "Deploying runner image using packer done"
 cd "$project_root_path"
 
 # Compile TS
-npm run --prefix ./modules/github-hook/function build 
+declare -a js_src_folders=("modules/start-and-stop/src" "modules/github-api/src" "modules/github-hook/function")
+for js_src_folder in "${js_src_folders[@]}"
+do
+  cd "$project_root_path/$js_src_folder"
+  npm install
+  npm run build
+done
+cd "$project_root_path"
 
 # Deploy terraform
 echo "Deploying infra using terraform..."

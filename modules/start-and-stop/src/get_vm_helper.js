@@ -1,7 +1,8 @@
 const Compute = require('@google-cloud/compute')
 const compute = new Compute()
+const zone = compute.zone(process.env.GOOGLE_ZONE)
 
-module.exports.getRunnerVMs = async function getRunnerVMs (idle) {
+async function getRunnerVMs (idle) {
   const filter = `labels.env=${process.env.GOOGLE_ENV} AND labels.idle=${idle}`
   const options = {
     filter: filter
@@ -10,7 +11,7 @@ module.exports.getRunnerVMs = async function getRunnerVMs (idle) {
   return vms
 }
 
-module.exports.getAllRunnerVMs = async function getAllRunnerVMs () {
+async function getAllRunnerVMs () {
   const filter = `labels.env=${process.env.GOOGLE_ENV}`
   const options = {
     filter: filter
@@ -18,3 +19,11 @@ module.exports.getAllRunnerVMs = async function getAllRunnerVMs () {
   const [vms] = await compute.getVMs(options)
   return vms
 }
+
+async function getRunnerVMByName (vmName) {
+  return zone.vm(vmName)
+}
+
+module.exports.getRunnerVMs = getRunnerVMs
+module.exports.getAllRunnerVMs = getAllRunnerVMs
+module.exports.getRunnerVMByName = getRunnerVMByName

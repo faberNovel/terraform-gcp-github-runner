@@ -1,9 +1,10 @@
 const GetVMHelper = require('./get_vm_helper.js')
 const CreateVMHelper = require('./create_vm_helper.js')
 const GitHubHelper = require('./github_helper')
+const deleteVmHelper = require('./delete_vm_helper')
 const chalk = require('chalk')
 
-module.exports.scaleIdleRunners = async function scaleIdleRunners () {
+async function scaleIdleRunners () {
   const idle = true
   const targetRunnerCountDelta = await getTargetRunnerCountDelta(idle)
   if (targetRunnerCountDelta > 0) {
@@ -15,7 +16,15 @@ module.exports.scaleIdleRunners = async function scaleIdleRunners () {
   }
 }
 
-module.exports.scaleUpNonIdleRunners = async function scaleUpNonIdleRunners () {
+async function renewIdleRunners () {
+  const idle = true
+  const force = true
+  const targetCount = getTargetRunnersCount(idle)
+  await scaleDownRunners(idle, targetCount, force)
+  await scaleUpRunners(idle, targetCount)
+}
+
+async function scaleUpNonIdleRunners () {
   const idle = false
   const targetRunnerCountDelta = await getTargetRunnerCountDelta(idle)
   if (targetRunnerCountDelta > 0) {
@@ -23,7 +32,7 @@ module.exports.scaleUpNonIdleRunners = async function scaleUpNonIdleRunners () {
   }
 }
 
-module.exports.scaleDownNonIdleRunners = async function scaleDownNonIdleRunners (force) {
+async function scaleDownNonIdleRunners (force) {
   const idle = false
   const runnerVms = await GetVMHelper.getRunnerVMs(idle)
   await scaleDownRunners(idle, runnerVms.length, force)
@@ -66,15 +75,22 @@ async function scaleDownRunners (idle, count, force) {
   const runnerVMsToDelete = runnerVMs.slice(-count)
   await Promise.all(runnerVMsToDelete.map(async (runnerVM) => {
     console.info(`trying to delete runner : ${runnerVM.name}`)
-    const isBusy = GitHubHelper.isRunnerBusy(runnerGitHubStates, runnerVM.name)
+    const gitHubRunner = GitHubHelper.parseGitHubRunnerStatus(runnerGitHubStates, runnerVM.name)
+    const isBusy = gitHubRunner && gitHubRunner.busy
     console.info(`GitHub runner is busy : ${isBusy}`)
     if (isBusy === true && force === false) {
       console.info(`runner busy, not deleting : ${runnerVM.name}`)
     } else {
-      console.info(`deleting instance : ${runnerVM.name}`)
-      await runnerVM.delete()
+      await deleteVmHelper.deleteVm(runnerVM.name)
     }
     Promise.resolve(`trying to delete instance end : ${runnerVM.name}`)
   }))
   console.info(chalk.green(`scale down runners idle:${idle}, force:${force} end`))
 }
+
+module.exports.scaleIdleRunners = scaleIdleRunners
+module.exports.scaleUpNonIdleRunners = scaleUpNonIdleRunners
+module.exports.scaleDownNonIdleRunners = scaleDownNonIdleRunners
+module.exports.getTargetRunnerCountDelta = getTargetRunnerCountDelta
+module.exports.scaleDownRunners = scaleDownRunners
+module.exports.renewIdleRunners = renewIdleRunners

@@ -4,12 +4,23 @@ const { v4: uuidv4 } = require('uuid')
 const chalk = require('chalk')
 const compute = new Compute()
 const zone = compute.zone(process.env.GOOGLE_ZONE)
+const githubHelper = require('./github_helper.js')
+const pWaitFor = require('p-wait-for')
 
 async function createVm (isIdle) {
   console.info(`create idle:${isIdle} VM ...`)
-  const [vm, operation] = await zone.createVM(createVmName(), createVmConfig(isIdle, process.env.GOOGLE_ENV))
-  await operation.promise()
-  console.info(chalk.green(`VM ${vm.name} created`))
+  const [vm] = await zone.createVM(createVmName(), createVmConfig(isIdle, process.env.GOOGLE_ENV))
+  console.info(`Waiting VM ${vm.name} to be RUNNING State`)
+  await vm.waitFor('RUNNING')
+  console.info(`Waiting VM ${vm.name} to be connected to GitHub API`)
+  await pWaitFor(
+    () => githubHelper.isRunnerGitHubStateOnline(vm.name),
+    {
+      interval: 10_000,
+      timeout: 60_000 * 2
+    }
+  )
+  console.info(chalk.green(`VM ${vm.name} created, up, and running`))
   return vm
 }
 
@@ -62,6 +73,10 @@ function createVmConfig (isIdle, env) {
         {
           value: process.env.GITHUB_ORG,
           key: 'github-org'
+        },
+        {
+          value: process.env.RUNNER_TAINT_LABELS,
+          key: 'taint-labels'
         },
         {
           value: startScript,
