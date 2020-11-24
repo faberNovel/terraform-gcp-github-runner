@@ -1,4 +1,4 @@
-const sinon = require('sinon')
+const sandbox = require('sinon').createSandbox()
 const chai = require('chai')
 const chaiAsPromised = require('chai-as-promised')
 const scaleHelper = require('../src/scale-helper')
@@ -11,40 +11,42 @@ chai.should()
 
 describe('start and stop tests', () => {
   describe('When wrong args', () => {
-    it('Should throw error', () => {
+    it('should throw error', () => {
       return startAndStop.startAndStop(null, null).should.rejected
     })
   })
   describe('When start payload', () => {
-    it('Should trigger scale', async () => {
+    it('should trigger scale', async () => {
       const payload = makePayload('start')
-      const stubScaleUpAllNonIdlesRunners = sinon.stub(scaleHelper, 'scaleUpAllNonIdlesRunners').returns(Promise.resolve())
-      const stubscaleIdleRunners = sinon.stub(scaleHelper, 'scaleIdleRunners').returns(Promise.resolve())
+      const scaleHelperMock = sandbox.mock(scaleHelper)
+      scaleHelperMock.expects('scaleUpAllNonIdlesRunners').resolves().once()
+      scaleHelperMock.expects('scaleIdleRunners').resolves().once()
 
       await startAndStop.startAndStop(payload, makeEvent())
 
-      stubScaleUpAllNonIdlesRunners.callCount.should.equal(1)
-      stubscaleIdleRunners.callCount.should.equal(1)
+      sandbox.verifyAndRestore()
     })
   })
   describe('When stop payload', () => {
-    it('Should trigger stop', async () => {
+    it('should trigger stop', async () => {
       const payload = makePayload('stop')
-      const stubScaleDownAllNonIdlesRunners = sinon.stub(scaleHelper, 'scaleDownAllNonIdlesRunners').returns(Promise.resolve())
+      const scaleHelperMock = sandbox.mock(scaleHelper)
+      scaleHelperMock.expects('scaleDownAllNonIdlesRunners').resolves().once()
 
       await startAndStop.startAndStop(payload, makeEvent())
 
-      stubScaleDownAllNonIdlesRunners.callCount.should.equal(1)
+      sandbox.verifyAndRestore()
     })
   })
   describe('When healthcheck payload', () => {
     it('Should trigger healthcheck', async () => {
       const payload = makePayload('healthcheck')
-      const stubRemoveDisconnectedGcpRunners = sinon.stub(healthCheck, 'removeOfflineGitHubRunners').returns(Promise.resolve())
+      const healthCheckMock = sandbox.mock(healthCheck)
+      healthCheckMock.expects('removeOfflineGitHubRunners').resolves().once()
 
       await startAndStop.startAndStop(payload, makeEvent())
 
-      stubRemoveDisconnectedGcpRunners.callCount.should.equal(1)
+      sandbox.verifyAndRestore()
     })
   })
 })
