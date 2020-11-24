@@ -84,9 +84,20 @@ resource "google_cloud_scheduler_job" "force_stop_job" {
   }
 }
 
+resource "google_cloud_scheduler_job" "healthcheck_job" {
+  name      = "healthcheck-job"
+  schedule  = "0 1 * * *"
+  time_zone = "Europe/Paris"
+
+  pubsub_target {
+    topic_name = google_pubsub_topic.start_and_stop.id
+    data       = base64encode("{\"action\":\"healthcheck\"}")
+  }
+}
+
 resource "google_cloud_scheduler_job" "renew_idle_runners_job" {
   name      = "renew-idle-runners-job"
-  schedule  = "0 1 * * *"
+  schedule  = "0 2 * * *"
   time_zone = "Europe/Paris"
 
   pubsub_target {
