@@ -9,7 +9,7 @@
   "scripts": {
     "build": "echo \"no-op\"",
     "predev": "bash ../../../.tools/setup.sh",
-    "dev": "node -r dotenv/config -e 'require(\"./src/start_and_stop.js\").dev()'",
+    "dev": "node -r dotenv/config -e 'require(\"./src/start_and_stop.js\").dev()' dotenv_config_path=../../../dev.env",
     "test": "DOTENV_CONFIG_PATH=./test/.test.env mocha test/*.test.js",
     "lint": "eslint *.js"
   },

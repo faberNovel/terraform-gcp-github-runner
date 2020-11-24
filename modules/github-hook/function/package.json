@@ -6,7 +6,7 @@
     "lint": "eslint src/**",
     "test": "mocha -r ts-node/register tests/**/*.ts",
     "predev": "bash ../../../.tools/setup.sh",
-    "dev": "npm run build && node -r dotenv/config -e 'require(\"./lib/github_hook.js\").dev()'"
+    "dev": "npm run build && node -r dotenv/config -e 'require(\"./lib/github_hook.js\").dev()' dotenv_config_path=../../../dev.env"
   },
   "engines": {
     "node": "12"
