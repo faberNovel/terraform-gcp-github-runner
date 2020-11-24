@@ -27,6 +27,7 @@ module.exports.startAndStop = async (data, context) => {
 
 module.exports.dev = async () => {
   try {
+    // await healthCheck()
     await scaleHelper.renewIdleRunners()
     console.log('ok')
   } catch (error) {
@@ -44,9 +45,7 @@ async function stopRunners (force) {
 }
 
 async function healthCheck () {
-  await healthCheckHelper.removeDisconnectedGcpRunners()
   await healthCheckHelper.removeOfflineGitHubRunners()
-  await startRunners()
 }
 
 async function renewIdleRunners () {
