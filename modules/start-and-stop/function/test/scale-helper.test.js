@@ -1,11 +1,11 @@
 const sandbox = require('sinon').createSandbox()
 const chai = require('chai')
 const rewire = require('rewire')
-const scaleHelper = rewire('../src/scale_helper.js')
+const scaleHelper = rewire('../src/scale-helper')
 const createRunnerHelper = require('../src/create-runner-helper')
-const gitHubHelper = require('../src/github_helper')
-const getVMHelper = require('../src/get_vm_helper.js')
-const deleteVmHelper = require('../src/delete_vm_helper')
+const gitHubHelper = require('../src/github-helper')
+const getVMHelper = require('../src/get-runner-helper')
+const deleteVmHelper = require('../src/delete-runner-helper')
 
 chai.should()
 

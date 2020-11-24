@@ -1,7 +1,7 @@
-const GetVMHelper = require('./get_vm_helper.js')
+const getVMHelper = require('./get-runner-helper')
 const createRunnerHelper = require('./create-runner-helper')
-const GitHubHelper = require('./github_helper')
-const deleteVmHelper = require('./delete_vm_helper')
+const gitHubHelper = require('./github-helper')
+const deleteRunnerHelper = require('./delete-runner-helper')
 const chalk = require('chalk')
 
 async function scaleIdleRunners () {
@@ -34,7 +34,7 @@ async function scaleUpNonIdleRunners () {
 
 async function scaleDownNonIdleRunners (force) {
   const idle = false
-  const runnerVms = await GetVMHelper.getRunnerVMs(idle)
+  const runnerVms = await getVMHelper.getRunnerVMs(idle)
   await scaleDownRunners(idle, runnerVms.length, force)
 }
 
@@ -47,7 +47,7 @@ function getTargetRunnersCount (idle) {
 }
 
 async function getTargetRunnerCountDelta (idle) {
-  const runnerVms = await GetVMHelper.getRunnerVMs(idle)
+  const runnerVms = await getVMHelper.getRunnerVMs(idle)
   const targetRunnersCount = getTargetRunnersCount(idle)
   console.info(`runners(idle:${idle}) : current count=${runnerVms.length} -> target count=${targetRunnersCount}`)
   const targetRunnerCountDelta = targetRunnersCount - runnerVms.length
@@ -66,22 +66,22 @@ async function scaleUpRunners (idle, count) {
 
 async function scaleDownRunners (idle, count, force) {
   console.info(`scale down runners idle:${idle}, force:${force}, by ${count}...`)
-  const runnerVMs = await GetVMHelper.getRunnerVMs(idle)
+  const runnerVMs = await getVMHelper.getRunnerVMs(idle)
   if (runnerVMs.length === 0) {
     console.info('runners already 0, nothing to scale down')
     return
   }
-  const runnerGitHubStates = await GitHubHelper.getRunnerGitHubStates()
+  const runnerGitHubStates = await gitHubHelper.getRunnerGitHubStates()
   const runnerVMsToDelete = runnerVMs.slice(-count)
   await Promise.all(runnerVMsToDelete.map(async (runnerVM) => {
     console.info(`trying to delete runner : ${runnerVM.name}`)
-    const gitHubRunner = GitHubHelper.parseGitHubRunnerStatus(runnerGitHubStates, runnerVM.name)
+    const gitHubRunner = gitHubHelper.parseGitHubRunnerStatus(runnerGitHubStates, runnerVM.name)
     const isBusy = gitHubRunner && gitHubRunner.busy
     console.info(`GitHub runner is busy : ${isBusy}`)
     if (isBusy === true && force === false) {
       console.info(`runner busy, not deleting : ${runnerVM.name}`)
     } else {
-      await deleteVmHelper.deleteVm(runnerVM.name)
+      await deleteRunnerHelper.deleteVm(runnerVM.name)
     }
     Promise.resolve(`trying to delete instance end : ${runnerVM.name}`)
   }))

@@ -4,7 +4,7 @@ const { v4: uuidv4 } = require('uuid')
 const chalk = require('chalk')
 const compute = new Compute()
 const zone = compute.zone(process.env.GOOGLE_ZONE)
-const githubHelper = require('./github_helper.js')
+const githubHelper = require('./github-helper.js')
 const pWaitFor = require('p-wait-for')
 const utils = require('./utils')
 

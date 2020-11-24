@@ -1,5 +1,5 @@
-const HealthCheckHelper = require('./healthcheck.js')
-const ScaleHelper = require('./scale_helper.js')
+const healthCheckHelper = require('./healthcheck')
+const scaleHelper = require('./scale-helper')
 const chalk = require('chalk')
 
 module.exports.startAndStop = async (data, context) => {
@@ -27,7 +27,7 @@ module.exports.startAndStop = async (data, context) => {
 
 module.exports.dev = async () => {
   try {
-    await ScaleHelper.renewIdleRunners()
+    await scaleHelper.renewIdleRunners()
     console.log('ok')
   } catch (error) {
     console.log(`error = ${error}`)
@@ -35,22 +35,22 @@ module.exports.dev = async () => {
 }
 
 async function startRunners () {
-  await ScaleHelper.scaleUpNonIdleRunners()
-  await ScaleHelper.scaleIdleRunners()
+  await scaleHelper.scaleUpNonIdleRunners()
+  await scaleHelper.scaleIdleRunners()
 }
 
 async function stopRunners (force) {
-  await ScaleHelper.scaleDownNonIdleRunners(force)
+  await scaleHelper.scaleDownNonIdleRunners(force)
 }
 
 async function healthCheck () {
-  await HealthCheckHelper.removeDisconnectedGcpRunners()
-  await HealthCheckHelper.removeOfflineGitHubRunners()
+  await healthCheckHelper.removeDisconnectedGcpRunners()
+  await healthCheckHelper.removeOfflineGitHubRunners()
   await startRunners()
 }
 
 async function renewIdleRunners () {
-  await ScaleHelper.renewIdleRunners()
+  await scaleHelper.renewIdleRunners()
 }
 
 function validatePayload (payload) {

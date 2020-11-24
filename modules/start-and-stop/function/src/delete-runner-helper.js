@@ -1,6 +1,6 @@
-const githubHelper = require('./github_helper.js')
+const githubHelper = require('./github-helper.js')
 const pWaitFor = require('p-wait-for')
-const getVmHelper = require('./get_vm_helper.js')
+const getVmHelper = require('./get-runner-helper.js')
 
 async function deleteVm (vmName) {
   console.info(`delete runner ${vmName}`)

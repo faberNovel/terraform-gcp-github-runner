@@ -1,12 +1,12 @@
-const GitHubHelper = require('./github_helper')
+const gitHubHelper = require('./github-helper')
 const createRunnerHelper = require('./create-runner-helper')
-const GetVMHelper = require('./get_vm_helper.js')
+const getRunnerHelper = require('./get-runner-helper')
 const chalk = require('chalk')
 
 module.exports.removeDisconnectedGcpRunners = async function () {
   console.info('Searching disconnected gcp runners...')
-  const vms = await GetVMHelper.getAllRunnerVMs()
-  const runnerGitHubStates = await GitHubHelper.getRunnerGitHubStates()
+  const vms = await getRunnerHelper.getAllRunnerVMs()
+  const runnerGitHubStates = await gitHubHelper.getRunnerGitHubStates()
   const disconnectedVMs = vms.filter(vm => {
     const isConnected = runnerGitHubStates.map(it => it.name).includes(vm.id)
     return !isConnected
@@ -40,7 +40,7 @@ module.exports.removeOfflineGitHubRunners = async function () {
   if (offlineGcpRunnerGitHubStates.length > 0) {
     console.warn(chalk.yellow('Delete offline GitHub runners...'))
     const offlineGcpRunnerGitHubStatesIds = offlineGcpRunnerGitHubStates.map(it => it.id)
-    await Promise.all(offlineGcpRunnerGitHubStatesIds.map(it => GitHubHelper.deleteRunnerGitHub(it)))
+    await Promise.all(offlineGcpRunnerGitHubStatesIds.map(it => gitHubHelper.deleteRunnerGitHub(it)))
     console.info(chalk.green('Delete offline GitHub runners with success'))
   } else {
     console.info(chalk.green('No offline GitHub runner to delete'))
@@ -48,7 +48,7 @@ module.exports.removeOfflineGitHubRunners = async function () {
 }
 
 async function getDanglingGcpVMs (offlineGcpRunnerGitHubStates) {
-  const vms = await GetVMHelper.getAllRunnerVMs()
+  const vms = await getRunnerHelper.getAllRunnerVMs()
   const danglingVMs = vms.filter(function (vm) {
     return offlineGcpRunnerGitHubStates.map(gh => gh.name).includes(vm.metadata.name)
   })
@@ -56,7 +56,7 @@ async function getDanglingGcpVMs (offlineGcpRunnerGitHubStates) {
 }
 
 async function getOfflineGcpRunnerGitHubStates () {
-  const runnerGitHubStates = await GitHubHelper.getRunnerGitHubStates()
+  const runnerGitHubStates = await gitHubHelper.getRunnerGitHubStates()
   const gcpRunnerGitHubStates = runnerGitHubStates.filter(function (runnerGitHubState) {
     return runnerGitHubState.name.startsWith(createRunnerHelper.getRunnerNamePrefix())
   })

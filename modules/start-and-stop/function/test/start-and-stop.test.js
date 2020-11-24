@@ -1,10 +1,10 @@
 const sinon = require('sinon')
 const chai = require('chai')
 const chaiAsPromised = require('chai-as-promised')
-const ScaleHelper = require('../src/scale_helper.js')
-const HealthCheck = require('../src/healthcheck.js')
+const scaleHelper = require('../src/scale-helper')
+const healthCheck = require('../src/healthcheck')
 const rewire = require('rewire')
-const startAndStop = rewire('../src/start_and_stop.js')
+const startAndStop = rewire('../src/start-and-stop')
 
 chai.use(chaiAsPromised)
 chai.should()
@@ -18,8 +18,8 @@ describe('start and stop tests', () => {
   describe('When start payload', () => {
     it('Should trigger scale', async () => {
       const payload = makePayload('start')
-      const stubScaleUpNonIdleRunners = sinon.stub(ScaleHelper, 'scaleUpNonIdleRunners').returns(Promise.resolve())
-      const stubscaleIdleRunners = sinon.stub(ScaleHelper, 'scaleIdleRunners').returns(Promise.resolve())
+      const stubScaleUpNonIdleRunners = sinon.stub(scaleHelper, 'scaleUpNonIdleRunners').returns(Promise.resolve())
+      const stubscaleIdleRunners = sinon.stub(scaleHelper, 'scaleIdleRunners').returns(Promise.resolve())
 
       await startAndStop.startAndStop(payload, null)
 
@@ -30,7 +30,7 @@ describe('start and stop tests', () => {
   describe('When stop payload', () => {
     it('Should trigger stop', async () => {
       const payload = makePayload('stop')
-      const stubScaleDownNonIdleRunners = sinon.stub(ScaleHelper, 'scaleDownNonIdleRunners').returns(Promise.resolve())
+      const stubScaleDownNonIdleRunners = sinon.stub(scaleHelper, 'scaleDownNonIdleRunners').returns(Promise.resolve())
 
       await startAndStop.startAndStop(payload, null)
 
@@ -40,8 +40,8 @@ describe('start and stop tests', () => {
   describe('When healthcheck payload', () => {
     it('Should trigger healthcheck', async () => {
       const payload = makePayload('healthcheck')
-      const stubRemoveDisconnectedGcpRunners = sinon.stub(HealthCheck, 'removeDisconnectedGcpRunners').returns(Promise.resolve())
-      const stubRemoveOfflineGitHubRunners = sinon.stub(HealthCheck, 'removeOfflineGitHubRunners').returns(Promise.resolve())
+      const stubRemoveDisconnectedGcpRunners = sinon.stub(healthCheck, 'removeDisconnectedGcpRunners').returns(Promise.resolve())
+      const stubRemoveOfflineGitHubRunners = sinon.stub(healthCheck, 'removeOfflineGitHubRunners').returns(Promise.resolve())
       const stubStartRunners = sinon.stub().returns(Promise.resolve())
       const revert = startAndStop.__set__('startRunners', stubStartRunners)
 
