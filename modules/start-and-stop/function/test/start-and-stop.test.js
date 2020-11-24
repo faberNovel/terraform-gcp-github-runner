@@ -21,7 +21,7 @@ describe('start and stop tests', () => {
       const stubScaleUpAllNonIdlesRunners = sinon.stub(scaleHelper, 'scaleUpAllNonIdlesRunners').returns(Promise.resolve())
       const stubscaleIdleRunners = sinon.stub(scaleHelper, 'scaleIdleRunners').returns(Promise.resolve())
 
-      await startAndStop.startAndStop(payload, null)
+      await startAndStop.startAndStop(payload, makeEvent())
 
       stubScaleUpAllNonIdlesRunners.callCount.should.equal(1)
       stubscaleIdleRunners.callCount.should.equal(1)
@@ -32,7 +32,7 @@ describe('start and stop tests', () => {
       const payload = makePayload('stop')
       const stubScaleDownAllNonIdlesRunners = sinon.stub(scaleHelper, 'scaleDownAllNonIdlesRunners').returns(Promise.resolve())
 
-      await startAndStop.startAndStop(payload, null)
+      await startAndStop.startAndStop(payload, makeEvent())
 
       stubScaleDownAllNonIdlesRunners.callCount.should.equal(1)
     })
@@ -40,17 +40,11 @@ describe('start and stop tests', () => {
   describe('When healthcheck payload', () => {
     it('Should trigger healthcheck', async () => {
       const payload = makePayload('healthcheck')
-      const stubRemoveDisconnectedGcpRunners = sinon.stub(healthCheck, 'removeDisconnectedGcpRunners').returns(Promise.resolve())
-      const stubRemoveOfflineGitHubRunners = sinon.stub(healthCheck, 'removeOfflineGitHubRunners').returns(Promise.resolve())
-      const stubStartRunners = sinon.stub().returns(Promise.resolve())
-      const revert = startAndStop.__set__('startRunners', stubStartRunners)
+      const stubRemoveDisconnectedGcpRunners = sinon.stub(healthCheck, 'removeOfflineGitHubRunners').returns(Promise.resolve())
 
-      await startAndStop.startAndStop(payload, null)
+      await startAndStop.startAndStop(payload, makeEvent())
 
       stubRemoveDisconnectedGcpRunners.callCount.should.equal(1)
-      stubRemoveOfflineGitHubRunners.callCount.should.equal(1)
-      stubStartRunners.callCount.should.equal(1)
-      revert()
     })
   })
 })
@@ -64,4 +58,10 @@ function makePayload (action) {
     data: jsonBase64
   }
   return payload
+}
+
+function makeEvent () {
+  return {
+    timestamp: new Date().toISOString()
+  }
 }
