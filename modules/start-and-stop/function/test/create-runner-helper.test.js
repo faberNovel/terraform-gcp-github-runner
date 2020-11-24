@@ -7,9 +7,9 @@ chai.use(chaiAsPromised)
 chai.use(chaiString)
 chai.should()
 
-describe('Testing create vm helper', () => {
-  describe('get runner name prefix', () => {
-    it('should start with correct vm gcp name', () => {
+describe('Testing create runner helper', () => {
+  describe('When getting runner name prefix', () => {
+    it('should start with correct runner name', () => {
       createRunnerHelper.getRunnerNamePrefix().should.startWith('vm-gcp')
     })
   })
