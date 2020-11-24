@@ -9,14 +9,14 @@ const deleteVmHelper = require('../src/delete-runner-helper')
 
 chai.should()
 
-describe('scale helper tests', () => {
+describe('Scale helper tests', () => {
   afterEach(function () {
     sandbox.verify()
     sandbox.restore()
   })
 
   describe('When calling scale up runners', () => {
-    it('Should scale up runners', async () => {
+    it('should scale up runners', async () => {
       const scaleUpRunners = scaleHelper.__get__('scaleUpRunners')
       const idle = false
       const count = 3
@@ -63,7 +63,7 @@ describe('scale helper tests', () => {
   })
 
   describe('When get target runner count delta', () => {
-    const getTargetRunnerCountDelta = scaleHelper.__get__('getTargetRunnerCountDelta')
+    const getTargetRunnerCountDelta = scaleHelper.__get__('getTargetRunnersCountDelta')
 
     it('should return positive when scaling up', async () => {
       const delta = await getTargetRunnerCountDeltaWrapped(0, 1, getTargetRunnerCountDelta)

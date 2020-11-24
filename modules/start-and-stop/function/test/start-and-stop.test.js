@@ -18,23 +18,23 @@ describe('start and stop tests', () => {
   describe('When start payload', () => {
     it('Should trigger scale', async () => {
       const payload = makePayload('start')
-      const stubScaleUpNonIdleRunners = sinon.stub(scaleHelper, 'scaleUpNonIdleRunners').returns(Promise.resolve())
+      const stubScaleUpAllNonIdlesRunners = sinon.stub(scaleHelper, 'scaleUpAllNonIdlesRunners').returns(Promise.resolve())
       const stubscaleIdleRunners = sinon.stub(scaleHelper, 'scaleIdleRunners').returns(Promise.resolve())
 
       await startAndStop.startAndStop(payload, null)
 
-      stubScaleUpNonIdleRunners.callCount.should.equal(1)
+      stubScaleUpAllNonIdlesRunners.callCount.should.equal(1)
       stubscaleIdleRunners.callCount.should.equal(1)
     })
   })
   describe('When stop payload', () => {
     it('Should trigger stop', async () => {
       const payload = makePayload('stop')
-      const stubScaleDownNonIdleRunners = sinon.stub(scaleHelper, 'scaleDownNonIdleRunners').returns(Promise.resolve())
+      const stubScaleDownAllNonIdlesRunners = sinon.stub(scaleHelper, 'scaleDownAllNonIdlesRunners').returns(Promise.resolve())
 
       await startAndStop.startAndStop(payload, null)
 
-      stubScaleDownNonIdleRunners.callCount.should.equal(1)
+      stubScaleDownAllNonIdlesRunners.callCount.should.equal(1)
     })
   })
   describe('When healthcheck payload', () => {

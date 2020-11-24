@@ -35,12 +35,12 @@ module.exports.dev = async () => {
 }
 
 async function startRunners () {
-  await scaleHelper.scaleUpNonIdleRunners()
+  await scaleHelper.scaleUpAllNonIdlesRunners()
   await scaleHelper.scaleIdleRunners()
 }
 
 async function stopRunners (force) {
-  await scaleHelper.scaleDownNonIdleRunners(force)
+  await scaleHelper.scaleDownAllNonIdlesRunners(force)
 }
 
 async function healthCheck () {
