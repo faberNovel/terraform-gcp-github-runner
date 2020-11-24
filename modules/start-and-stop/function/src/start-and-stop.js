@@ -5,6 +5,16 @@ const chalk = require('chalk')
 module.exports.startAndStop = async (data, context) => {
   try {
     console.info('startAndStop...')
+
+    const eventAge = Date.now() - Date.parse(context.timestamp)
+    const eventMaxAge = 1000 * 60 * 10 // 10 minutes
+    console.info(`Event date = ${context.timestamp}, age = ${eventAge} ms`)
+    // Ignore events that are too old
+    if (eventAge > eventMaxAge) {
+      console.info(`Dropping event ${data} with age ${eventAge} ms.`)
+      return Promise.resolve('startAndStop ignored too old event')
+    }
+
     const payload = validatePayload(
       JSON.parse(Buffer.from(data.data, 'base64').toString())
     )

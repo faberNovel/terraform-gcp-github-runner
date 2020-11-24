@@ -20,7 +20,7 @@ resource "google_cloudfunctions_function" "start_and_stop" {
   description           = "Handling start and stop of non idle runners"
   runtime               = "nodejs12"
   available_memory_mb   = 128
-  timeout               = 60 * 3
+  timeout               = 60 * 5
   source_archive_bucket = google_storage_bucket.start_and_stop_bucket.name
   source_archive_object = google_storage_bucket_object.start_and_stop_zip.name
   entry_point           = "startAndStop"
@@ -43,6 +43,9 @@ resource "google_cloudfunctions_function" "start_and_stop" {
   event_trigger {
     event_type = "google.pubsub.topic.publish"
     resource   = google_pubsub_topic.start_and_stop.name
+    failure_policy {
+      retry = true
+    }
   }
 
 }
