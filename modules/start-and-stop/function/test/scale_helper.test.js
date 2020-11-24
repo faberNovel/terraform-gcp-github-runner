@@ -2,7 +2,7 @@ const sandbox = require('sinon').createSandbox()
 const chai = require('chai')
 const rewire = require('rewire')
 const scaleHelper = rewire('../src/scale_helper.js')
-const createVMHelper = require('../src/create_vm_helper.js')
+const createRunnerHelper = require('../src/create-runner-helper')
 const gitHubHelper = require('../src/github_helper')
 const getVMHelper = require('../src/get_vm_helper.js')
 const deleteVmHelper = require('../src/delete_vm_helper')
@@ -20,7 +20,7 @@ describe('scale helper tests', () => {
       const scaleUpRunners = scaleHelper.__get__('scaleUpRunners')
       const idle = false
       const count = 3
-      const stub = sandbox.stub(createVMHelper, 'createVm').returns(Promise.resolve())
+      const stub = sandbox.stub(createRunnerHelper, 'createRunner').returns(Promise.resolve())
 
       await scaleUpRunners(idle, count)
 

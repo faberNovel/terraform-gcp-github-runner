@@ -1,5 +1,5 @@
 const GitHubHelper = require('./github_helper')
-const CreateVMHelper = require('./create_vm_helper.js')
+const createRunnerHelper = require('./create-runner-helper')
 const GetVMHelper = require('./get_vm_helper.js')
 const chalk = require('chalk')
 
@@ -58,7 +58,7 @@ async function getDanglingGcpVMs (offlineGcpRunnerGitHubStates) {
 async function getOfflineGcpRunnerGitHubStates () {
   const runnerGitHubStates = await GitHubHelper.getRunnerGitHubStates()
   const gcpRunnerGitHubStates = runnerGitHubStates.filter(function (runnerGitHubState) {
-    return runnerGitHubState.name.startsWith(CreateVMHelper.getRunnerNamePrefix())
+    return runnerGitHubState.name.startsWith(createRunnerHelper.getRunnerNamePrefix())
   })
   const offlineGcpRunnerGitHubStates = gcpRunnerGitHubStates.filter(function (gcpRunnerGitHubState) {
     return gcpRunnerGitHubState.status === 'offline'

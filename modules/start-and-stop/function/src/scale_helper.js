@@ -1,5 +1,5 @@
 const GetVMHelper = require('./get_vm_helper.js')
-const CreateVMHelper = require('./create_vm_helper.js')
+const createRunnerHelper = require('./create-runner-helper')
 const GitHubHelper = require('./github_helper')
 const deleteVmHelper = require('./delete_vm_helper')
 const chalk = require('chalk')
@@ -58,7 +58,7 @@ async function scaleUpRunners (idle, count) {
   console.info(`scale up runners idle:${idle} by ${count}...`)
   const createPromises = []
   for (let i = 0; i < count; i++) {
-    createPromises[i] = CreateVMHelper.createVm(idle)
+    createPromises[i] = createRunnerHelper.createRunner(idle)
   }
   await Promise.all(createPromises)
   console.info(chalk.green(`scale up runners idle:${idle} by ${count} succeed`))
