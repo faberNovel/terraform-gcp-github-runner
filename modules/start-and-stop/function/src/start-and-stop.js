@@ -18,15 +18,25 @@ module.exports.startAndStop = async (data, context) => {
     const payload = validatePayload(
       JSON.parse(Buffer.from(data.data, 'base64').toString())
     )
-    if (payload.action === 'start') {
-      await startRunners()
-    } else if (payload.action === 'stop') {
-      const force = payload.force === true
-      await stopRunners(force)
-    } else if (payload.action === 'healthcheck') {
-      await healthCheck()
-    } else if (payload.action === 'renew_idle_runners') {
-      await renewIdleRunners()
+    const action = payload.action
+    switch (action) {
+      case 'create_all_non_idle_runners':
+        await createAllNonIdleRunners()
+        break
+      case 'delete_all_non_idle_runners':
+        await deleteAllNonIdleRunners(false)
+        break
+      case 'force_delete_all_non_idle_runners':
+        await deleteAllNonIdleRunners(true)
+        break
+      case 'healthcheck':
+        await healthCheck()
+        break
+      case 'renew_idle_runners':
+        await renewIdleRunners()
+        break
+      default:
+        console.error(`action ${action} is unknown, nothing done`)  
     }
     return Promise.resolve('startAndStop end')
   } catch (err) {
@@ -45,12 +55,11 @@ module.exports.dev = async () => {
   }
 }
 
-async function startRunners () {
+async function createAllNonIdleRunners () {
   await scaleHelper.scaleUpAllNonIdlesRunners()
-  await scaleHelper.scaleIdleRunners()
 }
 
-async function stopRunners (force) {
+async function deleteAllNonIdleRunners (force) {
   await scaleHelper.scaleDownAllNonIdlesRunners(force)
 }
 

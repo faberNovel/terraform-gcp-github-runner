@@ -54,41 +54,41 @@ resource "google_pubsub_topic" "start_and_stop" {
   name = "start-and-stop-topic"
 }
 
-resource "google_cloud_scheduler_job" "start_job" {
-  name      = "start-job"
+resource "google_cloud_scheduler_job" "create_all_non_idle_runners" {
+  name      = "create all non idle runners"
   schedule  = "0 8 * * 1-5"
   time_zone = "Europe/Paris"
 
   pubsub_target {
     topic_name = google_pubsub_topic.start_and_stop.id
-    data       = base64encode("{\"action\":\"start\"}")
+    data       = base64encode("{\"action\":\"create_all_non_idle_runners\"}")
   }
 }
 
-resource "google_cloud_scheduler_job" "stop_job" {
-  name      = "stop-job"
+resource "google_cloud_scheduler_job" "delete_all_non_idle_runners" {
+  name      = "delete all non idle runners"
   schedule  = "0 19 * * 1-5"
   time_zone = "Europe/Paris"
 
   pubsub_target {
     topic_name = google_pubsub_topic.start_and_stop.id
-    data       = base64encode("{\"action\":\"stop\"}")
+    data       = base64encode("{\"action\":\"delete_all_non_idle_runners\"}")
   }
 }
 
-resource "google_cloud_scheduler_job" "force_stop_job" {
-  name      = "force-stop-job"
+resource "google_cloud_scheduler_job" "force_delete_all_non_idle_runners" {
+  name      = "force delete all non idle runners"
   schedule  = "0 20 * * 1-5"
   time_zone = "Europe/Paris"
 
   pubsub_target {
     topic_name = google_pubsub_topic.start_and_stop.id
-    data       = base64encode("{\"action\":\"stop\", \"force\":\"true\"}")
+    data       = base64encode("{\"action\":\"force_delete_all_non_idle_runners\"}")
   }
 }
 
-resource "google_cloud_scheduler_job" "healthcheck_job" {
-  name      = "healthcheck-job"
+resource "google_cloud_scheduler_job" "healthcheck" {
+  name      = "healthcheck"
   schedule  = "0 1 * * *"
   time_zone = "Europe/Paris"
 
@@ -98,8 +98,8 @@ resource "google_cloud_scheduler_job" "healthcheck_job" {
   }
 }
 
-resource "google_cloud_scheduler_job" "renew_idle_runners_job" {
-  name      = "renew-idle-runners-job"
+resource "google_cloud_scheduler_job" "renew_idle_runners" {
+  name      = "renew idle runners"
   schedule  = "0 2 * * *"
   time_zone = "Europe/Paris"
 

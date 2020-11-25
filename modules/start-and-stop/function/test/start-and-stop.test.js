@@ -17,10 +17,9 @@ describe('start and stop tests', () => {
   })
   describe('When start payload', () => {
     it('should trigger scale', async () => {
-      const payload = makePayload('start')
+      const payload = makePayload('create_all_non_idle_runners')
       const scaleHelperMock = sandbox.mock(scaleHelper)
       scaleHelperMock.expects('scaleUpAllNonIdlesRunners').resolves().once()
-      scaleHelperMock.expects('scaleIdleRunners').resolves().once()
 
       await startAndStop.startAndStop(payload, makeEvent())
 
@@ -29,7 +28,7 @@ describe('start and stop tests', () => {
   })
   describe('When stop payload', () => {
     it('should trigger stop', async () => {
-      const payload = makePayload('stop')
+      const payload = makePayload('delete_all_non_idle_runners')
       const scaleHelperMock = sandbox.mock(scaleHelper)
       scaleHelperMock.expects('scaleDownAllNonIdlesRunners').resolves().once()
 
