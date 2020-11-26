@@ -5,19 +5,21 @@ const chalk = require('chalk')
 module.exports.startAndStop = async (data, context) => {
   try {
     console.info('startAndStop...')
+    const eventDate = new Date(Date.parse(context.timestamp))
+    const payload = JSON.parse(Buffer.from(data.data, 'base64').toString())
+    console.info(`Receive event with payload ${JSON.stringify(payload)} and date ${eventDate.toISOString()}`)
 
-    const eventAge = Date.now() - Date.parse(context.timestamp)
-    const eventMaxAge = 1000 * 60 * 10 // 10 minutes
-    console.info(`Event date = ${context.timestamp}, age = ${eventAge} ms`)
-    // Ignore events that are too old
-    if (eventAge > eventMaxAge) {
-      console.info(`Dropping event ${data} with age ${eventAge} ms.`)
+    if (isEventAgeTooOld(eventDate)) {
+      const eventAgeMs = Date.now().getTime() - eventDate.getTime()
+      console.info(`Dropping event with age ${eventAgeMs} ms.`)
       return Promise.resolve('startAndStop ignored too old event')
     }
 
-    const payload = validatePayload(
-      JSON.parse(Buffer.from(data.data, 'base64').toString())
-    )
+    if (!isPayloadValid(payload)) {
+      console.info(`Payload ${payload} is invalid.`)
+      return Promise.resolve('startAndStop ignored invalid payload')
+    }
+
     const action = payload.action
     switch (action) {
       case 'create_all_non_idle_runners':
@@ -36,7 +38,7 @@ module.exports.startAndStop = async (data, context) => {
         await renewIdleRunners()
         break
       default:
-        console.error(`action ${action} is unknown, nothing done`)  
+        console.error(`action ${action} is unknown, nothing done`)
     }
     return Promise.resolve('startAndStop end')
   } catch (err) {
@@ -71,9 +73,12 @@ async function renewIdleRunners () {
   await scaleHelper.renewIdleRunners()
 }
 
-function validatePayload (payload) {
-  if (!payload.action) {
-    throw new Error('Attribute \'action\' missing from payload')
-  }
-  return payload
+function isPayloadValid (payload) {
+  return payload.action
+}
+
+function isEventAgeTooOld (eventDate) {
+  const eventAgeMs = Date.now() - eventDate.getTime()
+  const eventMaxAgeMs = 1000 * 60 * 10 // 10 minutes
+  return eventAgeMs > eventMaxAgeMs
 }
