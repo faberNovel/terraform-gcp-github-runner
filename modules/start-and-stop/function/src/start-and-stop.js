@@ -2,31 +2,48 @@ const healthCheckHelper = require('./healthcheck')
 const scaleHelper = require('./scale-helper')
 const chalk = require('chalk')
 
-module.exports.startAndStop = async (data, context) => {
+module.exports.startAndStop = startAndStop
+module.exports.dev = dev
+module.exports.isPayloadValid = isPayloadValid
+module.exports.isEventAgeTooOld = isEventAgeTooOld
+
+async function startAndStop (data, context) {
   try {
     console.info('startAndStop...')
+    const eventDate = new Date(Date.parse(context.timestamp))
+    const payload = JSON.parse(Buffer.from(data.data, 'base64').toString())
+    console.info(`Receive event with payload ${JSON.stringify(payload)} and date ${eventDate.toISOString()}`)
 
-    const eventAge = Date.now() - Date.parse(context.timestamp)
-    const eventMaxAge = 1000 * 60 * 10 // 10 minutes
-    console.info(`Event date = ${context.timestamp}, age = ${eventAge} ms`)
-    // Ignore events that are too old
-    if (eventAge > eventMaxAge) {
-      console.info(`Dropping event ${data} with age ${eventAge} ms.`)
+    if (isEventAgeTooOld(eventDate)) {
+      const eventAgeMs = Date.now().getTime() - eventDate.getTime()
+      console.info(`Dropping event with age ${eventAgeMs} ms.`)
       return Promise.resolve('startAndStop ignored too old event')
     }
 
-    const payload = validatePayload(
-      JSON.parse(Buffer.from(data.data, 'base64').toString())
-    )
-    if (payload.action === 'start') {
-      await startRunners()
-    } else if (payload.action === 'stop') {
-      const force = payload.force === true
-      await stopRunners(force)
-    } else if (payload.action === 'healthcheck') {
-      await healthCheck()
-    } else if (payload.action === 'renew_idle_runners') {
-      await renewIdleRunners()
+    if (!isPayloadValid(payload)) {
+      console.info(`Payload ${payload} is invalid.`)
+      return Promise.resolve('startAndStop ignored invalid payload')
+    }
+
+    const action = payload.action
+    switch (action) {
+      case 'create_all_non_idle_runners':
+        await createAllNonIdleRunners()
+        break
+      case 'delete_all_non_idle_runners':
+        await deleteAllNonIdleRunners(false)
+        break
+      case 'force_delete_all_non_idle_runners':
+        await deleteAllNonIdleRunners(true)
+        break
+      case 'healthcheck':
+        await healthCheck()
+        break
+      case 'renew_idle_runners':
+        await renewIdleRunners()
+        break
+      default:
+        console.error(`action ${action} is unknown, nothing done`)
     }
     return Promise.resolve('startAndStop end')
   } catch (err) {
@@ -35,7 +52,7 @@ module.exports.startAndStop = async (data, context) => {
   }
 }
 
-module.exports.dev = async () => {
+async function dev () {
   try {
     // await healthCheck()
     await scaleHelper.renewIdleRunners()
@@ -45,12 +62,11 @@ module.exports.dev = async () => {
   }
 }
 
-async function startRunners () {
+async function createAllNonIdleRunners () {
   await scaleHelper.scaleUpAllNonIdlesRunners()
-  await scaleHelper.scaleIdleRunners()
 }
 
-async function stopRunners (force) {
+async function deleteAllNonIdleRunners (force) {
   await scaleHelper.scaleDownAllNonIdlesRunners(force)
 }
 
@@ -62,9 +78,16 @@ async function renewIdleRunners () {
   await scaleHelper.renewIdleRunners()
 }
 
-function validatePayload (payload) {
-  if (!payload.action) {
-    throw new Error('Attribute \'action\' missing from payload')
+function isPayloadValid (payload) {
+  if (payload.action !== null && payload.action !== undefined) {
+    return true
+  } else {
+    return false
   }
-  return payload
+}
+
+function isEventAgeTooOld (eventDate) {
+  const eventAgeMs = Date.now() - eventDate.getTime()
+  const eventMaxAgeMs = 1000 * 60 * 10 // 10 minutes
+  return eventAgeMs > eventMaxAgeMs
 }

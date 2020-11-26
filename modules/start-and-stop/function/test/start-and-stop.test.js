@@ -3,8 +3,7 @@ const chai = require('chai')
 const chaiAsPromised = require('chai-as-promised')
 const scaleHelper = require('../src/scale-helper')
 const healthCheck = require('../src/healthcheck')
-const rewire = require('rewire')
-const startAndStop = rewire('../src/start-and-stop')
+const startAndStop = require('../src/start-and-stop')
 
 chai.use(chaiAsPromised)
 chai.should()
@@ -15,54 +14,85 @@ describe('start and stop tests', () => {
       return startAndStop.startAndStop(null, null).should.rejected
     })
   })
-  describe('When start payload', () => {
-    it('should trigger scale', async () => {
-      const payload = makePayload('start')
+  describe('When create all non idle runners payload', () => {
+    it('should create all non idle runners', async () => {
+      const data = makeDataFromAction('create_all_non_idle_runners')
       const scaleHelperMock = sandbox.mock(scaleHelper)
       scaleHelperMock.expects('scaleUpAllNonIdlesRunners').resolves().once()
-      scaleHelperMock.expects('scaleIdleRunners').resolves().once()
 
-      await startAndStop.startAndStop(payload, makeEvent())
+      await startAndStop.startAndStop(data, makeContext())
 
       sandbox.verifyAndRestore()
     })
   })
-  describe('When stop payload', () => {
-    it('should trigger stop', async () => {
-      const payload = makePayload('stop')
+  describe('When delete all non idle runners payload', () => {
+    it('should delete all non idle runners', async () => {
+      const payload = makeDataFromAction('delete_all_non_idle_runners')
       const scaleHelperMock = sandbox.mock(scaleHelper)
-      scaleHelperMock.expects('scaleDownAllNonIdlesRunners').resolves().once()
+      scaleHelperMock.expects('scaleDownAllNonIdlesRunners').withExactArgs(false).resolves().once()
 
-      await startAndStop.startAndStop(payload, makeEvent())
+      await startAndStop.startAndStop(payload, makeContext())
+
+      sandbox.verifyAndRestore()
+    })
+  })
+  describe('When force delete all non idle runners payload', () => {
+    it('should force delete all non idle runners', async () => {
+      const data = makeDataFromAction('force_delete_all_non_idle_runners')
+      const scaleHelperMock = sandbox.mock(scaleHelper)
+      scaleHelperMock.expects('scaleDownAllNonIdlesRunners').withExactArgs(true).resolves().once()
+
+      await startAndStop.startAndStop(data, makeContext())
 
       sandbox.verifyAndRestore()
     })
   })
   describe('When healthcheck payload', () => {
-    it('Should trigger healthcheck', async () => {
-      const payload = makePayload('healthcheck')
+    it('should trigger healthcheck', async () => {
+      const data = makeDataFromAction('healthcheck')
       const healthCheckMock = sandbox.mock(healthCheck)
       healthCheckMock.expects('removeOfflineGitHubRunners').resolves().once()
 
-      await startAndStop.startAndStop(payload, makeEvent())
+      await startAndStop.startAndStop(data, makeContext())
 
       sandbox.verifyAndRestore()
     })
   })
+  describe('When renew idle runners payload', () => {
+    it('should trigger renew idle runners', async () => {
+      const data = makeDataFromAction('renew_idle_runners')
+      const scaleHelperMock = sandbox.mock(scaleHelper)
+      scaleHelperMock.expects('renewIdleRunners').resolves().once()
+
+      await startAndStop.startAndStop(data, makeContext())
+
+      sandbox.verifyAndRestore()
+    })
+  })
+  describe('When receive invalide payload isPayloadValid', () => {
+    it('should return false', async () => {
+      startAndStop.isPayloadValid({}).should.be.false
+    })
+  })
+  describe('When receive too old context isEventAgeTooOld', () => {
+    it('should return true', async () => {
+      startAndStop.isEventAgeTooOld(new Date(0)).should.be.true
+    })
+  })
 })
 
-function makePayload (action) {
+function makeDataFromAction (action) {
   const json = {
     action: action
   }
   const jsonBase64 = Buffer.from(JSON.stringify(json)).toString('base64')
-  const payload = {
+  const data = {
     data: jsonBase64
   }
-  return payload
+  return data
 }
 
-function makeEvent () {
+function makeContext () {
   return {
     timestamp: new Date().toISOString()
   }
