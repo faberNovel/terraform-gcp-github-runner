@@ -55,7 +55,7 @@ resource "google_pubsub_topic" "start_and_stop" {
 }
 
 resource "google_cloud_scheduler_job" "create_all_non_idle_runners" {
-  name      = "create all non idle runners"
+  name      = "create_all_non_idle_runners"
   schedule  = "0 8 * * 1-5"
   time_zone = "Europe/Paris"
 
@@ -66,7 +66,7 @@ resource "google_cloud_scheduler_job" "create_all_non_idle_runners" {
 }
 
 resource "google_cloud_scheduler_job" "delete_all_non_idle_runners" {
-  name      = "delete all non idle runners"
+  name      = "delete_all_non_idle_runners"
   schedule  = "0 19 * * 1-5"
   time_zone = "Europe/Paris"
 
@@ -77,7 +77,7 @@ resource "google_cloud_scheduler_job" "delete_all_non_idle_runners" {
 }
 
 resource "google_cloud_scheduler_job" "force_delete_all_non_idle_runners" {
-  name      = "force delete all non idle runners"
+  name      = "force_delete_all_non_idle_runners"
   schedule  = "0 20 * * 1-5"
   time_zone = "Europe/Paris"
 
@@ -99,7 +99,7 @@ resource "google_cloud_scheduler_job" "healthcheck" {
 }
 
 resource "google_cloud_scheduler_job" "renew_idle_runners" {
-  name      = "renew idle runners"
+  name      = "renew_idle_runners"
   schedule  = "0 2 * * *"
   time_zone = "Europe/Paris"
 
