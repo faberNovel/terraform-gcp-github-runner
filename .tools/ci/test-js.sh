@@ -7,7 +7,7 @@ project_root_path=$(realpath "$script_dir/../..")
 
 cd "$project_root_path"
 
-declare -a js_src_folders=("modules/start-and-stop/src" "modules/github-api/src" "modules/github-hook/function")
+declare -a js_src_folders=("modules/start-and-stop/function" "modules/github-api/src" "modules/github-hook/function")
 for js_src_folder in "${js_src_folders[@]}"
 do
     cd "$project_root_path/$js_src_folder"

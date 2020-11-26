@@ -1,10 +1,20 @@
-const HealthCheckHelper = require('./healthcheck.js')
-const ScaleHelper = require('./scale_helper.js')
+const healthCheckHelper = require('./healthcheck')
+const scaleHelper = require('./scale-helper')
 const chalk = require('chalk')
 
 module.exports.startAndStop = async (data, context) => {
   try {
     console.info('startAndStop...')
+
+    const eventAge = Date.now() - Date.parse(context.timestamp)
+    const eventMaxAge = 1000 * 60 * 10 // 10 minutes
+    console.info(`Event date = ${context.timestamp}, age = ${eventAge} ms`)
+    // Ignore events that are too old
+    if (eventAge > eventMaxAge) {
+      console.info(`Dropping event ${data} with age ${eventAge} ms.`)
+      return Promise.resolve('startAndStop ignored too old event')
+    }
+
     const payload = validatePayload(
       JSON.parse(Buffer.from(data.data, 'base64').toString())
     )
@@ -27,7 +37,8 @@ module.exports.startAndStop = async (data, context) => {
 
 module.exports.dev = async () => {
   try {
-    await ScaleHelper.renewIdleRunners()
+    // await healthCheck()
+    await scaleHelper.renewIdleRunners()
     console.log('ok')
   } catch (error) {
     console.log(`error = ${error}`)
@@ -35,22 +46,20 @@ module.exports.dev = async () => {
 }
 
 async function startRunners () {
-  await ScaleHelper.scaleUpNonIdleRunners()
-  await ScaleHelper.scaleIdleRunners()
+  await scaleHelper.scaleUpAllNonIdlesRunners()
+  await scaleHelper.scaleIdleRunners()
 }
 
 async function stopRunners (force) {
-  await ScaleHelper.scaleDownNonIdleRunners(force)
+  await scaleHelper.scaleDownAllNonIdlesRunners(force)
 }
 
 async function healthCheck () {
-  await HealthCheckHelper.removeDisconnectedGcpRunners()
-  await HealthCheckHelper.removeOfflineGitHubRunners()
-  await startRunners()
+  await healthCheckHelper.removeOfflineGitHubRunners()
 }
 
 async function renewIdleRunners () {
-  await ScaleHelper.renewIdleRunners()
+  await scaleHelper.renewIdleRunners()
 }
 
 function validatePayload (payload) {

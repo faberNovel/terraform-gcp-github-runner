@@ -1,18 +1,17 @@
 {
   "name": "start_and_stop",
   "version": "1.0.0",
-  "main": "start_and_stop.js",
+  "main": "src/start-and-stop.js",
   "license": "MIT",
   "engines": {
     "node": "12"
   },
   "scripts": {
     "build": "echo \"no-op\"",
-    "run": "node -e 'require(\"./start_and_stop.js\").startAndStop()'",
     "predev": "bash ../../../.tools/setup.sh",
-    "dev": "node -r dotenv/config -e 'require(\"./start_and_stop.js\").dev()'",
-    "test": "DOTENV_CONFIG_PATH=./test/.test.env mocha *.test.js",
-    "lint": "eslint *.js"
+    "dev": "node -r dotenv/config -e 'require(\"./src/start-and-stop.js\").dev()' dotenv_config_path=../../../dev.env",
+    "test": "DOTENV_CONFIG_PATH=./test/.test.env mocha test/*.test.js",
+    "lint": "eslint src/*.js && eslint test/*.js"
   },
   "mocha": {
     "require": "dotenv/config, test/hooks.js"

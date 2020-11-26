@@ -5,3 +5,4 @@ github.auto.tfvars.json
 google-*.tfvars.json
 terraformrc
 **/auth.json
+**/dev.env

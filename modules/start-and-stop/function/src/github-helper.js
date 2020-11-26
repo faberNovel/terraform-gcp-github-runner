@@ -1,7 +1,13 @@
 const { GoogleAuth } = require('google-auth-library')
 const auth = new GoogleAuth()
 
-async function getRunnerGitHubStates () {
+module.exports.getGitHubRunners = getGitHubRunners
+module.exports.deleteGitHubRunner = deleteGitHubRunner
+module.exports.filterGitHubRunner = filterGitHubRunner
+module.exports.getGitHubRunnerByName = getGitHubRunnerByName
+module.exports.isGitHubRunnerOnline = isGitHubRunnerOnline
+
+async function getGitHubRunners () {
   const githubApiFunctionUrl = process.env.GITHUB_API_TRIGGER_URL
   const client = await auth.getIdTokenClient(githubApiFunctionUrl)
   const res = await client.request({
@@ -18,7 +24,7 @@ async function getRunnerGitHubStates () {
   return res.data.runners
 }
 
-async function deleteRunnerGitHub (gitHubRunnerId) {
+async function deleteGitHubRunner (gitHubRunnerId) {
   const githubApiFunctionUrl = process.env.GITHUB_API_TRIGGER_URL
   const client = await auth.getIdTokenClient(githubApiFunctionUrl)
   const res = await client.request({
@@ -36,9 +42,9 @@ async function deleteRunnerGitHub (gitHubRunnerId) {
   return res.data.runners
 }
 
-function parseGitHubRunnerStatus (githubRunners, vmName) {
+function filterGitHubRunner (githubRunners, runnerName) {
   const [githubRunner] = githubRunners.filter(runner => {
-    return runner.name === vmName
+    return runner.name === runnerName
   })
   if (githubRunner === undefined) {
     return null
@@ -46,10 +52,10 @@ function parseGitHubRunnerStatus (githubRunners, vmName) {
   return githubRunner
 }
 
-async function getRunnerGitHubStateByName (name) {
-  const githubRunners = await getRunnerGitHubStates()
+async function getGitHubRunnerByName (runnerName) {
+  const githubRunners = await getGitHubRunners()
   const [githubRunner] = githubRunners.filter(runner => {
-    return runner.name === name
+    return runner.name === runnerName
   })
   if (githubRunner === undefined) {
     return null
@@ -57,23 +63,17 @@ async function getRunnerGitHubStateByName (name) {
   return githubRunner
 }
 
-async function isRunnerGitHubStateOnline (name) {
-  const runnerGitHubState = await getRunnerGitHubStateByName(name)
+async function isGitHubRunnerOnline (runnerName) {
+  const runnerGitHubState = await getGitHubRunnerByName(runnerName)
   if (runnerGitHubState === null) {
-    console.log(`runner ${name} github status is unknown`)
+    console.log(`runner ${runnerName} github status is unknown`)
     return Promise.resolve(false)
   }
   const gitHubStatus = runnerGitHubState.status
   if (gitHubStatus !== 'online') {
-    console.log(`runner ${name} github status is ${gitHubStatus}`)
+    console.log(`runner ${runnerName} github status is ${gitHubStatus}`)
     return Promise.resolve(false)
   }
-  console.log(`runner ${name} github status is online`)
+  console.log(`runner ${runnerName} github status is online`)
   return Promise.resolve(true)
 }
-
-module.exports.getRunnerGitHubStates = getRunnerGitHubStates
-module.exports.deleteRunnerGitHub = deleteRunnerGitHub
-module.exports.parseGitHubRunnerStatus = parseGitHubRunnerStatus
-module.exports.getRunnerGitHubStateByName = getRunnerGitHubStateByName
-module.exports.isRunnerGitHubStateOnline = isRunnerGitHubStateOnline

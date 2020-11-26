@@ -1,26 +1,26 @@
 const sandbox = require('sinon').createSandbox()
 const chai = require('chai')
 const rewire = require('rewire')
-const scaleHelper = rewire('./scale_helper.js')
-const createVMHelper = require('./create_vm_helper.js')
-const gitHubHelper = require('./github_helper')
-const getVMHelper = require('./get_vm_helper.js')
-const deleteVmHelper = require('./delete_vm_helper')
+const scaleHelper = rewire('../src/scale-helper')
+const createRunnerHelper = require('../src/create-runner-helper')
+const gitHubHelper = require('../src/github-helper')
+const getVMHelper = require('../src/get-runner-helper')
+const deleteVmHelper = require('../src/delete-runner-helper')
 
 chai.should()
 
-describe('scale helper tests', () => {
+describe('Scale helper tests', () => {
   afterEach(function () {
     sandbox.verify()
     sandbox.restore()
   })
 
   describe('When calling scale up runners', () => {
-    it('Should scale up runners', async () => {
+    it('should scale up runners', async () => {
       const scaleUpRunners = scaleHelper.__get__('scaleUpRunners')
       const idle = false
       const count = 3
-      const stub = sandbox.stub(createVMHelper, 'createVm').returns(Promise.resolve())
+      const stub = sandbox.stub(createRunnerHelper, 'createRunner').returns(Promise.resolve())
 
       await scaleUpRunners(idle, count)
 
@@ -63,7 +63,7 @@ describe('scale helper tests', () => {
   })
 
   describe('When get target runner count delta', () => {
-    const getTargetRunnerCountDelta = scaleHelper.__get__('getTargetRunnerCountDelta')
+    const getTargetRunnerCountDelta = scaleHelper.__get__('getTargetRunnersCountDelta')
 
     it('should return positive when scaling up', async () => {
       const delta = await getTargetRunnerCountDeltaWrapped(0, 1, getTargetRunnerCountDelta)
@@ -77,7 +77,7 @@ describe('scale helper tests', () => {
 })
 
 async function getTargetRunnerCountDeltaWrapped (givenRunnerCount, targetRunnerCount, getTargetRunnerCountDelta) {
-  sandbox.stub(getVMHelper, 'getRunnerVMs').resolves(new Array(givenRunnerCount))
+  sandbox.stub(getVMHelper, 'getRunnersVms').resolves(new Array(givenRunnerCount))
   const getTargetRunnersCountStub = sandbox.stub().returns(targetRunnerCount)
   scaleHelper.__set__('getTargetRunnersCount', getTargetRunnersCountStub)
   const delta = await getTargetRunnerCountDelta(true)
@@ -85,8 +85,8 @@ async function getTargetRunnerCountDeltaWrapped (givenRunnerCount, targetRunnerC
 }
 
 function stubExternalDependencies (vms, busyCount) {
-  sandbox.stub(getVMHelper, 'getRunnerVMs').resolves(vms)
-  sandbox.stub(deleteVmHelper, 'deleteVm').callsFake(async vmName => {
+  sandbox.stub(getVMHelper, 'getRunnersVms').resolves(vms)
+  sandbox.stub(deleteVmHelper, 'deleteRunner').callsFake(async vmName => {
     await vms.filter(vm => vm.name === vmName)[0].delete()
     return Promise.resolve()
   })
@@ -99,7 +99,7 @@ function stubExternalDependencies (vms, busyCount) {
     }
     mergedGithubState.push(gitHubRunnerState)
   }
-  sandbox.stub(gitHubHelper, 'getRunnerGitHubStates').resolves(mergedGithubState)
+  sandbox.stub(gitHubHelper, 'getGitHubRunners').resolves(mergedGithubState)
 }
 
 function makeFakeVMs (count) {

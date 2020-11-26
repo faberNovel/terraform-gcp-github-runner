@@ -16,6 +16,7 @@ script_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 project_root_path=$(realpath "$script_dir/..")
 google_path=$project_root_path/google-dev.tfvars.json
 github_path=$project_root_path/github.auto.tfvars.json
+env_file_path=$project_root_path/dev.env
 
 # shellcheck source=.tools/load-default-terraform-env.sh
 source "$project_root_path"/.tools/load-default-terraform-env.sh
@@ -24,9 +25,9 @@ source "$project_root_path"/.tools/load-google-env.sh "$google_path"
 # shellcheck source=.tools/load-github-env.sh
 source "$project_root_path"/.tools/load-github-env.sh "$github_path"
 
-# clear .env file
-true > .env
-# generate .env file.
+# clear dev.env file
+true > "$env_file_path"
+# generate dev.env file.
 {
     echo "GOOGLE_APPLICATION_CREDENTIALS=$GOOGLE_APPLICATION_CREDENTIALS"
     echo "GOOGLE_ZONE=$GOOGLE_ZONE"
@@ -47,4 +48,4 @@ true > .env
     echo "GITHUB_CLIENT_ID=$GITHUB_CLIENT_ID"
     echo "GITHUB_CLIENT_SECRET=$GITHUB_CLIENT_SECRET"
     echo "GITHUB_WEBHOOK_SECRET=$GITHUB_WEBHOOK_SECRET"
-} >> .env
+} >> "$env_file_path"
