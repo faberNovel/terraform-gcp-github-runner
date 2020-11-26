@@ -2,7 +2,12 @@ const healthCheckHelper = require('./healthcheck')
 const scaleHelper = require('./scale-helper')
 const chalk = require('chalk')
 
-module.exports.startAndStop = async (data, context) => {
+module.exports.startAndStop = startAndStop
+module.exports.dev = dev
+module.exports.isPayloadValid = isPayloadValid
+module.exports.isEventAgeTooOld = isEventAgeTooOld
+
+async function startAndStop (data, context) {
   try {
     console.info('startAndStop...')
     const eventDate = new Date(Date.parse(context.timestamp))
@@ -47,7 +52,7 @@ module.exports.startAndStop = async (data, context) => {
   }
 }
 
-module.exports.dev = async () => {
+async function dev () {
   try {
     // await healthCheck()
     await scaleHelper.renewIdleRunners()
@@ -74,7 +79,11 @@ async function renewIdleRunners () {
 }
 
 function isPayloadValid (payload) {
-  return payload.action
+  if (payload.action !== null && payload.action !== undefined) {
+    return true
+  } else {
+    return false
+  }
 }
 
 function isEventAgeTooOld (eventDate) {
