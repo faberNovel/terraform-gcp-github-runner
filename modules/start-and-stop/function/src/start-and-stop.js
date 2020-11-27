@@ -42,6 +42,12 @@ async function startAndStop (data, context) {
       case 'renew_idle_runners':
         await renewIdleRunners()
         break
+      case 'scale_up':
+        await scaleUp()
+        break
+      case 'scale_down':
+        await scaleDown()
+        break
       default:
         console.error(`action ${action} is unknown, nothing done`)
     }
@@ -60,6 +66,14 @@ async function dev () {
   } catch (error) {
     console.log(`error = ${error}`)
   }
+}
+
+async function scaleUp () {
+  await scaleHelper.scaleUp()
+}
+
+async function scaleDown () {
+  await scaleHelper.scaleDown()
 }
 
 async function createAllNonIdleRunners () {

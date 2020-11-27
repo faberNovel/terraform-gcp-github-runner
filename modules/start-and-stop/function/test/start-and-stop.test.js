@@ -79,6 +79,28 @@ describe('start and stop tests', () => {
       startAndStop.isEventAgeTooOld(new Date(0)).should.be.true
     })
   })
+  describe('When scale up payload', () => {
+    it('should call scale up', async () => {
+      const data = makeDataFromAction('scale_up')
+      const scaleHelperMock = sandbox.mock(scaleHelper)
+      scaleHelperMock.expects('scaleUp').resolves().once()
+
+      await startAndStop.startAndStop(data, makeContext())
+
+      sandbox.verifyAndRestore()
+    })
+  })
+  describe('When scale down payload', () => {
+    it('should call scale down', async () => {
+      const data = makeDataFromAction('scale_down')
+      const scaleHelperMock = sandbox.mock(scaleHelper)
+      scaleHelperMock.expects('scaleDown').resolves().once()
+
+      await startAndStop.startAndStop(data, makeContext())
+
+      sandbox.verifyAndRestore()
+    })
+  })
 })
 
 function makeDataFromAction (action) {
