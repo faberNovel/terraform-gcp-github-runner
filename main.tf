@@ -50,9 +50,12 @@ module "secrets" {
 }
 
 module "github_hook" {
-  source             = "./modules/github-hook"
-  google             = var.google
-  secret_github_json = module.secrets.secret_github_json
+  source                    = "./modules/github-hook"
+  google                    = var.google
+  secret_github_json        = module.secrets.secret_github_json
+  start_and_stop_topic_name = module.start_and_stop.start_and_stop_topic_name
+
+  depends_on = [google_project_service.gcp_services]
 }
 
 output "github_webhook_url" {

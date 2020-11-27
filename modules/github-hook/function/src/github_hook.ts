@@ -2,6 +2,7 @@ import type { HttpFunction } from '@google-cloud/functions-framework/build/src/f
 import { Response, Request } from 'express'
 import { getGithubWebhookSecret } from './helper'
 import * as crypto from 'crypto'
+import { PubSub } from '@google-cloud/pubsub'
 
 const GITHUB_ACTION_APP_ID = 15368
 
@@ -102,6 +103,12 @@ export function generateSignature (secret: string, payload: string): string {
 
 export async function dev () {
   console.log('hello-world')
+  const topicName = process.env.START_AND_STOP_TOPIC_NAME!
+  const data = JSON.stringify({ foo: 'bar' })
+  const pubsub = new PubSub()
+  const dataBuffer = Buffer.from(data)
+  const messageId = await pubsub.topic(topicName).publish(dataBuffer)
+  console.log(messageId)
 }
 
 class CheckRunPayload {

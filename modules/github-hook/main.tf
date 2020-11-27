@@ -30,6 +30,7 @@ resource "google_cloudfunctions_function" "github_hook" {
 
   environment_variables = {
     "SECRET_GITHUB_JSON_RESOURCE_NAME" = var.secret_github_json.resource_name
+    "START_AND_STOP_TOPIC_NAME"        = var.start_and_stop_topic_name
   }
 }
 
