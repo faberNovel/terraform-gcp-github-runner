@@ -14,15 +14,20 @@ module.exports.getTargetRunnerCountDelta = getTargetRunnersCountDelta
 module.exports.scaleDownRunners = scaleDownRunners
 module.exports.renewIdleRunners = renewIdleRunners
 
-const nonBusyThreshold = 3
+const nonBusyThreshold = 1
 
-async function scaleUp () {
-  console.log('scale up...')
+async function getNonBusyGcpGitHubRunnersCount () {
   const gcpGitHubRunners = await gitHubHelper.getGcpGitHubRunners()
   const nonBusyGcpGitHubRunners = gcpGitHubRunners.filter(gitHubRunner => {
     return gitHubRunner.busy === false
   })
   const nonBusyGcpGitHubRunnersCount = nonBusyGcpGitHubRunners.length
+  return nonBusyGcpGitHubRunnersCount
+}
+
+async function scaleUp () {
+  console.log('scale up...')
+  const nonBusyGcpGitHubRunnersCount = await getNonBusyGcpGitHubRunnersCount()
   if (nonBusyGcpGitHubRunnersCount < nonBusyThreshold) {
     console.log(`non busy runners (${nonBusyGcpGitHubRunnersCount}) < threshold (${nonBusyThreshold}), evaluate scale up possibility`)
     const idle = false
@@ -43,7 +48,25 @@ async function scaleUp () {
 }
 
 async function scaleDown () {
-  // TODO
+  console.log('scale down...')
+  const nonBusyGcpGitHubRunnersCount = await getNonBusyGcpGitHubRunnersCount()
+  if (nonBusyGcpGitHubRunnersCount > nonBusyThreshold) {
+    console.log(`non busy runners (${nonBusyGcpGitHubRunnersCount}) > threshold (${nonBusyThreshold}), evaluate scale down possibility`)
+    const idle = false
+    const nonIdleRunners = await getRunnerHelper.getRunnersVms(idle)
+    const nonIdleRunnersCount = nonIdleRunners.length
+    console.log(`non idle runners count is ${nonIdleRunnersCount}, min is 0`)
+    if (nonIdleRunnersCount > 0) {
+      console.log('non idle runners count is > 0, scaling down')
+      const force = false
+      await scaleDownRunners(idle, 1, force)
+    } else {
+      console.log('non idle runners count is 0, can not scale down more')
+    }
+  } else {
+    console.log(`non busy runners (${nonBusyGcpGitHubRunnersCount}) <= threshold (${nonBusyThreshold}), nothing to do`)
+  }
+  console.log(chalk.green('scale down done'))
 }
 
 async function renewIdleRunners () {

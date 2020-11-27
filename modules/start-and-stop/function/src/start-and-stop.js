@@ -60,7 +60,7 @@ async function startAndStop (data, context) {
 
 async function dev () {
   try {
-    await scaleHelper.scaleUp()
+    await scaleHelper.scaleDown()
   } catch (error) {
     console.log(`error = ${error}`)
   }
