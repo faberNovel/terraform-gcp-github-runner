@@ -26,12 +26,24 @@ export const githubHook: HttpFunction = async (req: Request, res: Response) => {
   console.info(`event is a queued check_run : ${JSON.stringify(checkRunPayload)}`)
 
   if (checkRunPayload.repository.toLowerCase().includes('ios')) {
-    console.info('looks like a iOS workflow, ingoring...')
+    console.info('looks like a iOS workflow, ignoring...')
     res.sendStatus(202)
     return
   }
 
+  await sendScaleUpMessage()
+
   res.sendStatus(202)
+}
+
+async function sendScaleUpMessage () {
+  console.info('sending scale up message...')
+  const topicName = process.env.START_AND_STOP_TOPIC_NAME!
+  const data = JSON.stringify({ action: 'scale_up' })
+  const pubsub = new PubSub()
+  const dataBuffer = Buffer.from(data)
+  await pubsub.topic(topicName).publish(dataBuffer)
+  console.info('scale up send with success')
 }
 
 export async function validateRequest (req: Request) {

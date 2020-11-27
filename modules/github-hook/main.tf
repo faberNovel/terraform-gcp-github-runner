@@ -53,6 +53,11 @@ resource "google_project_iam_member" "github_hook_secretmanager_secretaccessor" 
   member = "serviceAccount:${google_service_account.github_hook.email}"
 }
 
+resource "google_project_iam_member" "github_hook_pubsub_publisher" {
+  role   = "roles/pubsub.publisher"
+  member = "serviceAccount:${google_service_account.github_hook.email}"
+}
+
 output "github_hook_trigger_url" {
   value = google_cloudfunctions_function.github_hook.https_trigger_url
 }
