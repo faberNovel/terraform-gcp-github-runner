@@ -60,9 +60,7 @@ async function startAndStop (data, context) {
 
 async function dev () {
   try {
-    // await healthCheck()
-    await scaleHelper.renewIdleRunners()
-    console.log('ok')
+    await scaleHelper.scaleUp()
   } catch (error) {
     console.log(`error = ${error}`)
   }

@@ -1,7 +1,9 @@
 const { GoogleAuth } = require('google-auth-library')
 const auth = new GoogleAuth()
+const createRunnerHelper = require('./create-runner-helper')
 
 module.exports.getGitHubRunners = getGitHubRunners
+module.exports.getGcpGitHubRunners = getGcpGitHubRunners
 module.exports.deleteGitHubRunner = deleteGitHubRunner
 module.exports.filterGitHubRunner = filterGitHubRunner
 module.exports.getGitHubRunnerByName = getGitHubRunnerByName
@@ -22,6 +24,14 @@ async function getGitHubRunners () {
     }
   })
   return res.data.runners
+}
+
+async function getGcpGitHubRunners () {
+  const gitHubRunners = await getGitHubRunners()
+  const gcpGitHubRunners = gitHubRunners.filter(gitHubRunner => {
+    return gitHubRunner.name.startsWith(createRunnerHelper.getRunnerNamePrefix())
+  })
+  return gcpGitHubRunners
 }
 
 async function deleteGitHubRunner (gitHubRunnerId) {

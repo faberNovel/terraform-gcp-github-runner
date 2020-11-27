@@ -14,8 +14,32 @@ module.exports.getTargetRunnerCountDelta = getTargetRunnersCountDelta
 module.exports.scaleDownRunners = scaleDownRunners
 module.exports.renewIdleRunners = renewIdleRunners
 
+const nonBusyThreshold = 3
+
 async function scaleUp () {
-  // TODO
+  console.log('scale up...')
+  const gcpGitHubRunners = await gitHubHelper.getGcpGitHubRunners()
+  const nonBusyGcpGitHubRunners = gcpGitHubRunners.filter(gitHubRunner => {
+    return gitHubRunner.busy === false
+  })
+  const nonBusyGcpGitHubRunnersCount = nonBusyGcpGitHubRunners.length
+  if (nonBusyGcpGitHubRunnersCount < nonBusyThreshold) {
+    console.log(`non busy runners (${nonBusyGcpGitHubRunnersCount}) < threshold (${nonBusyThreshold}), evaluate scale up possibility`)
+    const idle = false
+    const nonIdleRunners = await getRunnerHelper.getRunnersVms(idle)
+    const nonIdleRunnersCount = nonIdleRunners.length
+    const maxNonIdleRunnersCount = getTargetRunnersCount(idle)
+    console.log(`non idle runners count is ${nonIdleRunnersCount}, max is ${maxNonIdleRunnersCount}`)
+    if (nonIdleRunnersCount < maxNonIdleRunnersCount) {
+      console.log('max non idle runners count is not meet, scaling up')
+      await scaleUpRunners(idle, 1)
+    } else {
+      console.log('max non idle runners count is already meet, can not scale up more')
+    }
+  } else {
+    console.log(`non busy runners (${nonBusyGcpGitHubRunnersCount}) >= threshold (${nonBusyThreshold}), nothing to do`)
+  }
+  console.log(chalk.green('scale up done'))
 }
 
 async function scaleDown () {
