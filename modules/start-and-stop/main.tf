@@ -54,39 +54,6 @@ resource "google_pubsub_topic" "start_and_stop" {
   name = "start-and-stop-topic"
 }
 
-resource "google_cloud_scheduler_job" "create_all_non_idle_runners" {
-  name      = "create_all_non_idle_runners"
-  schedule  = "0 8 * * 1-5"
-  time_zone = "Europe/Paris"
-
-  pubsub_target {
-    topic_name = google_pubsub_topic.start_and_stop.id
-    data       = base64encode("{\"action\":\"create_all_non_idle_runners\"}")
-  }
-}
-
-resource "google_cloud_scheduler_job" "delete_all_non_idle_runners" {
-  name      = "delete_all_non_idle_runners"
-  schedule  = "0 19 * * 1-5"
-  time_zone = "Europe/Paris"
-
-  pubsub_target {
-    topic_name = google_pubsub_topic.start_and_stop.id
-    data       = base64encode("{\"action\":\"delete_all_non_idle_runners\"}")
-  }
-}
-
-resource "google_cloud_scheduler_job" "force_delete_all_non_idle_runners" {
-  name      = "force_delete_all_non_idle_runners"
-  schedule  = "0 20 * * 1-5"
-  time_zone = "Europe/Paris"
-
-  pubsub_target {
-    topic_name = google_pubsub_topic.start_and_stop.id
-    data       = base64encode("{\"action\":\"force_delete_all_non_idle_runners\"}")
-  }
-}
-
 resource "google_cloud_scheduler_job" "healthcheck" {
   name      = "healthcheck"
   schedule  = "0 1 * * *"
