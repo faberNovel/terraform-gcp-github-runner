@@ -153,3 +153,7 @@ resource "google_project_iam_member" "runner_monitoring_metricwriter" {
   role   = "roles/monitoring.metricWriter"
   member = "serviceAccount:${google_service_account.runner.email}"
 }
+
+output "start_and_stop_topic_name" {
+  value = google_pubsub_topic.start_and_stop.name
+}

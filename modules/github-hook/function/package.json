@@ -39,6 +39,7 @@
   "private": true,
   "dependencies": {
     "@google-cloud/functions-framework": "^1.7.1",
+    "@google-cloud/pubsub": "^2.6.0",
     "@google-cloud/secret-manager": "^3.2.2",
     "dotenv": "^8.2.0"
   }

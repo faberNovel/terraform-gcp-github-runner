@@ -30,6 +30,7 @@ resource "google_cloudfunctions_function" "github_hook" {
 
   environment_variables = {
     "SECRET_GITHUB_JSON_RESOURCE_NAME" = var.secret_github_json.resource_name
+    "START_AND_STOP_TOPIC_NAME"        = var.start_and_stop_topic_name
   }
 }
 
@@ -49,6 +50,11 @@ resource "google_service_account" "github_hook" {
 
 resource "google_project_iam_member" "github_hook_secretmanager_secretaccessor" {
   role   = "roles/secretmanager.secretAccessor"
+  member = "serviceAccount:${google_service_account.github_hook.email}"
+}
+
+resource "google_project_iam_member" "github_hook_pubsub_publisher" {
+  role   = "roles/pubsub.publisher"
   member = "serviceAccount:${google_service_account.github_hook.email}"
 }
 
