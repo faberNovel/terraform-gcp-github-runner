@@ -9,7 +9,7 @@ module.exports.scaleUpAllNonIdlesRunners = scaleUpAllNonIdlesRunners
 module.exports.scaleDownAllNonIdlesRunners = scaleDownAllNonIdlesRunners
 module.exports.scaleUp = scaleUp
 module.exports.scaleDown = scaleDown
-
+module.exports.getNonBusyGcpGitHubRunnersCount = getNonBusyGcpGitHubRunnersCount
 module.exports.getTargetRunnerCountDelta = getTargetRunnersCountDelta
 module.exports.scaleDownRunners = scaleDownRunners
 module.exports.renewIdleRunners = renewIdleRunners
