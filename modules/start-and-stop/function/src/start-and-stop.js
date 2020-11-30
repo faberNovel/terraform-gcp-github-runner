@@ -1,5 +1,6 @@
 const healthCheckHelper = require('./healthcheck')
 const scaleHelper = require('./scale-helper')
+const scalePolicy = require('./scale-policy')
 const chalk = require('chalk')
 
 module.exports.startAndStop = startAndStop
@@ -60,18 +61,18 @@ async function startAndStop (data, context) {
 
 async function dev () {
   try {
-    await scaleHelper.scaleDown()
+    await scalePolicy.scaleUp()
   } catch (error) {
     console.log(`error = ${error}`)
   }
 }
 
 async function scaleUp () {
-  await scaleHelper.scaleUp()
+  await scalePolicy.scaleUp()
 }
 
 async function scaleDown () {
-  await scaleHelper.scaleDown()
+  await scalePolicy.scaleDown()
 }
 
 async function createAllNonIdleRunners () {

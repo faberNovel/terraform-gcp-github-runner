@@ -4,6 +4,7 @@ const chaiAsPromised = require('chai-as-promised')
 const scaleHelper = require('../src/scale-helper')
 const healthCheck = require('../src/healthcheck')
 const startAndStop = require('../src/start-and-stop')
+const scalePolicy = require('../src/scale-policy')
 
 chai.use(chaiAsPromised)
 chai.should()
@@ -82,8 +83,8 @@ describe('start and stop tests', () => {
   describe('When scale up payload', () => {
     it('should call scale up', async () => {
       const data = makeDataFromAction('scale_up')
-      const scaleHelperMock = sandbox.mock(scaleHelper)
-      scaleHelperMock.expects('scaleUp').resolves().once()
+      const scalePolicyMock = sandbox.mock(scalePolicy)
+      scalePolicyMock.expects('scaleUp').resolves().once()
 
       await startAndStop.startAndStop(data, makeContext())
 
@@ -93,8 +94,8 @@ describe('start and stop tests', () => {
   describe('When scale down payload', () => {
     it('should call scale down', async () => {
       const data = makeDataFromAction('scale_down')
-      const scaleHelperMock = sandbox.mock(scaleHelper)
-      scaleHelperMock.expects('scaleDown').resolves().once()
+      const scalePolicyMock = sandbox.mock(scalePolicy)
+      scalePolicyMock.expects('scaleDown').resolves().once()
 
       await startAndStop.startAndStop(data, makeContext())
 

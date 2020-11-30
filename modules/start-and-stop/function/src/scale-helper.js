@@ -7,67 +7,11 @@ const chalk = require('chalk')
 module.exports.scaleIdleRunners = scaleIdleRunners
 module.exports.scaleUpAllNonIdlesRunners = scaleUpAllNonIdlesRunners
 module.exports.scaleDownAllNonIdlesRunners = scaleDownAllNonIdlesRunners
-module.exports.scaleUp = scaleUp
-module.exports.scaleDown = scaleDown
-module.exports.getNonBusyGcpGitHubRunnersCount = getNonBusyGcpGitHubRunnersCount
+module.exports.getTargetRunnersCount = getTargetRunnersCount
 module.exports.getTargetRunnerCountDelta = getTargetRunnersCountDelta
+module.exports.scaleUpRunners = scaleUpRunners
 module.exports.scaleDownRunners = scaleDownRunners
 module.exports.renewIdleRunners = renewIdleRunners
-
-const nonBusyThreshold = 1
-
-async function getNonBusyGcpGitHubRunnersCount () {
-  const gcpGitHubRunners = await gitHubHelper.getGcpGitHubRunners()
-  const nonBusyGcpGitHubRunners = gcpGitHubRunners.filter(gitHubRunner => {
-    return gitHubRunner.busy === false
-  })
-  const nonBusyGcpGitHubRunnersCount = nonBusyGcpGitHubRunners.length
-  return nonBusyGcpGitHubRunnersCount
-}
-
-async function scaleUp () {
-  console.log('scale up...')
-  const nonBusyGcpGitHubRunnersCount = await getNonBusyGcpGitHubRunnersCount()
-  if (nonBusyGcpGitHubRunnersCount < nonBusyThreshold) {
-    console.log(`non busy runners (${nonBusyGcpGitHubRunnersCount}) < threshold (${nonBusyThreshold}), evaluate scale up possibility`)
-    const idle = false
-    const nonIdleRunners = await getRunnerHelper.getRunnersVms(idle)
-    const nonIdleRunnersCount = nonIdleRunners.length
-    const maxNonIdleRunnersCount = getTargetRunnersCount(idle)
-    console.log(`non idle runners count is ${nonIdleRunnersCount}, max is ${maxNonIdleRunnersCount}`)
-    if (nonIdleRunnersCount < maxNonIdleRunnersCount) {
-      console.log('max non idle runners count is not meet, scaling up')
-      await scaleUpRunners(idle, 1)
-    } else {
-      console.log('max non idle runners count is already meet, can not scale up more')
-    }
-  } else {
-    console.log(`non busy runners (${nonBusyGcpGitHubRunnersCount}) >= threshold (${nonBusyThreshold}), nothing to do`)
-  }
-  console.log(chalk.green('scale up done'))
-}
-
-async function scaleDown () {
-  console.log('scale down...')
-  const nonBusyGcpGitHubRunnersCount = await getNonBusyGcpGitHubRunnersCount()
-  if (nonBusyGcpGitHubRunnersCount > nonBusyThreshold) {
-    console.log(`non busy runners (${nonBusyGcpGitHubRunnersCount}) > threshold (${nonBusyThreshold}), evaluate scale down possibility`)
-    const idle = false
-    const nonIdleRunners = await getRunnerHelper.getRunnersVms(idle)
-    const nonIdleRunnersCount = nonIdleRunners.length
-    console.log(`non idle runners count is ${nonIdleRunnersCount}, min is 0`)
-    if (nonIdleRunnersCount > 0) {
-      console.log('non idle runners count is > 0, scaling down')
-      const force = false
-      await scaleDownRunners(idle, 1, force)
-    } else {
-      console.log('non idle runners count is 0, can not scale down more')
-    }
-  } else {
-    console.log(`non busy runners (${nonBusyGcpGitHubRunnersCount}) <= threshold (${nonBusyThreshold}), nothing to do`)
-  }
-  console.log(chalk.green('scale down done'))
-}
 
 async function renewIdleRunners () {
   console.info('renew idle runners...')

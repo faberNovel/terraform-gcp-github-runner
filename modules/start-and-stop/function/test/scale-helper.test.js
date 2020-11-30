@@ -76,16 +76,6 @@ describe('Scale helper tests', () => {
       delta.should.equals(-1)
     })
   })
-
-  describe('When get non busy gcp gitHub runners count', () => {
-    it('should return the correct count', async () => {
-      const runnersCount = 3
-      const vms = makeFakeVMs(runnersCount)
-      const busyCount = 1
-      stubExternalDependencies(vms, busyCount)
-      scaleHelper.getNonBusyGcpGitHubRunnersCount().should.eventually.equals(runnersCount - busyCount)
-    })
-  })
 })
 
 async function getTargetRunnerCountDeltaWrapped (givenRunnerCount, targetRunnerCount, getTargetRunnerCountDelta) {
