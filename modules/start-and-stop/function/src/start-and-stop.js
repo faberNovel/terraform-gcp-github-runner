@@ -1,5 +1,6 @@
 const healthCheckHelper = require('./healthcheck')
 const scaleHelper = require('./scale-helper')
+const scalePolicy = require('./scale-policy')
 const chalk = require('chalk')
 
 module.exports.startAndStop = startAndStop
@@ -42,6 +43,12 @@ async function startAndStop (data, context) {
       case 'renew_idle_runners':
         await renewIdleRunners()
         break
+      case 'scale_up':
+        await scaleUp()
+        break
+      case 'scale_down':
+        await scaleDown()
+        break
       default:
         console.error(`action ${action} is unknown, nothing done`)
     }
@@ -54,12 +61,18 @@ async function startAndStop (data, context) {
 
 async function dev () {
   try {
-    // await healthCheck()
-    await scaleHelper.renewIdleRunners()
-    console.log('ok')
+    await scalePolicy.scaleUp()
   } catch (error) {
     console.log(`error = ${error}`)
   }
+}
+
+async function scaleUp () {
+  await scalePolicy.scaleUp()
+}
+
+async function scaleDown () {
+  await scalePolicy.scaleDown()
 }
 
 async function createAllNonIdleRunners () {

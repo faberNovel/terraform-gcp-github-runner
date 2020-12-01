@@ -1,5 +1,6 @@
 const sandbox = require('sinon').createSandbox()
 const chai = require('chai')
+const chaiAsPromised = require('chai-as-promised')
 const rewire = require('rewire')
 const scaleHelper = rewire('../src/scale-helper')
 const createRunnerHelper = require('../src/create-runner-helper')
@@ -8,6 +9,7 @@ const getVMHelper = require('../src/get-runner-helper')
 const deleteVmHelper = require('../src/delete-runner-helper')
 
 chai.should()
+chai.use(chaiAsPromised)
 
 describe('Scale helper tests', () => {
   afterEach(function () {
@@ -90,15 +92,18 @@ function stubExternalDependencies (vms, busyCount) {
     await vms.filter(vm => vm.name === vmName)[0].delete()
     return Promise.resolve()
   })
+  const vmsCount = vms.length
   const mergedGithubState = []
-  for (let index = 0; index < busyCount; index++) {
+  for (let index = 0; index < vmsCount; index++) {
+    const busy = index < busyCount
     const gitHubRunnerState = {
       name: vms[index].name,
       status: 'online',
-      busy: true
+      busy: busy
     }
     mergedGithubState.push(gitHubRunnerState)
   }
+  sandbox.stub(gitHubHelper, 'getGcpGitHubRunners').resolves(mergedGithubState)
   sandbox.stub(gitHubHelper, 'getGitHubRunners').resolves(mergedGithubState)
 }
 

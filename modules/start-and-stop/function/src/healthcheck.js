@@ -1,5 +1,4 @@
 const gitHubHelper = require('./github-helper')
-const createRunnerHelper = require('./create-runner-helper')
 const deleteRunnerHelper = require('./delete-runner-helper')
 const chalk = require('chalk')
 
@@ -17,10 +16,7 @@ async function removeOfflineGitHubRunners () {
 }
 
 async function getOfflineGitHubRunners () {
-  const githubRunners = await gitHubHelper.getGitHubRunners()
-  const gcpGitHubRunners = githubRunners.filter(gitHubRunner => {
-    return gitHubRunner.name.startsWith(createRunnerHelper.getRunnerNamePrefix())
-  })
+  const gcpGitHubRunners = await gitHubHelper.getGcpGitHubRunners()
   const offlineGcpGitHubRunners = gcpGitHubRunners.filter(gcpGitHubRunner => {
     return gcpGitHubRunner.status === 'offline'
   })

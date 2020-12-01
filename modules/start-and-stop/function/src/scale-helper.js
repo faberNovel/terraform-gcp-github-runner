@@ -7,8 +7,9 @@ const chalk = require('chalk')
 module.exports.scaleIdleRunners = scaleIdleRunners
 module.exports.scaleUpAllNonIdlesRunners = scaleUpAllNonIdlesRunners
 module.exports.scaleDownAllNonIdlesRunners = scaleDownAllNonIdlesRunners
-
+module.exports.getTargetRunnersCount = getTargetRunnersCount
 module.exports.getTargetRunnerCountDelta = getTargetRunnersCountDelta
+module.exports.scaleUpRunners = scaleUpRunners
 module.exports.scaleDownRunners = scaleDownRunners
 module.exports.renewIdleRunners = renewIdleRunners
 

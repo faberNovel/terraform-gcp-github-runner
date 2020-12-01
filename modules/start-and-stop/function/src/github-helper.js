@@ -1,11 +1,14 @@
 const { GoogleAuth } = require('google-auth-library')
 const auth = new GoogleAuth()
+const createRunnerHelper = require('./create-runner-helper')
 
 module.exports.getGitHubRunners = getGitHubRunners
+module.exports.getGcpGitHubRunners = getGcpGitHubRunners
 module.exports.deleteGitHubRunner = deleteGitHubRunner
 module.exports.filterGitHubRunner = filterGitHubRunner
 module.exports.getGitHubRunnerByName = getGitHubRunnerByName
 module.exports.isGitHubRunnerOnline = isGitHubRunnerOnline
+module.exports.getNonBusyGcpGitHubRunnersCount = getNonBusyGcpGitHubRunnersCount
 
 async function getGitHubRunners () {
   const githubApiFunctionUrl = process.env.GITHUB_API_TRIGGER_URL
@@ -22,6 +25,14 @@ async function getGitHubRunners () {
     }
   })
   return res.data.runners
+}
+
+async function getGcpGitHubRunners () {
+  const gitHubRunners = await getGitHubRunners()
+  const gcpGitHubRunners = gitHubRunners.filter(gitHubRunner => {
+    return gitHubRunner.name.startsWith(createRunnerHelper.getRunnerNamePrefix())
+  })
+  return gcpGitHubRunners
 }
 
 async function deleteGitHubRunner (gitHubRunnerId) {
@@ -76,4 +87,13 @@ async function isGitHubRunnerOnline (runnerName) {
   }
   console.log(`runner ${runnerName} github status is online`)
   return Promise.resolve(true)
+}
+
+async function getNonBusyGcpGitHubRunnersCount () {
+  const gcpGitHubRunners = await getGcpGitHubRunners()
+  const nonBusyGcpGitHubRunners = gcpGitHubRunners.filter(gitHubRunner => {
+    return gitHubRunner.busy === false
+  })
+  const nonBusyGcpGitHubRunnersCount = nonBusyGcpGitHubRunners.length
+  return nonBusyGcpGitHubRunnersCount
 }
