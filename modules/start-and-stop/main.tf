@@ -65,8 +65,8 @@ resource "google_cloud_scheduler_job" "healthcheck" {
   }
 }
 
-resource "google_cloud_scheduler_job" "renew_idle_runners" {
-  name      = "renew_idle_runners"
+resource "google_cloud_scheduler_job" "renew_runners" {
+  name      = "renew_runners"
   schedule  = "0 2 * * *"
   time_zone = "Europe/Paris"
 

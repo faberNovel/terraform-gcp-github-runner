@@ -11,17 +11,6 @@ module.exports.getTargetRunnersCount = getTargetRunnersCount
 module.exports.getTargetRunnerCountDelta = getTargetRunnersCountDelta
 module.exports.scaleUpRunners = scaleUpRunners
 module.exports.scaleDownRunners = scaleDownRunners
-module.exports.renewIdleRunners = renewIdleRunners
-
-async function renewIdleRunners () {
-  console.info('renew idle runners...')
-  const idle = true
-  const force = true
-  const targetCount = getTargetRunnersCount(idle)
-  await scaleDownRunners(idle, targetCount, force)
-  await scaleUpRunners(idle, targetCount)
-  console.info(chalk.green('idle runners renewed'))
-}
 
 async function scaleIdleRunners () {
   console.info('scale idle runners...')

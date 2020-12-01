@@ -5,6 +5,7 @@ const scaleHelper = require('../src/scale-helper')
 const healthCheck = require('../src/healthcheck')
 const startAndStop = require('../src/start-and-stop')
 const scalePolicy = require('../src/scale-policy')
+const renewRunnerHelper = require('../src/renew-runner')
 
 chai.use(chaiAsPromised)
 chai.should()
@@ -59,11 +60,11 @@ describe('start and stop tests', () => {
       sandbox.verifyAndRestore()
     })
   })
-  describe('When renew idle runners payload', () => {
-    it('should trigger renew idle runners', async () => {
-      const data = makeDataFromAction('renew_idle_runners')
-      const scaleHelperMock = sandbox.mock(scaleHelper)
-      scaleHelperMock.expects('renewIdleRunners').resolves().once()
+  describe('When renew runners payload', () => {
+    it('should trigger renew runners', async () => {
+      const data = makeDataFromAction('renew_runners')
+      const renewRunnerHelperMock = sandbox.mock(renewRunnerHelper)
+      renewRunnerHelperMock.expects('renewRunners').resolves().once()
 
       await startAndStop.startAndStop(data, makeContext())
 

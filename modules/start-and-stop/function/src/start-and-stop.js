@@ -1,6 +1,7 @@
 const healthCheckHelper = require('./healthcheck')
 const scaleHelper = require('./scale-helper')
 const scalePolicy = require('./scale-policy')
+const renewRunnerHelper = require('./renew-runner')
 const chalk = require('chalk')
 
 module.exports.startAndStop = startAndStop
@@ -40,8 +41,8 @@ async function startAndStop (data, context) {
       case 'healthcheck':
         await healthCheck()
         break
-      case 'renew_idle_runners':
-        await renewIdleRunners()
+      case 'renew_runners':
+        await renewRunners()
         break
       case 'scale_up':
         await scaleUp()
@@ -87,8 +88,8 @@ async function healthCheck () {
   await healthCheckHelper.removeOfflineGitHubRunners()
 }
 
-async function renewIdleRunners () {
-  await scaleHelper.renewIdleRunners()
+async function renewRunners () {
+  await renewRunnerHelper.renewRunners()
 }
 
 function isPayloadValid (payload) {

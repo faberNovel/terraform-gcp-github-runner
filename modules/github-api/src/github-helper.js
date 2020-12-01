@@ -13,19 +13,22 @@ module.exports.getOctokit = async function getOctokit () {
 }
 
 async function getGithubParams () {
-  console.log('Loading github params...')
   try {
     const githubParams = getGithubParamsFromProcessEnv()
     return githubParams
-  } catch (error) {
-    console.log(`Error loading github params from from process : ${error}`)
-    const githubParams = await getGithubParamsFromGoogleSecrets()
-    return githubParams
+  } catch (errorProcessEnv) {
+    try {
+      const githubParams = await getGithubParamsFromGoogleSecrets()
+      return githubParams
+    } catch (errorSecret) {
+      const errorText = `Error loading github params from process (${errorProcessEnv} or google secrets ($)) : ${errorSecret}`
+      console.error(errorText)
+      return Promise.reject(errorText)
+    }
   }
 }
 
 function getGithubParamsFromProcessEnv () {
-  console.log('Loading github params from process env')
   return new GithubParams(
     process.env.GITHUB_ORG,
     process.env.GITHUB_APP_ID,
@@ -37,7 +40,6 @@ function getGithubParamsFromProcessEnv () {
 }
 
 async function getGithubParamsFromGoogleSecrets () {
-  console.log('Loading github params from google secrets')
   const [version] = await client.accessSecretVersion({
     name: process.env.SECRET_GITHUB_JSON_RESOURCE_NAME
   })
