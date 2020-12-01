@@ -60,11 +60,11 @@ describe('start and stop tests', () => {
       sandbox.verifyAndRestore()
     })
   })
-  describe('When renew idle runners payload', () => {
-    it('should trigger renew idle runners', async () => {
-      const data = makeDataFromAction('renew_idle_runners')
+  describe('When renew runners payload', () => {
+    it('should trigger renew runners', async () => {
+      const data = makeDataFromAction('renew_runners')
       const renewRunnerHelperMock = sandbox.mock(renewRunnerHelper)
-      renewRunnerHelperMock.expects('renewIdleRunners').resolves().once()
+      renewRunnerHelperMock.expects('renewRunners').resolves().once()
 
       await startAndStop.startAndStop(data, makeContext())
 

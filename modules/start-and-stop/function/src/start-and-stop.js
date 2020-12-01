@@ -41,8 +41,8 @@ async function startAndStop (data, context) {
       case 'healthcheck':
         await healthCheck()
         break
-      case 'renew_idle_runners':
-        await renewIdleRunners()
+      case 'renew_runners':
+        await renewRunners()
         break
       case 'scale_up':
         await scaleUp()
@@ -88,8 +88,8 @@ async function healthCheck () {
   await healthCheckHelper.removeOfflineGitHubRunners()
 }
 
-async function renewIdleRunners () {
-  await renewRunnerHelper.renewIdleRunners()
+async function renewRunners () {
+  await renewRunnerHelper.renewRunners()
 }
 
 function isPayloadValid (payload) {

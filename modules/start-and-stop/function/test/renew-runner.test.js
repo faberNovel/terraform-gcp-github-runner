@@ -13,8 +13,8 @@ describe('Renew runners tests', () => {
     sandbox.verifyAndRestore()
   })
 
-  describe('When renew idle runners', () => {
-    it('should renew all idle runners', async () => {
+  describe('When renew runners', () => {
+    it('should renew all runners', async () => {
       const idle = true
       const currentIdleRunnerCount = 3
       const targetIdleRunnerCount = 2
@@ -24,8 +24,9 @@ describe('Renew runners tests', () => {
       scaleHelperMock.expects('getTargetRunnersCount').returns(targetIdleRunnerCount)
       scaleHelperMock.expects('scaleDownRunners').withExactArgs(idle, currentIdleRunnerCount, force).once()
       scaleHelperMock.expects('scaleUpRunners').withExactArgs(idle, targetIdleRunnerCount).once()
+      scaleHelperMock.expects('scaleDownAllNonIdlesRunners').once()
 
-      await renewRunnerHelper.renewIdleRunners()
+      await renewRunnerHelper.renewRunners()
     })
   })
 })
