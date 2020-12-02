@@ -78,12 +78,15 @@ async function scaleDownRunners (idle, count, force) {
     }))
   } else {
     const gcpGitHubRunners = await gitHubHelper.getGcpGitHubRunners()
-    const nonBusyGcpGitHubRunners = gcpGitHubRunners.filter(gitHubRunner => {
+    const gcpIdleFilteredGitHubRunners = gcpGitHubRunners.filter(gitHubRunner => {
+      return runnersVms.map(vm => vm.name).includes(gitHubRunner.name)
+    })
+    const nonBusyIdleFilteredGcpGitHubRunners = gcpIdleFilteredGitHubRunners.filter(gitHubRunner => {
       return gitHubRunner.busy === false
     })
-    const nonBusyGcpGitHubRunnersToDelete = nonBusyGcpGitHubRunners.slice(-count)
-    console.info(`${nonBusyGcpGitHubRunners.length} non busy gcp runner(s) to delete (total:${gcpGitHubRunners.length})`)
-    await Promise.all(nonBusyGcpGitHubRunnersToDelete.map(async (gitHubRunner) => {
+    const runnersToDelete = nonBusyIdleFilteredGcpGitHubRunners.slice(-count)
+    console.info(`${runnersToDelete.length} non busy gcp runner(s) (idle:${idle}) to delete`)
+    await Promise.all(runnersToDelete.map(async (gitHubRunner) => {
       await deleteRunnerHelper.deleteRunner(gitHubRunner.name)
     }))
   }
