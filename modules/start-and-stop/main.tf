@@ -72,7 +72,7 @@ resource "google_cloud_scheduler_job" "renew_runners" {
 
   pubsub_target {
     topic_name = google_pubsub_topic.start_and_stop.id
-    data       = base64encode("{\"action\":\"renew_idle_runners\"}")
+    data       = base64encode("{\"action\":\"renew_runners\"}")
   }
 }
 
