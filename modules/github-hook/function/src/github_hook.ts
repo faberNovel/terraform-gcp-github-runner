@@ -18,7 +18,7 @@ export const githubHook: HttpFunction = async (req: Request, res: Response) => {
 
   if (!isRequestAQueuedCheckRunFromGitHubAction(req)) {
     console.info('event is not a queued check_run')
-    res.sendStatus(403)
+    res.sendStatus(202)
     return
   }
 
