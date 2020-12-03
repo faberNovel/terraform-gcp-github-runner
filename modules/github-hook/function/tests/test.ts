@@ -6,7 +6,7 @@ import chaiAsPromised from 'chai-as-promised'
 import * as sinon from 'sinon'
 import * as httpMocks from 'node-mocks-http'
 
-import { generateSignature, validateRequest } from '../src/github_hook'
+import { generateSignature, validateRequest, isRequestAQueuedCheckRunFromGitHubAction, GITHUB_ACTION_APP_ID } from '../src/github_hook'
 
 chai.use(chaiAsPromised)
 
@@ -24,7 +24,7 @@ describe('GithubHook', () => {
     })
 
     after(() => {
-      sandbox.restore()
+      sandbox.verifyAndRestore()
     })
 
     it('should throw if method is invalid', () => {
@@ -63,4 +63,29 @@ describe('GithubHook', () => {
       return chai.expect(validateRequest(request)).to.eventually.be.fulfilled
     })
   })
+
+  describe('#isRequestAQueuedCheckRunFromGitHubAction()', async () => {
+    const sandbox = sinon.createSandbox()
+
+    after(() => {
+      sandbox.verifyAndRestore()
+    })
+
+    it('should return validate only expected body', () => {
+      testBody({}, false)
+      testBody({ action: 'created' }, false)
+      testBody({ action: 'created', check_run: {} }, false)
+      testBody({ action: 'created', check_run: { status: 'queued' } }, false)
+      testBody({ action: 'created', check_run: { status: 'queued', app: {} } }, false)
+      testBody({ action: 'created', check_run: { status: 'queued', app: { id: '123' } } }, false)
+      testBody({ action: 'created', check_run: { status: 'queued', app: { id: GITHUB_ACTION_APP_ID } } }, true)
+    })
+  })
 })
+
+function testBody (body: Object, isAQueuedCheckedRun: Boolean) {
+  const request = httpMocks.createRequest({
+    body: body
+  })
+  chai.expect(isRequestAQueuedCheckRunFromGitHubAction(request)).to.be.equals(isAQueuedCheckedRun)
+}

@@ -4,7 +4,7 @@ import { getGithubWebhookSecret } from './helper'
 import * as crypto from 'crypto'
 import { PubSub } from '@google-cloud/pubsub'
 
-const GITHUB_ACTION_APP_ID = 15368
+export const GITHUB_ACTION_APP_ID = 15368
 
 export const githubHook: HttpFunction = async (req: Request, res: Response) => {
   try {
@@ -71,7 +71,7 @@ async function authenticateRequest (req: Request) {
   }
 }
 
-function isRequestAQueuedCheckRunFromGitHubAction (request: Request): Boolean {
+export function isRequestAQueuedCheckRunFromGitHubAction (request: Request): Boolean {
   const body = request.body
   if (body.action !== 'created') {
     console.debug(`event action is not created (${body.action})`)
@@ -79,6 +79,10 @@ function isRequestAQueuedCheckRunFromGitHubAction (request: Request): Boolean {
   }
   if (!body.check_run) {
     console.debug('event check_run is not present')
+    return false
+  }
+  if (!body.check_run.status) {
+    console.debug('event check_run.status is not present')
     return false
   }
   if (body.check_run.status !== 'queued') {
