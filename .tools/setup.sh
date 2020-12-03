@@ -5,7 +5,7 @@ set -e
 
 cat << EOF
 The script will:
-- parse google-dev.tfvars.json, github.auto.tfvars.json and terraform.tfvars.json from the root folder of the project 
+- parse google-dev.tfvars.json, github-dev.tfvars.json and terraform.tfvars.json from the root folder of the project 
 - export google and github env vars (if sourced)
 - generate .env file from calling directory
 Warning : Values are evaluated from best effort parsing of terraform vars files. As some values are
@@ -15,7 +15,7 @@ EOF
 script_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 project_root_path=$(realpath "$script_dir/..")
 google_path=$project_root_path/google-dev.tfvars.json
-github_path=$project_root_path/github.auto.tfvars.json
+github_path=$project_root_path/github-dev.tfvars.json
 env_file_path=$project_root_path/dev.env
 
 # shellcheck source=.tools/load-default-terraform-env.sh
