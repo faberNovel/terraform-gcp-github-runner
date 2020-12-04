@@ -32,11 +32,6 @@ async function createRunnerVm (runnerName, isIdle) {
   const createVmPromise = zone.createVM(runnerName, createVmConfig(isIdle, process.env.GOOGLE_ENV))
   utils.logPromise(createVmPromise, `create runner ${runnerName} VM (idle:${isIdle})`)
   const [vm] = await createVmPromise
-
-  const awaitRunningStatePromise = vm.waitFor('RUNNING')
-  utils.logPromise(awaitRunningStatePromise, `waiting runner ${vm.name} VM to be in RUNNING State`)
-  await awaitRunningStatePromise
-
   return vm
 }
 
