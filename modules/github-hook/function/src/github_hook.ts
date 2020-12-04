@@ -86,7 +86,7 @@ export function isRequestAQueuedCheckRunFromGitHubAction (request: Request): Boo
     return false
   }
   if (body.check_run.status !== 'queued') {
-    console.debug(`status event check_run is not queued (${body.workflow_run.status})`)
+    console.debug(`status event check_run is not queued (${body.check_run.status})`)
     return false
   }
   if (!body.check_run.app) {

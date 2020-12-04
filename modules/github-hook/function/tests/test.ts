@@ -75,6 +75,7 @@ describe('GithubHook', () => {
       testBody({}, false)
       testBody({ action: 'created' }, false)
       testBody({ action: 'created', check_run: {} }, false)
+      testBody({ action: 'created', check_run: { status: 'completed' } }, false)
       testBody({ action: 'created', check_run: { status: 'queued' } }, false)
       testBody({ action: 'created', check_run: { status: 'queued', app: {} } }, false)
       testBody({ action: 'created', check_run: { status: 'queued', app: { id: '123' } } }, false)
