@@ -17,7 +17,7 @@ async function startAndStop (data, context) {
     console.info(`Receive event with payload ${JSON.stringify(payload)} and date ${eventDate.toISOString()}`)
 
     if (isEventAgeTooOld(eventDate)) {
-      const eventAgeMs = Date.now().getTime() - eventDate.getTime()
+      const eventAgeMs = Date.now() - eventDate.getTime()
       console.info(`Dropping event with age ${eventAgeMs} ms.`)
       return Promise.resolve('startAndStop ignored too old event')
     }
