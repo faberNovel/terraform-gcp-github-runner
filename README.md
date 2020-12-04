@@ -41,7 +41,7 @@ To address a specific GCP projet:
 |------|-------------|------|---------|:--------:|
 | github | n/a | <pre>object({<br>    organisation        = string<br>    app_id              = string<br>    app_installation_id = string<br>    client_id           = string<br>    client_secret       = string<br>    key_pem_b64         = string<br>    webhook_secret      = string<br>  })</pre> | n/a | yes |
 | google | n/a | <pre>object({<br>    project              = string<br>    region               = string<br>    zone                 = string<br>    credentials_json_b64 = string<br>    env                  = string<br>  })</pre> | n/a | yes |
-| runner | n/a | <pre>object({<br>    total_count  = number<br>    idle_count   = number<br>    type         = string<br>    taint_labels = bool<br>  })</pre> | n/a | yes |
+| runner | n/a | <pre>object({<br>    total_count                      = number<br>    idle_count                       = number<br>    scale_up_non_busy_target_count   = number<br>    scale_down_non_busy_target_count = number<br>    type                             = string<br>    taint_labels                     = bool<br>  })</pre> | n/a | yes |
 
 ## Outputs
 

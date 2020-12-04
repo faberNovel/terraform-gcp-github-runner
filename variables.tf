@@ -1,9 +1,11 @@
 variable "runner" {
   type = object({
-    total_count  = number
-    idle_count   = number
-    type         = string
-    taint_labels = bool
+    total_count                      = number
+    idle_count                       = number
+    scale_up_non_busy_target_count   = number
+    scale_down_non_busy_target_count = number
+    type                             = string
+    taint_labels                     = bool
   })
 }
 

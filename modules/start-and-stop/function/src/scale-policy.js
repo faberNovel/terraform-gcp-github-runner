@@ -4,6 +4,8 @@ const getRunnerHelper = require('./get-runner-helper')
 const scaleHelper = require('./scale-helper')
 
 const nonBusyThreshold = 1
+const scaleUpNonBusyTargetCount = process.env.SCALE_UP_NON_BUSY_TARGET_COUNT
+const scaleDownNonBusyTargetCount = process.env.SCALE_DOWN_NON_BUSY_TARGET_COUNT
 
 module.exports.scaleUp = scaleUp
 module.exports.scaleDown = scaleDown
