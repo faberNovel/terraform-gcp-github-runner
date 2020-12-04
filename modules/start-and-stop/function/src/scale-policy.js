@@ -3,8 +3,8 @@ const gitHubHelper = require('./github-helper')
 const getRunnerHelper = require('./get-runner-helper')
 const scaleHelper = require('./scale-helper')
 
-const scaleUpNonBusyTargetCount = process.env.SCALE_UP_NON_BUSY_TARGET_COUNT
-const scaleDownNonBusyTargetCount = process.env.SCALE_DOWN_NON_BUSY_TARGET_COUNT
+const scaleUpNonBusyTargetCount = process.env.RUNNER_SCALE_UP_NON_BUSY_TARGET_COUNT
+const scaleDownNonBusyTargetCount = process.env.RUNNER_SCALE_DOWN_NON_BUSY_TARGET_COUNT
 
 module.exports.scaleUp = scaleUp
 module.exports.scaleDown = scaleDown
