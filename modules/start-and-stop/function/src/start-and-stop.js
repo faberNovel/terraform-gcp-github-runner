@@ -62,7 +62,7 @@ async function startAndStop (data, context) {
 
 async function dev () {
   try {
-    await scalePolicy.scaleUp()
+    await healthCheckHelper.createGhostRunnerIfNeeded()
   } catch (error) {
     console.log(`error = ${error}`)
   }

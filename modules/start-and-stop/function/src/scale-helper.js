@@ -62,7 +62,11 @@ async function scaleUpRunners (idle, count) {
   console.info(`scale up ${count} runners (idle:${idle})...`)
   const createPromises = []
   for (let i = 0; i < count; i++) {
-    createPromises[i] = createRunnerHelper.createRunner(idle)
+    if (idle) {
+      createPromises[i] = createRunnerHelper.createIdleRunner()
+    } else {
+      createPromises[i] = createRunnerHelper.createTempRunner()
+    }
   }
   await Promise.all(createPromises)
   console.info(chalk.green(`scale up ${count} runners (idle:${idle}) succeed`))

@@ -7,8 +7,9 @@ module.exports.getGcpGitHubRunners = getGcpGitHubRunners
 module.exports.deleteGitHubRunner = deleteGitHubRunner
 module.exports.filterGitHubRunner = filterGitHubRunner
 module.exports.getGitHubRunnerByName = getGitHubRunnerByName
-module.exports.isGitHubRunnerOnline = isGitHubRunnerOnline
+module.exports.checkGitHubRunnerStatus = checkGitHubRunnerStatus
 module.exports.getNonBusyGcpGitHubRunnersCount = getNonBusyGcpGitHubRunnersCount
+module.exports.gitHubGhostRunnerExists = gitHubGhostRunnerExists
 
 async function getGitHubRunners () {
   const githubApiFunctionUrl = process.env.GITHUB_API_TRIGGER_URL
@@ -33,6 +34,14 @@ async function getGcpGitHubRunners () {
     return gitHubRunner.name.startsWith(createRunnerHelper.getRunnerNamePrefix())
   })
   return gcpGitHubRunners
+}
+
+async function gitHubGhostRunnerExists () {
+  const gitHubRunners = await getGitHubRunners()
+  const gcpGitHubGhostRunners = gitHubRunners.filter(gitHubRunner => {
+    return gitHubRunner.name.startsWith(createRunnerHelper.getGhostRunnerNamePrefix())
+  })
+  return gcpGitHubGhostRunners.length > 0
 }
 
 async function deleteGitHubRunner (gitHubRunnerId) {
@@ -74,18 +83,18 @@ async function getGitHubRunnerByName (runnerName) {
   return githubRunner
 }
 
-async function isGitHubRunnerOnline (runnerName) {
+async function checkGitHubRunnerStatus (runnerName, targetStatus) {
   const runnerGitHubState = await getGitHubRunnerByName(runnerName)
   if (runnerGitHubState === null) {
     console.log(`runner ${runnerName} github status is unknown`)
     return Promise.resolve(false)
   }
   const gitHubStatus = runnerGitHubState.status
-  if (gitHubStatus !== 'online') {
+  if (gitHubStatus !== targetStatus) {
     console.log(`runner ${runnerName} github status is ${gitHubStatus}`)
     return Promise.resolve(false)
   }
-  console.log(`runner ${runnerName} github status is online`)
+  console.log(`runner ${runnerName} github status is ${targetStatus}`)
   return Promise.resolve(true)
 }
 

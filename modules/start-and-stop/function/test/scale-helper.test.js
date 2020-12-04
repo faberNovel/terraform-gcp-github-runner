@@ -13,24 +13,22 @@ chai.use(chaiAsPromised)
 
 describe('Scale helper tests', () => {
   afterEach(function () {
-    sandbox.verify()
-    sandbox.restore()
+    sandbox.verifyAndRestore()
   })
 
-  describe('When calling scale up runners', () => {
-    it('should scale up runners', async () => {
-      const scaleUpRunners = scaleHelper.__get__('scaleUpRunners')
-      const idle = false
+  describe('When calling scale up temp runners', () => {
+    it('should scale up temp runners', async () => {
       const count = 3
-      const stub = sandbox.stub(createRunnerHelper, 'createRunner').returns(Promise.resolve())
+      sandbox.mock(createRunnerHelper).expects('createRunner').withExactArgs('temp').exactly(count).resolves()
+      await scaleHelper.scaleUpRunners(false, count)
+    })
+  })
 
-      await scaleUpRunners(idle, count)
-
-      stub.getCalls().map(it => {
-        const idleParam = it.args[0]
-        idleParam.should.equals(idle)
-      })
-      stub.getCalls().length.should.equals(count)
+  describe('When calling scale up idle runners', () => {
+    it('should scale up idle runners', async () => {
+      const count = 3
+      sandbox.mock(createRunnerHelper).expects('createRunner').withExactArgs('idle').exactly(count).resolves()
+      await scaleHelper.scaleUpRunners(true, count)
     })
   })
 
