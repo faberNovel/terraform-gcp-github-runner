@@ -11,6 +11,7 @@ const utils = require('./utils')
 module.exports.createRunner = createRunner
 module.exports.createIdleRunner = createIdleRunner
 module.exports.createTempRunner = createTempRunner
+module.exports.createGhostRunner = createGhostRunner
 module.exports.getRunnerNamePrefix = getRunnerNamePrefix
 module.exports.getGhostRunnerNamePrefix = getGhostRunnerNamePrefix
 
@@ -33,6 +34,10 @@ async function createIdleRunner() {
 
 async function createTempRunner() {
   return module.exports.createRunner(typeTemp)
+}
+
+async function createGhostRunner() {
+  return module.exports.createRunner(typeGhost)
 }
 
 function getRunnerNamePrefix () {

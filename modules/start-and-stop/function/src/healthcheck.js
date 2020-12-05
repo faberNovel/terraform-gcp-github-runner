@@ -38,5 +38,7 @@ async function createGhostRunnerIfNeeded () {
     console.info('ghost runner exist, nothing to do')
     return
   }
-  await createRunnerHelper.createGhostRunner()
+  const ghostRunnerVm = await createRunnerHelper.createGhostRunner()
+  await deleteRunnerHelper.deleteRunner(ghostRunnerVm.name)
+  console.info(chalk.green('ghost runner created'))
 }
