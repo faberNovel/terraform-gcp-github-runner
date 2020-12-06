@@ -7,6 +7,7 @@ const zone = compute.zone(process.env.GOOGLE_ZONE)
 const githubHelper = require('./github-helper.js')
 const pWaitFor = require('p-wait-for')
 const utils = require('./utils')
+const runnerType = require('./runner-type')
 
 module.exports.createRunner = createRunner
 module.exports.createIdleRunner = createIdleRunner
@@ -15,29 +16,25 @@ module.exports.createGhostRunner = createGhostRunner
 module.exports.getRunnerNamePrefix = getRunnerNamePrefix
 module.exports.getGhostRunnerNamePrefix = getGhostRunnerNamePrefix
 
-const typeIdle = 'idle'
-const typeTemp = 'temp' // == non idle
-const typeGhost = 'ghost'
-
 async function createRunner (type) {
   const runnerName = createRunnerName(type)
   console.info(`start create runner ${runnerName}...`)
   const vm = await createRunnerVm(runnerName, type)
-  await waitForRunnerConnectedToGitHub(vm)
+  await waitForRunnerConnectedToGitHub(vm, type)
   console.info(chalk.green(`runner ${vm.name} created, up, and connected to GitHub`))
   return vm
 }
 
 async function createIdleRunner() {
-  return module.exports.createRunner(typeIdle)
+  return module.exports.createRunner(runnerType.idle)
 }
 
 async function createTempRunner() {
-  return module.exports.createRunner(typeTemp)
+  return module.exports.createRunner(runnerType.temp)
 }
 
 async function createGhostRunner() {
-  return module.exports.createRunner(typeGhost)
+  return module.exports.createRunner(runnerType.ghost)
 }
 
 function getRunnerNamePrefix () {
@@ -50,10 +47,10 @@ function getGhostRunnerNamePrefix () {
 
 function createRunnerName (type) {
   switch (type) {
-    case typeIdle:
-    case typeTemp:
+    case runnerType.idle:
+    case runnerType.temp:
       return `${getRunnerNamePrefix()}-${uuidv4()}`
-    case typeGhost:
+    case runnerType.ghost:
       return `${getGhostRunnerNamePrefix()}-${uuidv4()}`
     default:
       throw new Error(`Invalid runner type ${type}`)
@@ -75,11 +72,11 @@ async function createRunnerVm (runnerName, type) {
 async function waitForRunnerConnectedToGitHub (vm, type) {
   let status
   switch (type) {
-    case typeIdle:
-    case typeTemp:
+    case runnerType.idle:
+    case runnerType.temp:
       status = 'online'
       break
-    case typeGhost:
+    case runnerType.ghost:
       status = 'offline'
       break
     default:
@@ -117,7 +114,7 @@ function createVmConfig (type, env) {
       }
     ],
     labels: {
-      idle: type === typeIdle,
+      type: type,
       env: env
     },
     serviceAccounts: [
@@ -141,10 +138,6 @@ function createVmConfig (type, env) {
         {
           value: process.env.RUNNER_TAINT_LABELS,
           key: 'taint-labels'
-        },
-        {
-          value: type,
-          key: 'runner-type'
         },
         {
           value: startScript,

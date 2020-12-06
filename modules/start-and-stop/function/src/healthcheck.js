@@ -2,6 +2,7 @@ const gitHubHelper = require('./github-helper')
 const deleteRunnerHelper = require('./delete-runner-helper')
 const scaleHelper = require('./scale-helper')
 const createRunnerHelper = require('./create-runner-helper')
+const runnerType = require('./runner-type')
 const chalk = require('chalk')
 
 module.exports.getOfflineGitHubRunners = getOfflineGitHubRunners
@@ -39,6 +40,6 @@ async function createGhostRunnerIfNeeded () {
     return
   }
   const ghostRunnerVm = await createRunnerHelper.createGhostRunner()
-  await deleteRunnerHelper.deleteRunner(ghostRunnerVm.name)
+  await deleteRunnerHelper.deleteRunnerVm(ghostRunnerVm.name)
   console.info(chalk.green('ghost runner created'))
 }
