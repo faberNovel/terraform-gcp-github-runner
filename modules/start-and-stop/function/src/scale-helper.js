@@ -15,13 +15,13 @@ module.exports.scaleDownRunners = scaleDownRunners
 
 async function scaleIdleRunners () {
   console.info('scale idle runners...')
-  const runnerType = runnerType.idle
-  const targetRunnerCountDelta = await getTargetRunnersCountDelta(runnerType)
+  const type = runnerType.idle
+  const targetRunnerCountDelta = await getTargetRunnersCountDelta(type)
   console.info(`${targetRunnerCountDelta} idle(s) runner(s) to change`)
   if (targetRunnerCountDelta > 0) {
-    await scaleUpRunners(runnerType, targetRunnerCountDelta)
+    await scaleUpRunners(type, targetRunnerCountDelta)
   } else if (targetRunnerCountDelta < 0) {
-    await scaleDownRunners(runnerType, Math.abs(targetRunnerCountDelta), true)
+    await scaleDownRunners(type, Math.abs(targetRunnerCountDelta), true)
   }
   console.info(chalk.green('scale idle runners succeed'))
 }

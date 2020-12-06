@@ -13,7 +13,7 @@ describe('Testing get runner vm helper', () => {
       const stub = sinon.stub(Compute.prototype, 'getVMs').returns([])
 
       await getRunnerHelper.getRunnersVms(type)
-      
+
       const options = stub.getCall(0).args[0]
       options.filter.should.equals(`labels.env=test AND labels.type=${type}`)
       stub.restore()

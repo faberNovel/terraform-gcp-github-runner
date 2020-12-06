@@ -1,5 +1,4 @@
 const Compute = require('@google-cloud/compute')
-const runnerType = require('./runner-type')
 const compute = new Compute()
 const zone = compute.zone(process.env.GOOGLE_ZONE)
 
