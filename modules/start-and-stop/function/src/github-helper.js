@@ -1,6 +1,7 @@
 const { GoogleAuth } = require('google-auth-library')
 const auth = new GoogleAuth()
 const createRunnerHelper = require('./create-runner-helper')
+const runnerType = require('./runner-type')
 
 module.exports.getGitHubRunners = getGitHubRunners
 module.exports.getGcpGitHubRunners = getGcpGitHubRunners
@@ -31,7 +32,9 @@ async function getGitHubRunners () {
 async function getGcpGitHubRunners () {
   const gitHubRunners = await getGitHubRunners()
   const gcpGitHubRunners = gitHubRunners.filter(gitHubRunner => {
-    return gitHubRunner.name.startsWith(createRunnerHelper.getRunnerNamePrefix())
+    const isTempRunner = gitHubRunner.name.startsWith(createRunnerHelper.getRunnerNamePrefix(runnerType.temp))
+    const isIdleRunner = gitHubRunner.name.startsWith(createRunnerHelper.getRunnerNamePrefix(runnerType.idle))
+    return isTempRunner || isIdleRunner 
   })
   return gcpGitHubRunners
 }
@@ -39,7 +42,7 @@ async function getGcpGitHubRunners () {
 async function gitHubGhostRunnerExists () {
   const gitHubRunners = await getGitHubRunners()
   const gcpGitHubGhostRunners = gitHubRunners.filter(gitHubRunner => {
-    return gitHubRunner.name.startsWith(createRunnerHelper.getGhostRunnerNamePrefix())
+    return gitHubRunner.name.startsWith(createRunnerHelper.getRunnerNamePrefix(runnerType.ghost))
   })
   return gcpGitHubGhostRunners.length > 0
 }

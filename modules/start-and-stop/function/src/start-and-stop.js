@@ -29,14 +29,14 @@ async function startAndStop (data, context) {
 
     const action = payload.action
     switch (action) {
-      case 'create_all_non_idle_runners':
-        await createAllNonIdleRunners()
+      case 'create_all_temp_runners':
+        await createAllTempRunners()
         break
-      case 'delete_all_non_idle_runners':
-        await deleteAllNonIdleRunners(false)
+      case 'delete_all_temp_runners':
+        await deleteAllTempRunners(false)
         break
-      case 'force_delete_all_non_idle_runners':
-        await deleteAllNonIdleRunners(true)
+      case 'force_delete_all_temp_runners':
+        await deleteAllTempRunners(true)
         break
       case 'healthcheck':
         await healthCheck()
@@ -62,7 +62,7 @@ async function startAndStop (data, context) {
 
 async function dev () {
   try {
-    await healthCheckHelper.createGhostRunnerIfNeeded()
+    await healthCheck()
   } catch (error) {
     console.log(`error = ${error}`)
   }
@@ -76,16 +76,17 @@ async function scaleDown () {
   await scalePolicy.scaleDown()
 }
 
-async function createAllNonIdleRunners () {
-  await scaleHelper.scaleUpAllNonIdlesRunners()
+async function createAllTempRunners () {
+  await scaleHelper.scaleUpAllTempRunners()
 }
 
-async function deleteAllNonIdleRunners (force) {
-  await scaleHelper.scaleDownAllNonIdlesRunners(force)
+async function deleteAllTempRunners (force) {
+  await scaleHelper.scaleDownAllTempRunners(force)
 }
 
 async function healthCheck () {
   await healthCheckHelper.removeOfflineGitHubRunners()
+  await healthCheckHelper.createGhostRunnerIfNeeded()
 }
 
 async function renewRunners () {

@@ -10,11 +10,7 @@ const utils = require('./utils')
 const runnerType = require('./runner-type')
 
 module.exports.createRunner = createRunner
-module.exports.createIdleRunner = createIdleRunner
-module.exports.createTempRunner = createTempRunner
-module.exports.createGhostRunner = createGhostRunner
 module.exports.getRunnerNamePrefix = getRunnerNamePrefix
-module.exports.getGhostRunnerNamePrefix = getGhostRunnerNamePrefix
 
 async function createRunner (type) {
   const runnerName = createRunnerName(type)
@@ -25,36 +21,20 @@ async function createRunner (type) {
   return vm
 }
 
-async function createIdleRunner() {
-  return module.exports.createRunner(runnerType.idle)
-}
-
-async function createTempRunner() {
-  return module.exports.createRunner(runnerType.temp)
-}
-
-async function createGhostRunner() {
-  return module.exports.createRunner(runnerType.ghost)
-}
-
-function getRunnerNamePrefix () {
-  return `vm-gcp-${process.env.GOOGLE_ENV}`
-}
-
-function getGhostRunnerNamePrefix () {
-  return `vm-gcp-ghost-${process.env.GOOGLE_ENV}`
-}
-
-function createRunnerName (type) {
+function getRunnerNamePrefix (type) {
   switch (type) {
     case runnerType.idle:
     case runnerType.temp:
-      return `${getRunnerNamePrefix()}-${uuidv4()}`
+      return `vm-gcp-${process.env.GOOGLE_ENV}`
     case runnerType.ghost:
-      return `${getGhostRunnerNamePrefix()}-${uuidv4()}`
+      return `vm-gcp-ghost-${process.env.GOOGLE_ENV}`
     default:
       throw new Error(`Invalid runner type ${type}`)
   }
+}
+
+function createRunnerName (type) {
+  return `${getRunnerNamePrefix(type)}-${uuidv4()}`
 }
 
 async function createRunnerVm (runnerName, type) {

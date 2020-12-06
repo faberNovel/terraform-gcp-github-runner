@@ -18,9 +18,9 @@ describe('start and stop tests', () => {
   })
   describe('When create all non idle runners payload', () => {
     it('should create all non idle runners', async () => {
-      const data = makeDataFromAction('create_all_non_idle_runners')
+      const data = makeDataFromAction('create_all_temp_runners')
       const scaleHelperMock = sandbox.mock(scaleHelper)
-      scaleHelperMock.expects('scaleUpAllNonIdlesRunners').resolves().once()
+      scaleHelperMock.expects('scaleUpAllTempRunners').resolves().once()
 
       await startAndStop.startAndStop(data, makeContext())
 
@@ -29,9 +29,9 @@ describe('start and stop tests', () => {
   })
   describe('When delete all non idle runners payload', () => {
     it('should delete all non idle runners', async () => {
-      const payload = makeDataFromAction('delete_all_non_idle_runners')
+      const payload = makeDataFromAction('delete_all_temp_runners')
       const scaleHelperMock = sandbox.mock(scaleHelper)
-      scaleHelperMock.expects('scaleDownAllNonIdlesRunners').withExactArgs(false).resolves().once()
+      scaleHelperMock.expects('scaleDownAllTempRunners').withExactArgs(false).resolves().once()
 
       await startAndStop.startAndStop(payload, makeContext())
 
@@ -40,9 +40,9 @@ describe('start and stop tests', () => {
   })
   describe('When force delete all non idle runners payload', () => {
     it('should force delete all non idle runners', async () => {
-      const data = makeDataFromAction('force_delete_all_non_idle_runners')
+      const data = makeDataFromAction('force_delete_all_temp_runners')
       const scaleHelperMock = sandbox.mock(scaleHelper)
-      scaleHelperMock.expects('scaleDownAllNonIdlesRunners').withExactArgs(true).resolves().once()
+      scaleHelperMock.expects('scaleDownAllTempRunners').withExactArgs(true).resolves().once()
 
       await startAndStop.startAndStop(data, makeContext())
 
@@ -54,6 +54,7 @@ describe('start and stop tests', () => {
       const data = makeDataFromAction('healthcheck')
       const healthCheckMock = sandbox.mock(healthCheck)
       healthCheckMock.expects('removeOfflineGitHubRunners').resolves().once()
+      healthCheckMock.expects('createGhostRunnerIfNeeded').resolves().once()
 
       await startAndStop.startAndStop(data, makeContext())
 

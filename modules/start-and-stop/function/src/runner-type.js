@@ -1,5 +1,5 @@
 const runnerTypeIdle = 'idle'
-const runnerTypeTemp = 'temp' // == non idle
+const runnerTypeTemp = 'temp'
 const runnerTypeGhost = 'ghost'
 
 module.exports.idle = runnerTypeIdle

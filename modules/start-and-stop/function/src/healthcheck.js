@@ -29,17 +29,17 @@ async function getOfflineGitHubRunners () {
 
 async function createGhostRunnerIfNeeded () {
   console.info('create ghost runner if needed...')
-  if (scaleHelper.getTargetRunnersCount(true) > 0) {
-    console.info('idle count > 0, no ghost runner needed')
+  if (scaleHelper.getTargetRunnersCount(runnerType.idle) > 0) {
+    console.info(chalk.green('idle count > 0, no ghost runner needed'))
     return
   }
   console.info('ghost runner needed')
   const ghostRunnerExists = await gitHubHelper.gitHubGhostRunnerExists()
   if (ghostRunnerExists) {
-    console.info('ghost runner exist, nothing to do')
+    console.info(chalk.green('ghost runner exist, nothing to do'))
     return
   }
-  const ghostRunnerVm = await createRunnerHelper.createGhostRunner()
+  const ghostRunnerVm = await createRunnerHelper.createRunner(runnerType.ghost)
   await deleteRunnerHelper.deleteRunnerVm(ghostRunnerVm.name)
   console.info(chalk.green('ghost runner created'))
 }
