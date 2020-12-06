@@ -40,29 +40,29 @@ describe('Scale helper tests', () => {
       const idleCount = 5
       const idleBusyCount = 2
       const idleVms = makeFakeVMs(idleCount, true)
-      const nonIdleCount = 10
-      const nonIdleBusyCount = 6
-      const nonIdleVms = makeFakeVMs(nonIdleCount, false)
-      stubExternalDependencies(idleVms, idleBusyCount, nonIdleVms, nonIdleBusyCount)
+      const tempCount = 10
+      const tempBusyCount = 6
+      const tempVms = makeFakeVMs(tempCount, false)
+      stubExternalDependencies(idleVms, idleBusyCount, tempVms, tempBusyCount)
 
       await scaleDownRunners(runnerType.idle, idleCount, true)
 
       countFakeVmsDeleted(idleVms).should.equals(idleCount)
-      countFakeVmsDeleted(nonIdleVms).should.equals(0)
+      countFakeVmsDeleted(tempVms).should.equals(0)
     })
 
     it('should scale down runners according github status when force is not used', async () => {
       const idleCount = 5
       const idleBusyCount = 2
       const idleVms = makeFakeVMs(idleCount, true)
-      const nonIdleCount = 10
-      const nonIdleBusyCount = 6
-      const nonIdleVms = makeFakeVMs(nonIdleCount, false)
-      stubExternalDependencies(idleVms, idleBusyCount, nonIdleVms, nonIdleBusyCount)
+      const tempCount = 10
+      const tempBusyCount = 6
+      const tempVms = makeFakeVMs(tempCount, false)
+      stubExternalDependencies(idleVms, idleBusyCount, tempVms, tempBusyCount)
 
-      await scaleDownRunners(runnerType.temp, nonIdleCount, false)
+      await scaleDownRunners(runnerType.temp, tempCount, false)
 
-      countFakeVmsDeleted(nonIdleVms).should.equals(nonIdleCount - nonIdleBusyCount)
+      countFakeVmsDeleted(tempVms).should.equals(tempCount - tempBusyCount)
       countFakeVmsDeleted(idleVms).should.equals(0)
     })
   })
@@ -89,16 +89,16 @@ async function getTargetRunnerCountDeltaWrapped (givenRunnerCount, targetRunnerC
   return delta
 }
 
-function stubExternalDependencies (idleVms, idleBusyCount, nonIdleVms, nonIdleBusyCount) {
-  const vms = idleVms.concat(nonIdleVms)
+function stubExternalDependencies (idleVms, idleBusyCount, tempVms, tempBusyCount) {
+  const vms = idleVms.concat(tempVms)
   const getRunnersVmsStub = sandbox.stub(getVMHelper, 'getRunnersVms')
   getRunnersVmsStub.withArgs(runnerType.idle).resolves(idleVms)
-  getRunnersVmsStub.withArgs(runnerType.temp).resolves(nonIdleVms)
+  getRunnersVmsStub.withArgs(runnerType.temp).resolves(tempVms)
   sandbox.stub(deleteVmHelper, 'deleteRunner').callsFake(async vmName => {
     await vms.filter(vm => vm.name === vmName)[0].delete()
     return Promise.resolve()
   })
-  const mergedGithubState = makeFakeGitHubState(idleVms, idleBusyCount).concat(makeFakeGitHubState(nonIdleVms, nonIdleBusyCount))
+  const mergedGithubState = makeFakeGitHubState(idleVms, idleBusyCount).concat(makeFakeGitHubState(tempVms, tempBusyCount))
   sandbox.stub(gitHubHelper, 'getGcpGitHubRunners').resolves(mergedGithubState)
   sandbox.stub(gitHubHelper, 'getGitHubRunners').resolves(mergedGithubState)
 }
