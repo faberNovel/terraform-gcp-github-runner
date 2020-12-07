@@ -5,6 +5,7 @@ const utils = require('./utils')
 const chalk = require('chalk')
 
 module.exports.deleteRunner = deleteRunner
+module.exports.deleteRunnerVm = deleteRunnerVm
 
 async function deleteRunner (runnerName) {
   console.info(`start delete runner ${runnerName}...`)

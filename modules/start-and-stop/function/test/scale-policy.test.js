@@ -5,6 +5,7 @@ const scalePolicy = require('../src/scale-policy')
 const githubHelper = require('../src/github-helper')
 const scaleHelper = require('../src/scale-helper')
 const getRunnerHelper = require('../src/get-runner-helper')
+const runnerType = require('../src/runner-type')
 
 chai.should()
 chai.use(chaiAsPromised)
@@ -30,7 +31,7 @@ describe('Scale policy tests', () => {
       const nonBusyGcpGitHubRunnersCount = scalePolicy.scaleUpNonBusyTargetCount - 1
       stubExternalDependencies(nonBusyGcpGitHubRunnersCount, 0, 1)
       const scalHelperMock = sandbox.mock(scaleHelper)
-      scalHelperMock.expects('scaleUpRunners').withExactArgs(false, 1).once()
+      scalHelperMock.expects('scaleUpRunners').withExactArgs(runnerType.temp, 1).once()
       scalePolicy.scaleUp()
     })
   })
@@ -60,7 +61,7 @@ describe('Scale policy tests', () => {
       const nonBusyGcpGitHubRunnersCount = scalePolicy.scaleDownNonBusyTargetCount + 1
       stubExternalDependencies(nonBusyGcpGitHubRunnersCount, 1, 1)
       const scalHelperMock = sandbox.mock(scaleHelper)
-      scalHelperMock.expects('scaleDownRunners').withExactArgs(false, 1, false).once()
+      scalHelperMock.expects('scaleDownRunners').withExactArgs(runnerType.temp, 1, false).once()
       scalePolicy.scaleDown()
     })
   })
@@ -76,16 +77,16 @@ describe('Scale policy tests', () => {
   })
 })
 
-function stubExternalDependencies (nonBusyRunnersCount, nonIdleRunnersCount, maxNonIdleRunnersCount) {
+function stubExternalDependencies (nonBusyRunnersCount, tempRunnersCount, maxTempRunnersCount) {
   sandbox.stub(githubHelper, 'getNonBusyGcpGitHubRunnersCount').resolves(nonBusyRunnersCount)
-  const idle = false
-  const nonIdleRunners = []
-  for (let index = 0; index < nonIdleRunnersCount; index++) {
+  const type = runnerType.temp
+  const tempRunners = []
+  for (let index = 0; index < tempRunnersCount; index++) {
     const vm = {
       name: `vm-${index}`
     }
-    nonIdleRunners.push(vm)
+    tempRunners.push(vm)
   }
-  sandbox.stub(getRunnerHelper, 'getRunnersVms').withArgs(idle).resolves(nonIdleRunners)
-  sandbox.stub(scaleHelper, 'getTargetRunnersCount').withArgs(idle).returns(maxNonIdleRunnersCount)
+  sandbox.stub(getRunnerHelper, 'getRunnersVms').withArgs(type).resolves(tempRunners)
+  sandbox.stub(scaleHelper, 'getTargetRunnersCount').withArgs(type).returns(maxTempRunnersCount)
 }

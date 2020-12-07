@@ -4,6 +4,12 @@ echo "start stop script"
 
 RUNNER_USER="runner"
 
+RUNNER_TYPE=$(gcloud compute instances describe "$HOSTNAME" --zone "$ZONE" --flatten="labels[type]" --format=object)
+if [ "$RUNNER_TYPE" = "ghost" ]
+  echo "Ghost runner, exiting"
+  exit 0
+fi
+
 ## Fetch remove token
 ZONE=$(curl -H Metadata-Flavor:Google http://metadata/computeMetadata/v1/instance/zone)
 FUNCTION_URL=$(gcloud compute instances describe "$HOSTNAME" --zone "$ZONE" --flatten="metadata[github-api-trigger-url]" --format=object)

@@ -1,9 +1,13 @@
 const gitHubHelper = require('./github-helper')
 const deleteRunnerHelper = require('./delete-runner-helper')
+const scaleHelper = require('./scale-helper')
+const createRunnerHelper = require('./create-runner-helper')
+const runnerType = require('./runner-type')
 const chalk = require('chalk')
 
 module.exports.getOfflineGitHubRunners = getOfflineGitHubRunners
 module.exports.removeOfflineGitHubRunners = removeOfflineGitHubRunners
+module.exports.createGhostRunnerIfNeeded = createGhostRunnerIfNeeded
 
 async function removeOfflineGitHubRunners () {
   console.info('remove offline github runners...')
@@ -21,4 +25,21 @@ async function getOfflineGitHubRunners () {
     return gcpGitHubRunner.status === 'offline'
   })
   return offlineGcpGitHubRunners
+}
+
+async function createGhostRunnerIfNeeded () {
+  console.info('create ghost runner if needed...')
+  if (scaleHelper.getTargetRunnersCount(runnerType.idle) > 0) {
+    console.info(chalk.green('idle count > 0, no ghost runner needed'))
+    return
+  }
+  console.info('ghost runner needed')
+  const ghostRunnerExists = await gitHubHelper.gitHubGhostRunnerExists()
+  if (ghostRunnerExists) {
+    console.info(chalk.green('ghost runner exist, nothing to do'))
+    return
+  }
+  const ghostRunnerVm = await createRunnerHelper.createRunner(runnerType.ghost)
+  await deleteRunnerHelper.deleteRunnerVm(ghostRunnerVm.name)
+  console.info(chalk.green('ghost runner created'))
 }
