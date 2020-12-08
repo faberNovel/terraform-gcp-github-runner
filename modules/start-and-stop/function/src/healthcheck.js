@@ -9,6 +9,7 @@ const chalk = require('chalk')
 module.exports.healthChecks = healthChecks
 module.exports.removeOfflineGitHubRunners = removeOfflineGitHubRunners
 module.exports.removeUnknownGitHubRunners = removeUnknownGitHubRunners
+module.exports.createGhostRunnerIfNeeded = createGhostRunnerIfNeeded
 
 async function healthChecks () {
   await removeOfflineGitHubRunners()
@@ -42,8 +43,9 @@ async function removeUnknownGitHubRunners () {
 
 async function createGhostRunnerIfNeeded () {
   console.info('create ghost runner if needed...')
-  if (scaleHelper.getTargetRunnersCount(runnerType.idle) > 0) {
-    console.info(chalk.green('idle count > 0, no ghost runner needed'))
+  const targetIdleRunnerCount = scaleHelper.getTargetRunnersCount(runnerType.idle)
+  if (targetIdleRunnerCount > 0) {
+    console.info(chalk.green(`idle count ${targetIdleRunnerCount} > 0, no ghost runner needed`))
     return
   }
   console.info('ghost runner needed')
