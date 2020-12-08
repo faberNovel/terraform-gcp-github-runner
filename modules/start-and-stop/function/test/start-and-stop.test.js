@@ -53,8 +53,7 @@ describe('start and stop tests', () => {
     it('should trigger healthcheck', async () => {
       const data = makeDataFromAction('healthcheck')
       const healthCheckMock = sandbox.mock(healthCheck)
-      healthCheckMock.expects('removeOfflineGitHubRunners').resolves().once()
-      healthCheckMock.expects('createGhostRunnerIfNeeded').resolves().once()
+      healthCheckMock.expects('healthChecks').resolves().once()
 
       await startAndStop.startAndStop(data, makeContext())
 
