@@ -6,10 +6,13 @@ const runnerType = require('./runner-type')
 const getRunnerHelper = require('./get-runner-helper')
 const chalk = require('chalk')
 
-module.exports.getOfflineGitHubRunners = getOfflineGitHubRunners
-module.exports.removeOfflineGitHubRunners = removeOfflineGitHubRunners
-module.exports.removeUnknownGitHubRunners = removeUnknownGitHubRunners
-module.exports.createGhostRunnerIfNeeded = createGhostRunnerIfNeeded
+module.exports.healthChecks = healthChecks
+
+async function healthChecks () {
+  await removeOfflineGitHubRunners()
+  await removeUnknownGitHubRunners()
+  await createGhostRunnerIfNeeded()
+}
 
 async function removeOfflineGitHubRunners () {
   console.info('remove offline github runner(s)...')
