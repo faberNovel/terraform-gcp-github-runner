@@ -11,6 +11,7 @@ module.exports.getGitHubRunnerByName = getGitHubRunnerByName
 module.exports.checkGitHubRunnerStatus = checkGitHubRunnerStatus
 module.exports.getNonBusyGcpGitHubRunnersCount = getNonBusyGcpGitHubRunnersCount
 module.exports.gitHubGhostRunnerExists = gitHubGhostRunnerExists
+module.exports.getOfflineGitHubRunners = getOfflineGitHubRunners
 
 async function getGitHubRunners () {
   const githubApiFunctionUrl = process.env.GITHUB_API_TRIGGER_URL
@@ -108,4 +109,12 @@ async function getNonBusyGcpGitHubRunnersCount () {
   })
   const nonBusyGcpGitHubRunnersCount = nonBusyGcpGitHubRunners.length
   return nonBusyGcpGitHubRunnersCount
+}
+
+async function getOfflineGitHubRunners () {
+  const gcpGitHubRunners = await getGcpGitHubRunners()
+  const offlineGcpGitHubRunners = gcpGitHubRunners.filter(gcpGitHubRunner => {
+    return gcpGitHubRunner.status === 'offline'
+  })
+  return offlineGcpGitHubRunners
 }

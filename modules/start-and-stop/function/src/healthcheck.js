@@ -7,6 +7,7 @@ const getRunnerHelper = require('./get-runner-helper')
 const chalk = require('chalk')
 
 module.exports.healthChecks = healthChecks
+module.exports.removeOfflineGitHubRunners = removeOfflineGitHubRunners
 
 async function healthChecks () {
   await removeOfflineGitHubRunners()
@@ -16,7 +17,7 @@ async function healthChecks () {
 
 async function removeOfflineGitHubRunners () {
   console.info('remove offline github runner(s)...')
-  const offlineGcpGitHubRunners = await getOfflineGitHubRunners()
+  const offlineGcpGitHubRunners = await gitHubHelper.getOfflineGitHubRunners()
   console.info(`${offlineGcpGitHubRunners.length} GitHub runner(s) offline`)
   await Promise.all(offlineGcpGitHubRunners.map(async offlineGitHubRunner => {
     await deleteRunnerHelper.deleteRunner(offlineGitHubRunner.name)
@@ -36,14 +37,6 @@ async function removeUnknownGitHubRunners () {
     await deleteRunnerHelper.deleteRunnerVm(unknownRunnerName)
   }))
   console.info(chalk.green('remove unknown GitHub runner()s end'))
-}
-
-async function getOfflineGitHubRunners () {
-  const gcpGitHubRunners = await gitHubHelper.getGcpGitHubRunners()
-  const offlineGcpGitHubRunners = gcpGitHubRunners.filter(gcpGitHubRunner => {
-    return gcpGitHubRunner.status === 'offline'
-  })
-  return offlineGcpGitHubRunners
 }
 
 async function createGhostRunnerIfNeeded () {
