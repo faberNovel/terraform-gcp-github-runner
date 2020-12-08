@@ -62,7 +62,7 @@ async function startAndStop (data, context) {
 
 async function dev () {
   try {
-    await healthCheck()
+    await healthCheckHelper.removeUnknownGitHubRunners()
   } catch (error) {
     console.log(`error = ${error}`)
   }
