@@ -8,6 +8,7 @@ const chalk = require('chalk')
 
 module.exports.healthChecks = healthChecks
 module.exports.removeOfflineGitHubRunners = removeOfflineGitHubRunners
+module.exports.removeUnknownGitHubRunners = removeUnknownGitHubRunners
 
 async function healthChecks () {
   await removeOfflineGitHubRunners()
