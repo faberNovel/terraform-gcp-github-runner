@@ -34,7 +34,7 @@ async function deleteRunnerVm (runnerName) {
     () => vmDoesNotExist(runnerVm),
     {
       interval: 5000,
-      timeout: 60000
+      timeout: 60000 * 2
     }
   )
   utils.logPromise(waitForVmDeletionPromise, `waiting runner ${runnerVm.name} vm to be fully deleted`)
