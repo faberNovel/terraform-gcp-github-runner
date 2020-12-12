@@ -5,7 +5,7 @@ echo "start stop script"
 RUNNER_USER="runner"
 
 RUNNER_TYPE=$(gcloud compute instances describe "$HOSTNAME" --zone "$ZONE" --flatten="labels[type]" --format=object)
-if [ "$RUNNER_TYPE" = "ghost" ]
+if [ "$RUNNER_TYPE" = "ghost" ]; then
   echo "Ghost runner, exiting"
   exit 0
 fi

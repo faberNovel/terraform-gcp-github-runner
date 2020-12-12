@@ -3,6 +3,7 @@ const compute = new Compute()
 const zone = compute.zone(process.env.GOOGLE_ZONE)
 
 module.exports.getRunnersVms = getRunnersVms
+module.exports.getAllRunnersVms = getAllRunnersVms
 module.exports.getRunnerVmByName = getRunnerVmByName
 
 async function getRunnersVms (runnerType) {
@@ -16,4 +17,13 @@ async function getRunnersVms (runnerType) {
 
 async function getRunnerVmByName (vmName) {
   return zone.vm(vmName)
+}
+
+async function getAllRunnersVms () {
+  const filter = `labels.env=${process.env.GOOGLE_ENV}`
+  const options = {
+    filter: filter
+  }
+  const [vms] = await compute.getVMs(options)
+  return vms
 }

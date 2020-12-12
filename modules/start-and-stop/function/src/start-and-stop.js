@@ -62,7 +62,7 @@ async function startAndStop (data, context) {
 
 async function dev () {
   try {
-    await healthCheck()
+    await healthCheckHelper.healthChecks()
   } catch (error) {
     console.log(`error = ${error}`)
   }
@@ -85,8 +85,7 @@ async function deleteAllTempRunners (force) {
 }
 
 async function healthCheck () {
-  await healthCheckHelper.removeOfflineGitHubRunners()
-  await healthCheckHelper.createGhostRunnerIfNeeded()
+  await healthCheckHelper.healthChecks()
 }
 
 async function renewRunners () {

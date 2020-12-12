@@ -53,6 +53,6 @@ eval "$packer_cmd"
 echo "Lint bash"
 bash_lint_cmd="docker run \
 $volume_options --rm --env CI \
-koalaman/shellcheck-alpine shellcheck .tools/**/*.sh -x"
+koalaman/shellcheck-alpine shellcheck .tools/**/*.sh ./modules/start-and-stop/function/runner-scripts/*.sh -x"
 echo "$bash_lint_cmd"
 eval "$bash_lint_cmd"
