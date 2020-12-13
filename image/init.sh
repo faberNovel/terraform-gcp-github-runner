@@ -30,10 +30,13 @@ sudo add-apt-repository \
    $(lsb_release -cs) \
    stable"
 sudo apt-get -y update
-sudo apt-get -y install docker-ce docker-ce-cli containerd.io
+DOCKER_VERSION="5:19.03.14~3-0~debian-buster"
+sudo apt-get -y install docker-ce=$DOCKER_VERSION docker-ce-cli=$DOCKER_VERSION containerd.io
 sudo systemctl start docker
 sudo systemctl enable docker
 sudo usermod -aG docker $RUNNER_USER
+# Esnure Docker is correctly setup
+sudo -u $RUNNER_USER docker run hello-world
 
 ## Stack driver
 curl -sSO https://dl.google.com/cloudagents/add-monitoring-agent-repo.sh
