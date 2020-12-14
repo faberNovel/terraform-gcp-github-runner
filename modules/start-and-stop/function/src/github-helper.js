@@ -51,7 +51,7 @@ async function gitHubGhostRunnerExists () {
 async function deleteGitHubRunner (gitHubRunnerId) {
   const githubApiFunctionUrl = process.env.GITHUB_API_TRIGGER_URL
   const client = await auth.getIdTokenClient(githubApiFunctionUrl)
-  const res = await client.request({
+  await client.request({
     url: githubApiFunctionUrl,
     method: 'POST',
     data: {
@@ -63,7 +63,6 @@ async function deleteGitHubRunner (gitHubRunnerId) {
       }
     }
   })
-  return res.data.runners
 }
 
 function filterGitHubRunner (githubRunners, runnerName) {

@@ -33,10 +33,7 @@ async function startAndStop (data, context) {
         await createAllTempRunners()
         break
       case 'delete_all_temp_runners':
-        await deleteAllTempRunners(false)
-        break
-      case 'force_delete_all_temp_runners':
-        await deleteAllTempRunners(true)
+        await deleteAllTempRunners()
         break
       case 'healthcheck':
         await healthCheck()
@@ -62,9 +59,10 @@ async function startAndStop (data, context) {
 
 async function dev () {
   try {
-    await healthCheckHelper.healthChecks()
+    await renewRunnerHelper.renewRunners()
   } catch (error) {
-    console.log(`error = ${error}`)
+    console.error(chalk.red(JSON.stringify(error)))
+    console.error(chalk.red(error.stack))
   }
 }
 
@@ -80,8 +78,8 @@ async function createAllTempRunners () {
   await scaleHelper.scaleUpAllTempRunners()
 }
 
-async function deleteAllTempRunners (force) {
-  await scaleHelper.scaleDownAllTempRunners(force)
+async function deleteAllTempRunners () {
+  await scaleHelper.scaleDownAllTempRunners()
 }
 
 async function healthCheck () {

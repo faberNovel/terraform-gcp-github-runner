@@ -31,20 +31,9 @@ describe('start and stop tests', () => {
     it('should delete all non idle runners', async () => {
       const payload = makeDataFromAction('delete_all_temp_runners')
       const scaleHelperMock = sandbox.mock(scaleHelper)
-      scaleHelperMock.expects('scaleDownAllTempRunners').withExactArgs(false).resolves().once()
+      scaleHelperMock.expects('scaleDownAllTempRunners').resolves().once()
 
       await startAndStop.startAndStop(payload, makeContext())
-
-      sandbox.verifyAndRestore()
-    })
-  })
-  describe('When force delete all non idle runners payload', () => {
-    it('should force delete all non idle runners', async () => {
-      const data = makeDataFromAction('force_delete_all_temp_runners')
-      const scaleHelperMock = sandbox.mock(scaleHelper)
-      scaleHelperMock.expects('scaleDownAllTempRunners').withExactArgs(true).resolves().once()
-
-      await startAndStop.startAndStop(data, makeContext())
 
       sandbox.verifyAndRestore()
     })

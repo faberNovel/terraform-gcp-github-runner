@@ -4,7 +4,8 @@ const chaiAsPromised = require('chai-as-promised')
 const renewRunnerHelper = require('../src/renew-runner')
 const scaleHelper = require('../src/scale-helper')
 const getRunnerHelper = require('../src/get-runner-helper')
-const runnerType = require('../src/runner-type')
+const deleteRunnerHelper = require('../src/delete-runner-helper')
+const scalePolicy = require('../src/scale-policy')
 
 chai.should()
 chai.use(chaiAsPromised)
@@ -16,15 +17,13 @@ describe('Renew runners tests', () => {
 
   describe('When renew runners', () => {
     it('should renew all runners', async () => {
-      const currentIdleRunnerCount = 3
-      const targetIdleRunnerCount = 2
-      const force = true
+      const agedRunnersCount = 3
+
+      sandbox.stub(getRunnerHelper, 'getAgedRunnersVms').resolves(makeVms(agedRunnersCount))
+      sandbox.mock(deleteRunnerHelper).expects('deleteRunner').resolves(true).exactly(agedRunnersCount)
       const scaleHelperMock = sandbox.mock(scaleHelper)
-      sandbox.stub(getRunnerHelper, 'getRunnersVms').withArgs(runnerType.idle).resolves(makeVms(currentIdleRunnerCount))
-      scaleHelperMock.expects('getTargetRunnersCount').returns(targetIdleRunnerCount)
-      scaleHelperMock.expects('scaleDownRunners').withExactArgs(runnerType.idle, currentIdleRunnerCount, force).once()
-      scaleHelperMock.expects('scaleUpRunners').withExactArgs(runnerType.idle, targetIdleRunnerCount).once()
-      scaleHelperMock.expects('scaleDownAllTempRunners').once()
+      scaleHelperMock.expects('scaleIdleRunners').resolves().once()
+      sandbox.mock(scalePolicy).expects('scaleUp').resolves().once()
 
       await renewRunnerHelper.renewRunners()
     })
