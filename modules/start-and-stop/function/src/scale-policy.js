@@ -45,8 +45,7 @@ async function scaleDown () {
     console.log(`temp runners count is ${tempRunnersCount}, min is 0`)
     if (tempRunnersCount > 0) {
       console.log('temp runners count is > 0, scaling down')
-      const force = false
-      await scaleHelper.scaleDownRunners(runnerTypeTemp, 1, force)
+      await scaleHelper.scaleDownRunners(runnerTypeTemp, 1)
     } else {
       console.log('temp runners count is 0, can not scale down more')
     }

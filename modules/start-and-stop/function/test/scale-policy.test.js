@@ -57,11 +57,11 @@ describe('Scale policy tests', () => {
   })
 
   describe('When scalling down with threshold not meet and non idle runners online', () => {
-    it('should scale down without force', async () => {
+    it('should scale down', async () => {
       const nonBusyGcpGitHubRunnersCount = scalePolicy.scaleDownNonBusyTargetCount + 1
       stubExternalDependencies(nonBusyGcpGitHubRunnersCount, 1, 1)
       const scalHelperMock = sandbox.mock(scaleHelper)
-      scalHelperMock.expects('scaleDownRunners').withExactArgs(runnerType.temp, 1, false).once()
+      scalHelperMock.expects('scaleDownRunners').withExactArgs(runnerType.temp, 1).once()
       scalePolicy.scaleDown()
     })
   })

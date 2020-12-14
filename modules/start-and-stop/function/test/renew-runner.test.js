@@ -18,11 +18,10 @@ describe('Renew runners tests', () => {
     it('should renew all runners', async () => {
       const currentIdleRunnerCount = 3
       const targetIdleRunnerCount = 2
-      const force = true
       const scaleHelperMock = sandbox.mock(scaleHelper)
       sandbox.stub(getRunnerHelper, 'getRunnersVms').withArgs(runnerType.idle).resolves(makeVms(currentIdleRunnerCount))
       scaleHelperMock.expects('getTargetRunnersCount').returns(targetIdleRunnerCount)
-      scaleHelperMock.expects('scaleDownRunners').withExactArgs(runnerType.idle, currentIdleRunnerCount, force).once()
+      scaleHelperMock.expects('scaleDownRunners').withExactArgs(runnerType.idle, currentIdleRunnerCount).once()
       scaleHelperMock.expects('scaleUpRunners').withExactArgs(runnerType.idle, targetIdleRunnerCount).once()
       scaleHelperMock.expects('scaleDownAllTempRunners').once()
 

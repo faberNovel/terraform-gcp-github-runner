@@ -36,11 +36,11 @@ async function scaleUpAllTempRunners () {
   console.info(chalk.green('scale up all temp runners succeed'))
 }
 
-async function scaleDownAllTempRunners (force) {
+async function scaleDownAllTempRunners () {
   console.info('scale down all temp runners...')
   const type = runnerType.temp
   const runnerVms = await getRunnerHelper.getRunnersVms(type)
-  await scaleDownRunners(type, runnerVms.length, force)
+  await scaleDownRunners(type, runnerVms.length)
   console.info(chalk.green('scale down all temp runners succeed'))
 }
 
@@ -72,27 +72,20 @@ async function scaleUpRunners (type, count) {
   console.info(chalk.green(`scale up ${count} runners (type:${type}) succeed`))
 }
 
-async function scaleDownRunners (type, count, force) {
-  console.info(`scale down ${count} runners (type:${type}, force:${force})...`)
+async function scaleDownRunners (type, count) {
+  console.info(`scale down ${count} runners (type:${type})...`)
   const runnersVms = await getRunnerHelper.getRunnersVms(type)
-  if (force) {
-    const runnersVmsToDelete = runnersVms.slice(-count)
-    await Promise.all(runnersVmsToDelete.map(async (runnerVM) => {
-      await deleteRunnerHelper.deleteRunner(runnerVM.name)
-    }))
-  } else {
-    const gcpGitHubRunners = await gitHubHelper.getGcpGitHubRunners()
-    const gcpIdleFilteredGitHubRunners = gcpGitHubRunners.filter(gitHubRunner => {
-      return runnersVms.map(vm => vm.name).includes(gitHubRunner.name)
-    })
-    const nonBusyIdleFilteredGcpGitHubRunners = gcpIdleFilteredGitHubRunners.filter(gitHubRunner => {
-      return gitHubRunner.busy === false
-    })
-    const runnersToDelete = nonBusyIdleFilteredGcpGitHubRunners.slice(-count)
-    console.info(`${runnersToDelete.length} non busy gcp runner(s) (type:${type}) to delete`)
-    await Promise.all(runnersToDelete.map(async (gitHubRunner) => {
-      await deleteRunnerHelper.deleteRunner(gitHubRunner.name)
-    }))
-  }
-  console.info(chalk.green(`scale down ${count} runners (type:${type}, force:${force}) succeed`))
+  const gcpGitHubRunners = await gitHubHelper.getGcpGitHubRunners()
+  const gcpIdleFilteredGitHubRunners = gcpGitHubRunners.filter(gitHubRunner => {
+    return runnersVms.map(vm => vm.name).includes(gitHubRunner.name)
+  })
+  const nonBusyIdleFilteredGcpGitHubRunners = gcpIdleFilteredGitHubRunners.filter(gitHubRunner => {
+    return gitHubRunner.busy === false
+  })
+  const runnersToDelete = nonBusyIdleFilteredGcpGitHubRunners.slice(-count)
+  console.info(`${runnersToDelete.length} non busy gcp runner(s) (type:${type}) to delete`)
+  await Promise.all(runnersToDelete.map(async (gitHubRunner) => {
+    await deleteRunnerHelper.deleteRunner(gitHubRunner.name)
+  }))
+  console.info(chalk.green(`scale down ${count} runners (type:${type}) succeed`))
 }

@@ -36,22 +36,7 @@ describe('Scale helper tests', () => {
   describe('When calling scale down runners', () => {
     const scaleDownRunners = scaleHelper.__get__('scaleDownRunners')
 
-    it('should scale down runners when force is used', async () => {
-      const idleCount = 5
-      const idleBusyCount = 2
-      const idleVms = makeFakeVMs(idleCount, true)
-      const tempCount = 10
-      const tempBusyCount = 6
-      const tempVms = makeFakeVMs(tempCount, false)
-      stubExternalDependencies(idleVms, idleBusyCount, tempVms, tempBusyCount)
-
-      await scaleDownRunners(runnerType.idle, idleCount, true)
-
-      countFakeVmsDeleted(idleVms).should.equals(idleCount)
-      countFakeVmsDeleted(tempVms).should.equals(0)
-    })
-
-    it('should scale down runners according github status when force is not used', async () => {
+    it('should scale down runners according github status', async () => {
       const idleCount = 5
       const idleBusyCount = 2
       const idleVms = makeFakeVMs(idleCount, true)

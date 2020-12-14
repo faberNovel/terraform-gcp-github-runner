@@ -7,13 +7,12 @@ module.exports.renewRunners = renewRunners
 
 async function renewRunners () {
   console.info('renew runners...')
-  const force = true
   const idleRunnerType = runnerType.idle
   const currentIdleRunners = await getRunnerHelper.getRunnersVms(idleRunnerType)
   const currentIdleRunnersCount = currentIdleRunners.length
   const targetCount = scaleHelper.getTargetRunnersCount(idleRunnerType)
-  await scaleHelper.scaleDownRunners(idleRunnerType, currentIdleRunnersCount, force)
+  await scaleHelper.scaleDownRunners(idleRunnerType, currentIdleRunnersCount)
   await scaleHelper.scaleUpRunners(idleRunnerType, targetCount)
-  await scaleHelper.scaleDownAllTempRunners(force)
+  await scaleHelper.scaleDownAllTempRunners()
   console.info(chalk.green('runners renewed'))
 }

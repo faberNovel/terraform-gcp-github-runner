@@ -2,6 +2,7 @@ const healthCheckHelper = require('./healthcheck')
 const scaleHelper = require('./scale-helper')
 const scalePolicy = require('./scale-policy')
 const renewRunnerHelper = require('./renew-runner')
+const deleteRunnerHelper = require('./delete-runner-helper')
 const chalk = require('chalk')
 
 module.exports.startAndStop = startAndStop
@@ -33,10 +34,7 @@ async function startAndStop (data, context) {
         await createAllTempRunners()
         break
       case 'delete_all_temp_runners':
-        await deleteAllTempRunners(false)
-        break
-      case 'force_delete_all_temp_runners':
-        await deleteAllTempRunners(true)
+        await deleteAllTempRunners()
         break
       case 'healthcheck':
         await healthCheck()
@@ -62,9 +60,10 @@ async function startAndStop (data, context) {
 
 async function dev () {
   try {
-    await healthCheckHelper.healthChecks()
+    await deleteRunnerHelper.deleteRunner('vm-gcp-dev-b4289fab-97fb-4cf7-8a86-27ca73a808f3')
   } catch (error) {
-    console.log(`error = ${error}`)
+    console.error(chalk.red(JSON.stringify(error)))
+    console.error(chalk.red(error.stack))
   }
 }
 
@@ -80,8 +79,8 @@ async function createAllTempRunners () {
   await scaleHelper.scaleUpAllTempRunners()
 }
 
-async function deleteAllTempRunners (force) {
-  await scaleHelper.scaleDownAllTempRunners(force)
+async function deleteAllTempRunners () {
+  await scaleHelper.scaleDownAllTempRunners()
 }
 
 async function healthCheck () {

@@ -17,7 +17,8 @@ describe('Testing delete runner helper', () => {
       const runnerName = 'runner'
       const runnerGitHubId = 'gitHubRunnerId'
       const runnerGitHubStatus = {
-        id: runnerGitHubId
+        id: runnerGitHubId,
+        busy: false
       }
       const runnerVm = {
         name: 'runnerVm',
