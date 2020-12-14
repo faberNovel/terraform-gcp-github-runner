@@ -14,8 +14,10 @@ async function deleteRunner (runnerName) {
   if (deleteFromGitHubSucceed) {
     await deleteRunnerVm(runnerName)
     console.info(chalk.green(`runner ${runnerName} is fully deleted`))
+    return true
   } else {
     console.info(chalk.yellow(`runner ${runnerName} was not deleted`))
+    return false
   }
 }
 
