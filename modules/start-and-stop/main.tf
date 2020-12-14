@@ -58,8 +58,8 @@ resource "google_pubsub_topic" "start_and_stop" {
 
 resource "google_cloud_scheduler_job" "healthcheck" {
   name      = "healthcheck"
-  schedule  = "0 1 * * *"
-  time_zone = "Europe/Paris"
+  schedule  = var.triggers.healthcheck_schedule
+  time_zone = var.triggers.time_zone
 
   pubsub_target {
     topic_name = google_pubsub_topic.start_and_stop.id
@@ -69,8 +69,8 @@ resource "google_cloud_scheduler_job" "healthcheck" {
 
 resource "google_cloud_scheduler_job" "renew_runners" {
   name      = "renew_runners"
-  schedule  = "0 2 * * *"
-  time_zone = "Europe/Paris"
+  schedule  = var.triggers.renew_schedule
+  time_zone = var.triggers.time_zone
 
   pubsub_target {
     topic_name = google_pubsub_topic.start_and_stop.id
@@ -80,8 +80,8 @@ resource "google_cloud_scheduler_job" "renew_runners" {
 
 resource "google_cloud_scheduler_job" "scale_down" {
   name      = "scale_down"
-  schedule  = "*/10 * * * *"
-  time_zone = "Europe/Paris"
+  schedule  = var.triggers.scale_down_schedule
+  time_zone = var.triggers.time_zone
 
   pubsub_target {
     topic_name = google_pubsub_topic.start_and_stop.id
