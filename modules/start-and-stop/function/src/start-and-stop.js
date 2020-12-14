@@ -2,7 +2,6 @@ const healthCheckHelper = require('./healthcheck')
 const scaleHelper = require('./scale-helper')
 const scalePolicy = require('./scale-policy')
 const renewRunnerHelper = require('./renew-runner')
-const deleteRunnerHelper = require('./delete-runner-helper')
 const chalk = require('chalk')
 
 module.exports.startAndStop = startAndStop
@@ -60,7 +59,7 @@ async function startAndStop (data, context) {
 
 async function dev () {
   try {
-    await deleteRunnerHelper.deleteRunner('vm-gcp-dev-b4289fab-97fb-4cf7-8a86-27ca73a808f3')
+    await renewRunnerHelper.renewRunners()
   } catch (error) {
     console.error(chalk.red(JSON.stringify(error)))
     console.error(chalk.red(error.stack))
