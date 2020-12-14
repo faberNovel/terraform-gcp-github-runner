@@ -31,7 +31,7 @@ async function deleteRunnerFromGitHub (runnerName) {
     console.info(`runner ${runnerName} deleted from GitHub`)
     return true
   } else {
-    console.warn(chalk.yellow(`runner ${runnerName} is busy, can not delete it form github`))
+    console.warn(chalk.yellow(`runner ${runnerName} is busy, can not delete it from github`))
     return false
   }
 }
