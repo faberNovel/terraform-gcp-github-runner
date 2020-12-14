@@ -9,6 +9,7 @@ module.exports.renewRunners = renewRunners
 async function renewRunners () {
   console.info('renew runners...')
   const agedRunnersVms = await getRunnerHelper.getAgedRunnersVms()
+  console.info(`Found ${agedRunnersVms.length} aged runners`)
   await Promise.all(agedRunnersVms.map(async (agedRunnerVm) => {
     await deleteRunnerHelper.deleteRunner(agedRunnerVm.name)
   }))
