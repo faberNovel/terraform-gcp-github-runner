@@ -28,6 +28,7 @@ module "start_and_stop" {
   source                 = "./modules/start-and-stop"
   google                 = var.google
   runner                 = var.runner
+  triggers               = var.triggers
   github_api_trigger_url = module.github_api.github_api_trigger_url
   github_org             = var.github.organisation
 

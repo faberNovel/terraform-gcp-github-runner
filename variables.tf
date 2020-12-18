@@ -9,6 +9,15 @@ variable "runner" {
   })
 }
 
+variable "triggers" {
+  type = object({
+    time_zone            = string
+    scale_down_schedule  = string
+    healthcheck_schedule = string
+    renew_schedule       = string
+  })
+}
+
 variable "google" {
   type = object({
     project              = string
