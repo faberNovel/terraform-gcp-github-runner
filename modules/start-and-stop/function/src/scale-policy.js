@@ -6,6 +6,7 @@ const runnerType = require('./runner-type')
 
 const scaleUpNonBusyTargetCount = process.env.RUNNER_SCALE_UP_NON_BUSY_TARGET_COUNT
 const scaleDownNonBusyTargetCount = process.env.RUNNER_SCALE_DOWN_NON_BUSY_TARGET_COUNT
+const scaleDownMaxCount = process.env.RUNNER_SCALE_DOWN_MAX_COUNT
 
 module.exports.scaleUp = scaleUp
 module.exports.scaleDown = scaleDown
@@ -44,7 +45,7 @@ async function scaleDown () {
     const tempRunnersCount = tempRunners.length
     console.log(`temp runners count is ${tempRunnersCount}, min is 0`)
     if (tempRunnersCount > 0) {
-      const scaleDownCount = Math.min(tempRunnersCount, Number(process.env.RUNNER_SCALE_DOWN_MAX_COUNT))
+      const scaleDownCount = Math.min(tempRunnersCount, scaleDownMaxCount)
       console.log(`temp runners count is > 0, scaling down by ${scaleDownCount}`)
       await scaleHelper.scaleDownRunners(runnerTypeTemp, scaleDownCount)
     } else {
