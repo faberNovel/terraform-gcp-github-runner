@@ -57,12 +57,24 @@ describe('Scale policy tests', () => {
     })
   })
 
-  describe('When scalling down with threshold not meet and non idle runners online', () => {
-    it('should scale down', async () => {
-      const nonBusyGcpGitHubRunnersCount = scalePolicySettings.scaleDownNonBusyTargetCount() + 1
-      stubExternalDependencies(nonBusyGcpGitHubRunnersCount, 1, 1)
+  describe('When scalling down with threshold not meet and non idle runners online count > scaleDownMaxCount', () => {
+    it('should scale down according scaleDownMaxCount setting', async () => {
+      const scaleDownMaxCount = 3
+      const nonBusyGcpGitHubRunnersCount = 6
+      stubExternalDependencies(nonBusyGcpGitHubRunnersCount, nonBusyGcpGitHubRunnersCount, nonBusyGcpGitHubRunnersCount, scaleDownMaxCount)
       const scalHelperMock = sandbox.mock(scaleHelper)
-      scalHelperMock.expects('scaleDownRunners').withExactArgs(runnerType.temp, 1).once()
+      scalHelperMock.expects('scaleDownRunners').withExactArgs(runnerType.temp, scaleDownMaxCount).once()
+      scalePolicy.scaleDown()
+    })
+  })
+
+  describe('When scalling down with threshold not meet and non idle runners online count < scaleDownMaxCount', () => {
+    it('should scale down according available runner count', async () => {
+      const scaleDownMaxCount = 3
+      const nonBusyGcpGitHubRunnersCount = 2
+      stubExternalDependencies(nonBusyGcpGitHubRunnersCount, nonBusyGcpGitHubRunnersCount, nonBusyGcpGitHubRunnersCount, scaleDownMaxCount)
+      const scalHelperMock = sandbox.mock(scaleHelper)
+      scalHelperMock.expects('scaleDownRunners').withExactArgs(runnerType.temp, nonBusyGcpGitHubRunnersCount).once()
       scalePolicy.scaleDown()
     })
   })
