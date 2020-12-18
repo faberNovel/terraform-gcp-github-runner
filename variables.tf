@@ -4,6 +4,7 @@ variable "runner" {
     idle_count                       = number
     scale_up_non_busy_target_count   = number
     scale_down_non_busy_target_count = number
+    scale_down_max_count             = number
     type                             = string
     taint_labels                     = bool
   })

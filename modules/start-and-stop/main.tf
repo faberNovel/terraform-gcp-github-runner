@@ -38,6 +38,7 @@ resource "google_cloudfunctions_function" "start_and_stop" {
     "RUNNER_SERVICE_ACCOUNT"                  = google_service_account.runner.email
     "RUNNER_SCALE_UP_NON_BUSY_TARGET_COUNT"   = var.runner.scale_up_non_busy_target_count
     "RUNNER_SCALE_DOWN_NON_BUSY_TARGET_COUNT" = var.runner.scale_down_non_busy_target_count
+    "RUNNER_SCALE_DOWN_MAX_COUNT"             = var.runner.scale_down_max_count
     "GITHUB_API_TRIGGER_URL"                  = var.github_api_trigger_url
     "GITHUB_ORG"                              = var.github_org
   }
