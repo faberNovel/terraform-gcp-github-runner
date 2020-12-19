@@ -19,8 +19,8 @@ describe('Scale policy tests', () => {
 
   describe('When scalling up with threshold already meet', () => {
     it('should not scale up', async () => {
-      const nonBusyGcpGitHubRunnersCount = scalePolicySettings.scaleUpNonBusyTargetCount()
-      stubExternalDependencies(nonBusyGcpGitHubRunnersCount, 0, 0, scalePolicySettings.scaleDownMaxCount())
+      const nonBusyGcpGitHubRunnersCount = scalePolicySettings.scaleUpNonBusyRunnersTargetCount()
+      stubExternalDependencies(nonBusyGcpGitHubRunnersCount, 0, 0, 1)
       const scalHelperMock = sandbox.mock(scaleHelper)
       scalHelperMock.expects('scaleUpRunners').never()
       scalePolicy.scaleUp()
@@ -29,8 +29,8 @@ describe('Scale policy tests', () => {
 
   describe('When scalling up with threshold not meet and non idle runner slot available', () => {
     it('should scale up', async () => {
-      const nonBusyGcpGitHubRunnersCount = scalePolicySettings.scaleUpNonBusyTargetCount() - 1
-      stubExternalDependencies(nonBusyGcpGitHubRunnersCount, 0, 1, scalePolicySettings.scaleDownMaxCount())
+      const nonBusyGcpGitHubRunnersCount = scalePolicySettings.scaleUpNonBusyRunnersTargetCount() - 1
+      stubExternalDependencies(nonBusyGcpGitHubRunnersCount, 0, 1, 1)
       const scalHelperMock = sandbox.mock(scaleHelper)
       scalHelperMock.expects('scaleUpRunners').withExactArgs(runnerType.temp, 1).once()
       scalePolicy.scaleUp()
@@ -39,18 +39,18 @@ describe('Scale policy tests', () => {
 
   describe('When scalling up with threshold not meet and no non idle runner slot available', () => {
     it('should not scale up', async () => {
-      const nonBusyGcpGitHubRunnersCount = scalePolicySettings.scaleUpNonBusyTargetCount() - 1
-      stubExternalDependencies(nonBusyGcpGitHubRunnersCount, 1, 1, scalePolicySettings.scaleDownMaxCount())
+      const nonBusyGcpGitHubRunnersCount = scalePolicySettings.scaleUpNonBusyRunnersTargetCount() - 1
+      stubExternalDependencies(nonBusyGcpGitHubRunnersCount, 1, 1, 1)
       const scalHelperMock = sandbox.mock(scaleHelper)
-      scalHelperMock.expects('scaleUpRunners').never()
+      scalHelperMock.expects('scaleUpRunners').withExactArgs(runnerType.temp, 0).once()
       scalePolicy.scaleUp()
     })
   })
 
   describe('When scalling down with threshold already meet', () => {
     it('should not scale down', async () => {
-      const nonBusyGcpGitHubRunnersCount = scalePolicySettings.scaleDownNonBusyTargetCount()
-      stubExternalDependencies(nonBusyGcpGitHubRunnersCount, 1, 1, scalePolicySettings.scaleDownMaxCount())
+      const nonBusyGcpGitHubRunnersCount = 0
+      stubExternalDependencies(nonBusyGcpGitHubRunnersCount, 1, 1, 1)
       const scalHelperMock = sandbox.mock(scaleHelper)
       scalHelperMock.expects('scaleDownRunners').never()
       scalePolicy.scaleDown()
@@ -81,16 +81,16 @@ describe('Scale policy tests', () => {
 
   describe('When scalling down with threshold not meet and no non idle runner online', () => {
     it('should not scale down', async () => {
-      const nonBusyGcpGitHubRunnersCount = scalePolicySettings.scaleDownNonBusyTargetCount() + 1
-      stubExternalDependencies(nonBusyGcpGitHubRunnersCount, 0, 1)
+      const nonBusyGcpGitHubRunnersCount = 1
+      stubExternalDependencies(nonBusyGcpGitHubRunnersCount, 0, 1, 1)
       const scalHelperMock = sandbox.mock(scaleHelper)
-      scalHelperMock.expects('scaleDownRunners').never()
+      scalHelperMock.expects('scaleDownRunners').withExactArgs(runnerType.temp, 0).once()
       scalePolicy.scaleDown()
     })
   })
 })
 
-function stubExternalDependencies (nonBusyRunnersCount, tempRunnersCount, maxTempRunnersCount, scaleDownMaxCount) {
+function stubExternalDependencies (nonBusyRunnersCount, tempRunnersCount, maxTempRunnersCount, scaleDownNonBusyRunnersChunckSize) {
   sandbox.stub(githubHelper, 'getNonBusyGcpGitHubRunnersCount').resolves(nonBusyRunnersCount)
   const type = runnerType.temp
   const tempRunners = []
@@ -102,5 +102,5 @@ function stubExternalDependencies (nonBusyRunnersCount, tempRunnersCount, maxTem
   }
   sandbox.stub(getRunnerHelper, 'getRunnersVms').withArgs(type).resolves(tempRunners)
   sandbox.stub(scaleHelper, 'getTargetRunnersCount').withArgs(type).returns(maxTempRunnersCount)
-  sandbox.stub(scalePolicySettings, 'scaleDownMaxCount').returns(scaleDownMaxCount)
+  sandbox.stub(scalePolicySettings, 'scaleDownNonBusyRunnersChunckSize').returns(scaleDownNonBusyRunnersChunckSize)
 }

@@ -11,21 +11,20 @@ module.exports.scaleDown = scaleDown
 async function scaleUp () {
   console.log('scale up...')
   const nonBusyGcpGitHubRunnersCount = await gitHubHelper.getNonBusyGcpGitHubRunnersCount()
-  if (nonBusyGcpGitHubRunnersCount < scalePolicySettings.scaleUpNonBusyTargetCount()) {
-    console.log(`non busy runners (${nonBusyGcpGitHubRunnersCount}) < threshold (${scalePolicySettings.scaleUpNonBusyTargetCount()}), evaluate scale up possibility`)
+  const scaleUpNonBusyRunnersTargetCount = scalePolicySettings.scaleUpNonBusyRunnersTargetCount()
+  if (nonBusyGcpGitHubRunnersCount < scaleUpNonBusyRunnersTargetCount) {
+    console.log(`non busy runners (${nonBusyGcpGitHubRunnersCount}) < threshold (${scaleUpNonBusyRunnersTargetCount}), evaluate scale up possibility`)
+    const runnersToCreateTargetCount = scaleUpNonBusyRunnersTargetCount - nonBusyGcpGitHubRunnersCount
     const runnerTypeTemp = runnerType.temp
     const tempRunners = await getRunnerHelper.getRunnersVms(runnerTypeTemp)
     const tempRunnersCount = tempRunners.length
     const maxTempRunnersCount = scaleHelper.getTargetRunnersCount(runnerTypeTemp)
-    console.log(`temp runners count is ${tempRunnersCount}, max is ${maxTempRunnersCount}`)
-    if (tempRunnersCount < maxTempRunnersCount) {
-      console.log('max temp runners count is not meet, scaling up')
-      await scaleHelper.scaleUpRunners(runnerTypeTemp, 1)
-    } else {
-      console.log('max temp runners count is already meet, can not scale up more')
-    }
+    const availableRunnersSlotForScaleUp = maxTempRunnersCount - tempRunnersCount
+    console.log(`runners to create to meet target count = ${runnersToCreateTargetCount}, available runners slot for scale up = ${availableRunnersSlotForScaleUp}`)
+    const scaleUpCount = Math.min(runnersToCreateTargetCount, availableRunnersSlotForScaleUp)
+    await scaleHelper.scaleUpRunners(runnerTypeTemp, scaleUpCount)
   } else {
-    console.log(`non busy runners (${nonBusyGcpGitHubRunnersCount}) >= threshold (${scalePolicySettings.scaleUpNonBusyTargetCount()}), nothing to do`)
+    console.log(`non busy runners (${nonBusyGcpGitHubRunnersCount}) >= threshold (${scalePolicySettings.scaleUpNonBusyRunnersTargetCount()}), nothing to do`)
   }
   console.log(chalk.green('scale up done'))
 }
@@ -33,21 +32,17 @@ async function scaleUp () {
 async function scaleDown () {
   console.log('scale down...')
   const nonBusyGcpGitHubRunnersCount = await gitHubHelper.getNonBusyGcpGitHubRunnersCount()
-  if (nonBusyGcpGitHubRunnersCount > scalePolicySettings.scaleDownNonBusyTargetCount()) {
-    console.log(`non busy runners (${nonBusyGcpGitHubRunnersCount}) > threshold (${scalePolicySettings.scaleDownNonBusyTargetCount()}), evaluate scale down possibility`)
+  if (nonBusyGcpGitHubRunnersCount > 0) {
+    console.log(`non busy runners ${nonBusyGcpGitHubRunnersCount} > 0, evaluate scale down possibility`)
     const runnerTypeTemp = runnerType.temp
     const tempRunners = await getRunnerHelper.getRunnersVms(runnerTypeTemp)
     const tempRunnersCount = tempRunners.length
-    console.log(`temp runners count is ${tempRunnersCount}, min is 0`)
-    if (tempRunnersCount > 0) {
-      const scaleDownCount = Math.min(tempRunnersCount, scalePolicySettings.scaleDownMaxCount())
-      console.log(`temp runners count is > 0, scaling down by ${scaleDownCount}`)
-      await scaleHelper.scaleDownRunners(runnerTypeTemp, scaleDownCount)
-    } else {
-      console.log('temp runners count is 0, can not scale down more')
-    }
+    const scaleDownNonBusyRunnersChunckSize = scalePolicySettings.scaleDownNonBusyRunnersChunckSize()
+    console.log(`scale down non busy runners chunck size = ${scaleDownNonBusyRunnersChunckSize}, available runners for scale down = ${tempRunnersCount}`)
+    const scaleDownCount = Math.min(tempRunnersCount, scaleDownNonBusyRunnersChunckSize)
+    await scaleHelper.scaleDownRunners(runnerTypeTemp, scaleDownCount)
   } else {
-    console.log(`non busy runners (${nonBusyGcpGitHubRunnersCount}) <= threshold (${scalePolicySettings.scaleDownNonBusyTargetCount()}), nothing to do`)
+    console.log(`non busy runners count (${nonBusyGcpGitHubRunnersCount}) is 0, nothing to do`)
   }
   console.log(chalk.green('scale down done'))
 }
