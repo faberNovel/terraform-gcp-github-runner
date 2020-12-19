@@ -33,22 +33,12 @@ extract_and_export() {
 set -e
 
 if [ -z "$1" ]; then
-    echo "usage: source $0 [your-google-file.tfvars.json]"
+    echo "usage: source $0 [your-file.tfvars.json]"
     exit 1
 else
   json_file_path=$(realpath "$1")
 fi
-echo "Parsing $json_file_path file to load gcp env and auth as https://cloud.google.com/docs/authentication/getting-started#setting_the_environment_variable"
-
-script_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
-project_root_path=$(realpath "$script_dir/..")
-auth_path="$project_root_path/auth.json"
-
-# Setup google credentials
-credentials_json_b64=$(extract_params_from_json_file .google.credentials_json_b64 "$json_file_path")
-credentials_json=$(echo "$credentials_json_b64" | base64 -d)
-echo "$credentials_json" > "$auth_path"
-export GOOGLE_APPLICATION_CREDENTIALS="$auth_path"
+echo "Parsing $json_file_path file to load terraform params"
 
 # Setup project envs vars
 extract_and_export ".google.region" "$json_file_path" "GOOGLE_REGION"
@@ -60,6 +50,14 @@ extract_and_export ".runner.type" "$json_file_path" "RUNNER_MACHINE_TYPE"
 extract_and_export ".runner.idle_count" "$json_file_path" "RUNNER_IDLE_COUNT"
 extract_and_export ".runner.total_count" "$json_file_path" "RUNNER_TOTAL_COUNT"
 extract_and_export ".runner.taint_labels" "$json_file_path" "RUNNER_TAINT_LABELS"
-extract_and_export ".runner.scale_up_non_busy_target_count" "$json_file_path" "RUNNER_SCALE_UP_NON_BUSY_TARGET_COUNT"
-extract_and_export ".runner.scale_down_non_busy_target_count" "$json_file_path" "RUNNER_SCALE_DOWN_NON_BUSY_TARGET_COUNT"
-extract_and_export ".runner.scale_down_max_count" "$json_file_path" "RUNNER_SCALE_DOWN_MAX_COUNT"
+
+extract_and_export ".scaling.scale_up_non_busy_runners_target_count" "$json_file_path" "SCALING_UP_NON_BUSY_RUNNERS_TARGET_COUNT"
+extract_and_export ".scaling.scale_down_non_busy_runners_chunk_size" "$json_file_path" "SCALING_DOWN_NON_BUSY_RUNNERS_CHUNK_SIZE"
+
+extract_and_export ".github.organisation" "$json_file_path" "GITHUB_ORG"
+extract_and_export ".github.key_pem_b64" "$json_file_path" "GITHUB_KEY_B64"
+extract_and_export ".github.app_id" "$json_file_path" "GITHUB_APP_ID"
+extract_and_export ".github.app_installation_id" "$json_file_path" "GITHUB_INSTALLATION_ID"
+extract_and_export ".github.client_id" "$json_file_path" "GITHUB_CLIENT_ID"
+extract_and_export ".github.client_secret" "$json_file_path" "GITHUB_CLIENT_SECRET"
+extract_and_export ".github.webhook_secret" "$json_file_path" "GITHUB_WEBHOOK_SECRET"

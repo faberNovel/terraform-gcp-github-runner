@@ -1,19 +1,22 @@
 variable "runner" {
   type = object({
-    total_count                      = number
-    idle_count                       = number
-    scale_up_non_busy_target_count   = number
-    scale_down_non_busy_target_count = number
-    scale_down_max_count             = number
-    type                             = string
-    taint_labels                     = bool
+    total_count  = number
+    idle_count   = number
+    type         = string
+    taint_labels = bool
+  })
+}
+
+variable "scaling" {
+  type = object({
+    scale_up_non_busy_runners_target_count = number
+    scale_down_non_busy_runners_chunk_size = number
+    scale_down_schedule                    = string
   })
 }
 
 variable "triggers" {
   type = object({
-    time_zone            = string
-    scale_down_schedule  = string
     healthcheck_schedule = string
     renew_schedule       = string
   })
@@ -26,6 +29,7 @@ variable "google" {
     zone                 = string
     credentials_json_b64 = string
     env                  = string
+    time_zone            = string
   })
 }
 
