@@ -3,8 +3,10 @@
 echo "start stop script"
 
 RUNNER_USER="runner"
-
+ZONE=$(curl -H Metadata-Flavor:Google http://metadata/computeMetadata/v1/instance/zone)
 RUNNER_TYPE=$(gcloud compute instances describe "$HOSTNAME" --zone "$ZONE" --flatten="labels[type]" --format=object)
+
+## Exit now if ghost runner
 if [ "$RUNNER_TYPE" = "ghost" ]; then
   echo "Ghost runner, exiting"
   exit 0
@@ -24,7 +26,7 @@ else
   echo "error fetching remove token" >&2
 fi
 
-## Runner
+## Unregister runner
 cd "/home/$RUNNER_USER/actions-runner" || exit 1
 sudo -u $RUNNER_USER ./config.sh remove --token "$REMOVE_TOKEN"
 cd /home/$RUNNER_USER || exit 1
