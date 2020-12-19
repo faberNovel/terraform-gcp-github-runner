@@ -28,19 +28,18 @@ resource "google_cloudfunctions_function" "start_and_stop" {
   max_instances         = 1
 
   environment_variables = {
-    "GOOGLE_ZONE"                             = var.google.zone
-    "GOOGLE_ENV"                              = var.google.env
-    "GOOGLE_PROJECT"                          = var.google.project
-    "RUNNER_TAINT_LABELS"                     = var.runner.taint_labels
-    "RUNNER_MACHINE_TYPE"                     = var.runner.type
-    "RUNNER_IDLE_COUNT"                       = var.runner.idle_count
-    "RUNNER_TOTAL_COUNT"                      = var.runner.total_count
-    "RUNNER_SERVICE_ACCOUNT"                  = google_service_account.runner.email
-    "RUNNER_SCALE_UP_NON_BUSY_TARGET_COUNT"   = var.runner.scale_up_non_busy_target_count
-    "RUNNER_SCALE_DOWN_NON_BUSY_TARGET_COUNT" = var.runner.scale_down_non_busy_target_count
-    "RUNNER_SCALE_DOWN_MAX_COUNT"             = var.runner.scale_down_max_count
-    "GITHUB_API_TRIGGER_URL"                  = var.github_api_trigger_url
-    "GITHUB_ORG"                              = var.github_org
+    "GOOGLE_ZONE"                              = var.google.zone
+    "GOOGLE_ENV"                               = var.google.env
+    "GOOGLE_PROJECT"                           = var.google.project
+    "RUNNER_TAINT_LABELS"                      = var.runner.taint_labels
+    "RUNNER_MACHINE_TYPE"                      = var.runner.type
+    "RUNNER_IDLE_COUNT"                        = var.runner.idle_count
+    "RUNNER_TOTAL_COUNT"                       = var.runner.total_count
+    "RUNNER_SERVICE_ACCOUNT"                   = google_service_account.runner.email
+    "SCALING_UP_NON_BUSY_RUNNERS_TARGET_COUNT" = var.scaling.scale_up_non_busy_runners_target_count
+    "SCALING_DOWN_NON_BUSY_RUNNERS_CHUNK_SIZE" = var.scaling.scale_down_non_busy_runners_chunk_size
+    "GITHUB_API_TRIGGER_URL"                   = var.github_api_trigger_url
+    "GITHUB_ORG"                               = var.github_org
   }
 
   event_trigger {
@@ -81,7 +80,7 @@ resource "google_cloud_scheduler_job" "renew_runners" {
 
 resource "google_cloud_scheduler_job" "scale_down" {
   name      = "scale_down"
-  schedule  = var.triggers.scale_down_schedule
+  schedule  = var.scaling.scale_down_schedule
   time_zone = var.triggers.time_zone
 
   pubsub_target {
