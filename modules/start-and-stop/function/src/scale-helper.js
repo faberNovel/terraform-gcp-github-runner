@@ -6,14 +6,14 @@ const chalk = require('chalk')
 
 module.exports.scaleUpAllRunners = scaleUpAllRunners
 module.exports.scaleDownAllRunners = scaleDownAllRunners
-module.exports.getTargetRunnersCount = getTargetRunnersCount
-module.exports.getTargetRunnerCountDelta = getTargetRunnersCountDelta
+module.exports.getRunnersMaxCount = getRunnersMaxCount
+module.exports.getRunnersDeltaToMaxCount = getRunnersDeltaToMaxCount
 module.exports.scaleUpRunners = scaleUpRunners
 module.exports.scaleDownRunners = scaleDownRunners
 
 async function scaleUpAllRunners () {
   console.info('scale up all runners...')
-  const targetRunnerCountDelta = await getTargetRunnersCountDelta()
+  const targetRunnerCountDelta = await getRunnersDeltaToMaxCount()
   if (targetRunnerCountDelta > 0) {
     await scaleUpRunners(targetRunnerCountDelta)
   }
@@ -27,13 +27,13 @@ async function scaleDownAllRunners () {
   console.info(chalk.green('scale down all runners succeed'))
 }
 
-function getTargetRunnersCount () {
-  return process.env.RUNNER_TOTAL_COUNT
+function getRunnersMaxCount () {
+  return Number(process.env.SCALING_MAX_COUNT)
 }
 
-async function getTargetRunnersCountDelta () {
+async function getRunnersDeltaToMaxCount () {
   const runnersVms = await getRunnerHelper.getRunnersVms()
-  const targetRunnersCount = getTargetRunnersCount()
+  const targetRunnersCount = getRunnersMaxCount()
   const targetRunnerCountDelta = targetRunnersCount - runnersVms.length
   return targetRunnerCountDelta
 }

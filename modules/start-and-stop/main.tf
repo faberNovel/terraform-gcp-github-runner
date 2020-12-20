@@ -33,8 +33,8 @@ resource "google_cloudfunctions_function" "start_and_stop" {
     "GOOGLE_PROJECT"                           = var.google.project
     "RUNNER_TAINT_LABELS"                      = var.runner.taint_labels
     "RUNNER_MACHINE_TYPE"                      = var.runner.type
-    "RUNNER_TOTAL_COUNT"                       = var.runner.total_count
     "RUNNER_SERVICE_ACCOUNT"                   = google_service_account.runner.email
+    "SCALING_MAX_COUNT"                        = var.scaling.max_count
     "SCALING_UP_NON_BUSY_RUNNERS_TARGET_COUNT" = var.scaling.scale_up_non_busy_runners_target_count
     "SCALING_DOWN_NON_BUSY_RUNNERS_CHUNK_SIZE" = var.scaling.scale_down_non_busy_runners_chunk_size
     "GITHUB_API_TRIGGER_URL"                   = var.github_api_trigger_url

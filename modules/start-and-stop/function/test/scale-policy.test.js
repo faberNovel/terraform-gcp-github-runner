@@ -89,7 +89,7 @@ describe('Scale policy tests', () => {
   })
 })
 
-function stubExternalDependencies (nonBusyRunnersCount, runnersCount, maxRunnersCount, scaleDownNonBusyRunnersChunckSize) {
+function stubExternalDependencies (nonBusyRunnersCount, runnersCount, runnersMaxCount, scaleDownNonBusyRunnersChunckSize) {
   sandbox.stub(githubHelper, 'getNonBusyGcpGitHubRunnersCount').resolves(nonBusyRunnersCount)
   const runners = []
   for (let index = 0; index < runnersCount; index++) {
@@ -99,6 +99,6 @@ function stubExternalDependencies (nonBusyRunnersCount, runnersCount, maxRunners
     runners.push(vm)
   }
   sandbox.stub(getRunnerHelper, 'getRunnersVms').resolves(runners)
-  sandbox.stub(scaleHelper, 'getTargetRunnersCount').returns(maxRunnersCount)
+  sandbox.stub(scaleHelper, 'getRunnersMaxCount').returns(runnersMaxCount)
   sandbox.stub(scalePolicySettings, 'scaleDownNonBusyRunnersChunckSize').returns(scaleDownNonBusyRunnersChunckSize)
 }

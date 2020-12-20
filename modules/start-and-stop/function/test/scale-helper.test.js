@@ -39,25 +39,25 @@ describe('Scale helper tests', () => {
     })
   })
 
-  describe('When get target runner count delta', () => {
-    const getTargetRunnerCountDelta = scaleHelper.__get__('getTargetRunnersCountDelta')
+  describe('When get runners delta to max count', () => {
+    const getRunnersDeltaToMaxCountFun = scaleHelper.__get__('getRunnersDeltaToMaxCount')
 
     it('should return positive when scaling up', async () => {
-      const delta = await getTargetRunnerCountDeltaWrapped(0, 1, getTargetRunnerCountDelta)
+      const delta = await getRunnersDeltaToMaxCountWrapped(0, 1, getRunnersDeltaToMaxCountFun)
       delta.should.equals(1)
     })
     it('should return negative when scaling down', async () => {
-      const delta = await getTargetRunnerCountDeltaWrapped(1, 0, getTargetRunnerCountDelta)
+      const delta = await getRunnersDeltaToMaxCountWrapped(1, 0, getRunnersDeltaToMaxCountFun)
       delta.should.equals(-1)
     })
   })
 })
 
-async function getTargetRunnerCountDeltaWrapped (givenRunnerCount, targetRunnerCount, getTargetRunnerCountDelta) {
-  sandbox.stub(getVMHelper, 'getRunnersVms').resolves(new Array(givenRunnerCount))
-  const getTargetRunnersCountStub = sandbox.stub().returns(targetRunnerCount)
-  scaleHelper.__set__('getTargetRunnersCount', getTargetRunnersCountStub)
-  const delta = await getTargetRunnerCountDelta(true)
+async function getRunnersDeltaToMaxCountWrapped (givenRunnersCount, runnersMaxCount, getRunnersDeltaToMaxCount) {
+  sandbox.stub(getVMHelper, 'getRunnersVms').resolves(new Array(givenRunnersCount))
+  const getRunnersMaxCountStub = sandbox.stub().returns(runnersMaxCount)
+  scaleHelper.__set__('getRunnersMaxCount', getRunnersMaxCountStub)
+  const delta = await getRunnersDeltaToMaxCount(true)
   return delta
 }
 
