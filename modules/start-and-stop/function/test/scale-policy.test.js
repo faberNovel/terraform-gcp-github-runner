@@ -27,7 +27,7 @@ describe('Scale policy tests', () => {
     })
   })
 
-  describe('When scalling up with threshold not meet and non idle runner slot available', () => {
+  describe('When scalling up with threshold not meet and no runner slot available', () => {
     it('should scale up', async () => {
       const nonBusyGcpGitHubRunnersCount = scalePolicySettings.scaleUpNonBusyRunnersTargetCount() - 1
       stubExternalDependencies(nonBusyGcpGitHubRunnersCount, 0, 1, 1)
@@ -37,7 +37,7 @@ describe('Scale policy tests', () => {
     })
   })
 
-  describe('When scalling up with threshold not meet and no non idle runner slot available', () => {
+  describe('When scalling up with threshold not meet and no runner slot available', () => {
     it('should not scale up', async () => {
       const nonBusyGcpGitHubRunnersCount = scalePolicySettings.scaleUpNonBusyRunnersTargetCount() - 1
       stubExternalDependencies(nonBusyGcpGitHubRunnersCount, 1, 1, 1)
@@ -57,7 +57,7 @@ describe('Scale policy tests', () => {
     })
   })
 
-  describe('When scalling down with threshold not meet and non idle runners online count > scaleDownMaxCount', () => {
+  describe('When scalling down with threshold not meet and runners online count > scaleDownMaxCount', () => {
     it('should scale down according scaleDownMaxCount setting', async () => {
       const scaleDownMaxCount = 3
       const nonBusyGcpGitHubRunnersCount = 6
@@ -68,7 +68,7 @@ describe('Scale policy tests', () => {
     })
   })
 
-  describe('When scalling down with threshold not meet and non idle runners online count < scaleDownMaxCount', () => {
+  describe('When scalling down with threshold not meet and runners online count < scaleDownMaxCount', () => {
     it('should scale down according available runner count', async () => {
       const scaleDownMaxCount = 3
       const nonBusyGcpGitHubRunnersCount = 2
@@ -79,7 +79,7 @@ describe('Scale policy tests', () => {
     })
   })
 
-  describe('When scalling down with threshold not meet and no non idle runner online', () => {
+  describe('When scalling down with threshold not meet and no runner online', () => {
     it('should not scale down', async () => {
       const nonBusyGcpGitHubRunnersCount = 1
       stubExternalDependencies(nonBusyGcpGitHubRunnersCount, 0, 1, 1)
