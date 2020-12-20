@@ -5,7 +5,6 @@ const scalePolicy = require('../src/scale-policy')
 const githubHelper = require('../src/github-helper')
 const scaleHelper = require('../src/scale-helper')
 const getRunnerHelper = require('../src/get-runner-helper')
-const runnerType = require('../src/runner-type')
 const scalePolicySettings = require('../src/scale-policy-settings')
 
 chai.should()
@@ -32,7 +31,7 @@ describe('Scale policy tests', () => {
       const nonBusyGcpGitHubRunnersCount = scalePolicySettings.scaleUpNonBusyRunnersTargetCount() - 1
       stubExternalDependencies(nonBusyGcpGitHubRunnersCount, 0, 1, 1)
       const scalHelperMock = sandbox.mock(scaleHelper)
-      scalHelperMock.expects('scaleUpRunners').withExactArgs(runnerType.temp, 1).once()
+      scalHelperMock.expects('scaleUpRunners').withExactArgs(1).once()
       scalePolicy.scaleUp()
     })
   })
@@ -42,7 +41,7 @@ describe('Scale policy tests', () => {
       const nonBusyGcpGitHubRunnersCount = scalePolicySettings.scaleUpNonBusyRunnersTargetCount() - 1
       stubExternalDependencies(nonBusyGcpGitHubRunnersCount, 1, 1, 1)
       const scalHelperMock = sandbox.mock(scaleHelper)
-      scalHelperMock.expects('scaleUpRunners').withExactArgs(runnerType.temp, 0).once()
+      scalHelperMock.expects('scaleUpRunners').withExactArgs(0).once()
       scalePolicy.scaleUp()
     })
   })
@@ -63,7 +62,7 @@ describe('Scale policy tests', () => {
       const nonBusyGcpGitHubRunnersCount = 6
       stubExternalDependencies(nonBusyGcpGitHubRunnersCount, nonBusyGcpGitHubRunnersCount, nonBusyGcpGitHubRunnersCount, scaleDownMaxCount)
       const scalHelperMock = sandbox.mock(scaleHelper)
-      scalHelperMock.expects('scaleDownRunners').withExactArgs(runnerType.temp, scaleDownMaxCount).once()
+      scalHelperMock.expects('scaleDownRunners').withExactArgs(scaleDownMaxCount).once()
       scalePolicy.scaleDown()
     })
   })
@@ -74,7 +73,7 @@ describe('Scale policy tests', () => {
       const nonBusyGcpGitHubRunnersCount = 2
       stubExternalDependencies(nonBusyGcpGitHubRunnersCount, nonBusyGcpGitHubRunnersCount, nonBusyGcpGitHubRunnersCount, scaleDownMaxCount)
       const scalHelperMock = sandbox.mock(scaleHelper)
-      scalHelperMock.expects('scaleDownRunners').withExactArgs(runnerType.temp, nonBusyGcpGitHubRunnersCount).once()
+      scalHelperMock.expects('scaleDownRunners').withExactArgs(nonBusyGcpGitHubRunnersCount).once()
       scalePolicy.scaleDown()
     })
   })
@@ -84,23 +83,22 @@ describe('Scale policy tests', () => {
       const nonBusyGcpGitHubRunnersCount = 1
       stubExternalDependencies(nonBusyGcpGitHubRunnersCount, 0, 1, 1)
       const scalHelperMock = sandbox.mock(scaleHelper)
-      scalHelperMock.expects('scaleDownRunners').withExactArgs(runnerType.temp, 0).once()
+      scalHelperMock.expects('scaleDownRunners').withExactArgs(0).once()
       scalePolicy.scaleDown()
     })
   })
 })
 
-function stubExternalDependencies (nonBusyRunnersCount, tempRunnersCount, maxTempRunnersCount, scaleDownNonBusyRunnersChunckSize) {
+function stubExternalDependencies (nonBusyRunnersCount, runnersCount, maxRunnersCount, scaleDownNonBusyRunnersChunckSize) {
   sandbox.stub(githubHelper, 'getNonBusyGcpGitHubRunnersCount').resolves(nonBusyRunnersCount)
-  const type = runnerType.temp
-  const tempRunners = []
-  for (let index = 0; index < tempRunnersCount; index++) {
+  const runners = []
+  for (let index = 0; index < runnersCount; index++) {
     const vm = {
       name: `vm-${index}`
     }
-    tempRunners.push(vm)
+    runners.push(vm)
   }
-  sandbox.stub(getRunnerHelper, 'getRunnersVms').withArgs(type).resolves(tempRunners)
-  sandbox.stub(scaleHelper, 'getTargetRunnersCount').withArgs(type).returns(maxTempRunnersCount)
+  sandbox.stub(getRunnerHelper, 'getRunnersVms').resolves(runners)
+  sandbox.stub(scaleHelper, 'getTargetRunnersCount').returns(maxRunnersCount)
   sandbox.stub(scalePolicySettings, 'scaleDownNonBusyRunnersChunckSize').returns(scaleDownNonBusyRunnersChunckSize)
 }

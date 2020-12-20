@@ -23,7 +23,7 @@ async function createRunner (type) {
 
 function getRunnerNamePrefix (type) {
   switch (type) {
-    case runnerType.temp:
+    case runnerType.default:
       return `vm-gcp-${process.env.GOOGLE_ENV}`
     case runnerType.ghost:
       return `vm-gcp-ghost-${process.env.GOOGLE_ENV}`
@@ -51,7 +51,7 @@ async function createRunnerVm (runnerName, type) {
 async function waitForRunnerConnectedToGitHub (vm, type) {
   let status
   switch (type) {
-    case runnerType.temp:
+    case runnerType.default:
       status = 'online'
       break
     case runnerType.ghost:

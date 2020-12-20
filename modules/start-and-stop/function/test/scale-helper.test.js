@@ -7,7 +7,6 @@ const createRunnerHelper = require('../src/create-runner-helper')
 const gitHubHelper = require('../src/github-helper')
 const getVMHelper = require('../src/get-runner-helper')
 const deleteVmHelper = require('../src/delete-runner-helper')
-const runnerType = require('../src/runner-type')
 
 chai.should()
 chai.use(chaiAsPromised)
@@ -17,11 +16,11 @@ describe('Scale helper tests', () => {
     sandbox.verifyAndRestore()
   })
 
-  describe('When calling scale up temp runners', () => {
-    it('should scale up temp runners', async () => {
+  describe('When calling scale up runners', () => {
+    it('should scale up runners', async () => {
       const count = 3
-      sandbox.mock(createRunnerHelper).expects('createRunner').withExactArgs(runnerType.temp).exactly(count).resolves()
-      await scaleHelper.scaleUpRunners(runnerType.temp, count)
+      sandbox.mock(createRunnerHelper).expects('createRunner').exactly(count).resolves()
+      await scaleHelper.scaleUpRunners(count)
     })
   })
 
@@ -31,10 +30,10 @@ describe('Scale helper tests', () => {
     it('should scale down runners according github status', async () => {
       const count = 10
       const busyCount = 6
-      const vms = makeFakeVMs(count, false)
+      const vms = makeFakeVMs(count)
       stubExternalDependencies(vms, busyCount)
 
-      await scaleDownRunners(runnerType.temp, count, false)
+      await scaleDownRunners(count)
 
       countFakeVmsDeleted(vms).should.equals(count - busyCount)
     })
@@ -64,7 +63,7 @@ async function getTargetRunnerCountDeltaWrapped (givenRunnerCount, targetRunnerC
 
 function stubExternalDependencies (vms, busyCount) {
   const getRunnersVmsStub = sandbox.stub(getVMHelper, 'getRunnersVms')
-  getRunnersVmsStub.withArgs(runnerType.temp).resolves(vms)
+  getRunnersVmsStub.resolves(vms)
   sandbox.stub(deleteVmHelper, 'deleteRunner').callsFake(async vmName => {
     await vms.filter(vm => vm.name === vmName)[0].delete()
     return Promise.resolve()

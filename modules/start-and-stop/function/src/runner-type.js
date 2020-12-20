@@ -1,5 +1,5 @@
-const runnerTypeTemp = 'temp'
+const runnerTypeDefault = 'default'
 const runnerTypeGhost = 'ghost'
 
-module.exports.temp = runnerTypeTemp
+module.exports.default = runnerTypeDefault
 module.exports.ghost = runnerTypeGhost

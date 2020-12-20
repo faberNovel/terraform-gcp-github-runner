@@ -7,8 +7,8 @@ module.exports.getAllRunnersVms = getAllRunnersVms
 module.exports.getRunnerVmByName = getRunnerVmByName
 module.exports.getAgedRunnersVms = getAgedRunnersVms
 
-async function getRunnersVms (runnerType) {
-  const filter = `labels.env=${process.env.GOOGLE_ENV} AND labels.type=${runnerType}`
+async function getRunnersVms () {
+  const filter = `labels.env=${process.env.GOOGLE_ENV}`
   const options = {
     filter: filter
   }

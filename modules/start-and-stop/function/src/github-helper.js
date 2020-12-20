@@ -33,8 +33,7 @@ async function getGitHubRunners () {
 async function getGcpGitHubRunners () {
   const gitHubRunners = await getGitHubRunners()
   const gcpGitHubRunners = gitHubRunners.filter(gitHubRunner => {
-    const isTempRunner = gitHubRunner.name.startsWith(createRunnerHelper.getRunnerNamePrefix(runnerType.temp))
-    return isTempRunner
+    return gitHubRunner.name.startsWith(createRunnerHelper.getRunnerNamePrefix(runnerType.default))
   })
   return gcpGitHubRunners
 }
