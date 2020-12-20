@@ -17,7 +17,7 @@ resource "google_storage_bucket_object" "start_and_stop_zip" {
 
 resource "google_cloudfunctions_function" "start_and_stop" {
   name                  = "start_and_stop_function"
-  description           = "Handling start and stop of non idle runners"
+  description           = "Handling start and stop of runners"
   runtime               = "nodejs12"
   available_memory_mb   = 128
   timeout               = 60 * 5
@@ -33,7 +33,6 @@ resource "google_cloudfunctions_function" "start_and_stop" {
     "GOOGLE_PROJECT"                           = var.google.project
     "RUNNER_TAINT_LABELS"                      = var.runner.taint_labels
     "RUNNER_MACHINE_TYPE"                      = var.runner.type
-    "RUNNER_IDLE_COUNT"                        = var.runner.idle_count
     "RUNNER_TOTAL_COUNT"                       = var.runner.total_count
     "RUNNER_SERVICE_ACCOUNT"                   = google_service_account.runner.email
     "SCALING_UP_NON_BUSY_RUNNERS_TARGET_COUNT" = var.scaling.scale_up_non_busy_runners_target_count

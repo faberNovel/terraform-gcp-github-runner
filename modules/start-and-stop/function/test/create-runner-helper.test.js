@@ -11,7 +11,7 @@ chai.should()
 describe('Testing create runner helper', () => {
   describe('When getting runner name prefix', () => {
     it('should start with correct runner name', () => {
-      createRunnerHelper.getRunnerNamePrefix(runnerType.idle).should.startWith('vm-gcp')
+      createRunnerHelper.getRunnerNamePrefix(runnerType.temp).should.startWith('vm-gcp')
     })
   })
 })

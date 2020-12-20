@@ -1,4 +1,3 @@
-const scaleHelper = require('./scale-helper')
 const getRunnerHelper = require('./get-runner-helper')
 const deleteRunnerHelper = require('./delete-runner-helper')
 const scalePolicy = require('./scale-policy')
@@ -13,7 +12,6 @@ async function renewRunners () {
   await Promise.all(agedRunnersVms.map(async (agedRunnerVm) => {
     await deleteRunnerHelper.deleteRunner(agedRunnerVm.name)
   }))
-  await scaleHelper.scaleIdleRunners() // Ensure min number of idle runner
-  await scalePolicy.scaleUp() // Ensure min number of temp runner
+  await scalePolicy.scaleUp() // Ensure min number of runners
   console.info(chalk.green('runners renewed'))
 }

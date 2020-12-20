@@ -2,7 +2,6 @@ const sandbox = require('sinon').createSandbox()
 const chai = require('chai')
 const chaiAsPromised = require('chai-as-promised')
 const renewRunnerHelper = require('../src/renew-runner')
-const scaleHelper = require('../src/scale-helper')
 const getRunnerHelper = require('../src/get-runner-helper')
 const deleteRunnerHelper = require('../src/delete-runner-helper')
 const scalePolicy = require('../src/scale-policy')
@@ -21,8 +20,6 @@ describe('Renew runners tests', () => {
 
       sandbox.stub(getRunnerHelper, 'getAgedRunnersVms').resolves(makeVms(agedRunnersCount))
       sandbox.mock(deleteRunnerHelper).expects('deleteRunner').resolves(true).exactly(agedRunnersCount)
-      const scaleHelperMock = sandbox.mock(scaleHelper)
-      scaleHelperMock.expects('scaleIdleRunners').resolves().once()
       sandbox.mock(scalePolicy).expects('scaleUp').resolves().once()
 
       await renewRunnerHelper.renewRunners()

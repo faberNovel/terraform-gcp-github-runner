@@ -5,26 +5,12 @@ const gitHubHelper = require('./github-helper')
 const chalk = require('chalk')
 const runnerType = require('./runner-type')
 
-module.exports.scaleIdleRunners = scaleIdleRunners
 module.exports.scaleUpAllTempRunners = scaleUpAllTempRunners
 module.exports.scaleDownAllTempRunners = scaleDownAllTempRunners
 module.exports.getTargetRunnersCount = getTargetRunnersCount
 module.exports.getTargetRunnerCountDelta = getTargetRunnersCountDelta
 module.exports.scaleUpRunners = scaleUpRunners
 module.exports.scaleDownRunners = scaleDownRunners
-
-async function scaleIdleRunners () {
-  console.info('scale idle runners...')
-  const type = runnerType.idle
-  const targetRunnerCountDelta = await getTargetRunnersCountDelta(type)
-  console.info(`${targetRunnerCountDelta} idle(s) runner(s) to change`)
-  if (targetRunnerCountDelta > 0) {
-    await scaleUpRunners(type, targetRunnerCountDelta)
-  } else if (targetRunnerCountDelta < 0) {
-    await scaleDownRunners(type, Math.abs(targetRunnerCountDelta), true)
-  }
-  console.info(chalk.green('scale idle runners succeed'))
-}
 
 async function scaleUpAllTempRunners () {
   console.info('scale up all temp runners...')
@@ -44,15 +30,8 @@ async function scaleDownAllTempRunners () {
   console.info(chalk.green('scale down all temp runners succeed'))
 }
 
-function getTargetRunnersCount (type) {
-  switch (type) {
-    case runnerType.idle:
-      return Number(process.env.RUNNER_IDLE_COUNT)
-    case runnerType.temp:
-      return process.env.RUNNER_TOTAL_COUNT - process.env.RUNNER_IDLE_COUNT
-    default:
-      throw new Error(`Invalid runner type ${type}`)
-  }
+function getTargetRunnersCount () {
+  return process.env.RUNNER_TOTAL_COUNT
 }
 
 async function getTargetRunnersCountDelta (type) {
@@ -76,13 +55,13 @@ async function scaleDownRunners (type, count) {
   console.info(`scale down ${count} runners (type:${type})...`)
   const runnersVms = await getRunnerHelper.getRunnersVms(type)
   const gcpGitHubRunners = await gitHubHelper.getGcpGitHubRunners()
-  const gcpIdleFilteredGitHubRunners = gcpGitHubRunners.filter(gitHubRunner => {
+  const gcpFilteredGitHubRunners = gcpGitHubRunners.filter(gitHubRunner => {
     return runnersVms.map(vm => vm.name).includes(gitHubRunner.name)
   })
-  const nonBusyIdleFilteredGcpGitHubRunners = gcpIdleFilteredGitHubRunners.filter(gitHubRunner => {
+  const nonBusyFilteredGcpGitHubRunners = gcpFilteredGitHubRunners.filter(gitHubRunner => {
     return gitHubRunner.busy === false
   })
-  const runnersToDelete = nonBusyIdleFilteredGcpGitHubRunners.slice(-count)
+  const runnersToDelete = nonBusyFilteredGcpGitHubRunners.slice(-count)
   console.info(`${runnersToDelete.length} non busy gcp runner(s) (type:${type}) to delete`)
   await Promise.all(runnersToDelete.map(async (gitHubRunner) => {
     await deleteRunnerHelper.deleteRunner(gitHubRunner.name)
