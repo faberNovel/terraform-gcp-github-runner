@@ -4,10 +4,10 @@ const deleteRunnerHelper = require('./delete-runner-helper')
 const gitHubHelper = require('./github-helper')
 const chalk = require('chalk')
 const runnerType = require('./runner-type')
+const scalePolicySettings = require('./scale-policy-settings')
 
 module.exports.scaleUpAllRunners = scaleUpAllRunners
 module.exports.scaleDownAllRunners = scaleDownAllRunners
-module.exports.getRunnersMaxCount = getRunnersMaxCount
 module.exports.getRunnersDeltaToMaxCount = getRunnersDeltaToMaxCount
 module.exports.scaleUpRunners = scaleUpRunners
 module.exports.scaleDownRunners = scaleDownRunners
@@ -28,13 +28,9 @@ async function scaleDownAllRunners () {
   console.info(chalk.green('scale down all runners succeed'))
 }
 
-function getRunnersMaxCount () {
-  return Number(process.env.SCALING_MAX_COUNT)
-}
-
 async function getRunnersDeltaToMaxCount () {
   const runnersVms = await getRunnerHelper.getRunnersVms()
-  const targetRunnersCount = getRunnersMaxCount()
+  const targetRunnersCount = scalePolicySettings.runnersMaxCount()
   const targetRunnerCountDelta = targetRunnersCount - runnersVms.length
   return targetRunnerCountDelta
 }

@@ -16,7 +16,7 @@ async function scaleUp () {
     const runnersToCreateTargetCount = scaleUpNonBusyRunnersTargetCount - nonBusyGcpGitHubRunnersCount
     const runners = await getRunnerHelper.getRunnersVms()
     const runnersCount = runners.length
-    const maxRunnersCount = scaleHelper.getRunnersMaxCount()
+    const maxRunnersCount = scalePolicySettings.runnersMaxCount()
     const availableRunnersSlotForScaleUp = maxRunnersCount - runnersCount
     console.log(`runners to create to meet target count = ${runnersToCreateTargetCount}, available runners slot for scale up = ${availableRunnersSlotForScaleUp}`)
     const scaleUpCount = Math.min(runnersToCreateTargetCount, availableRunnersSlotForScaleUp)

@@ -99,6 +99,6 @@ function stubExternalDependencies (nonBusyRunnersCount, runnersCount, runnersMax
     runners.push(vm)
   }
   sandbox.stub(getRunnerHelper, 'getRunnersVms').resolves(runners)
-  sandbox.stub(scaleHelper, 'getRunnersMaxCount').returns(runnersMaxCount)
+  sandbox.stub(scalePolicySettings, 'runnersMaxCount').returns(runnersMaxCount)
   sandbox.stub(scalePolicySettings, 'scaleDownNonBusyRunnersChunckSize').returns(scaleDownNonBusyRunnersChunckSize)
 }

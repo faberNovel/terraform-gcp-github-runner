@@ -3,6 +3,7 @@ const chai = require('chai')
 const chaiAsPromised = require('chai-as-promised')
 const rewire = require('rewire')
 const scaleHelper = rewire('../src/scale-helper')
+const scalePolicySettings = require('../src/scale-policy-settings')
 const createRunnerHelper = require('../src/create-runner-helper')
 const gitHubHelper = require('../src/github-helper')
 const getVMHelper = require('../src/get-runner-helper')
@@ -56,8 +57,7 @@ describe('Scale helper tests', () => {
 
 async function getRunnersDeltaToMaxCountWrapped (givenRunnersCount, runnersMaxCount, getRunnersDeltaToMaxCount) {
   sandbox.stub(getVMHelper, 'getRunnersVms').resolves(new Array(givenRunnersCount))
-  const getRunnersMaxCountStub = sandbox.stub().returns(runnersMaxCount)
-  scaleHelper.__set__('getRunnersMaxCount', getRunnersMaxCountStub)
+  sandbox.stub(scalePolicySettings, 'runnersMaxCount').returns(runnersMaxCount)
   const delta = await getRunnersDeltaToMaxCount(true)
   return delta
 }
