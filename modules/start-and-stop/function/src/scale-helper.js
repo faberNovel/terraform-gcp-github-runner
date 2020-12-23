@@ -3,6 +3,7 @@ const createRunnerHelper = require('./create-runner-helper')
 const deleteRunnerHelper = require('./delete-runner-helper')
 const gitHubHelper = require('./github-helper')
 const chalk = require('chalk')
+const runnerType = require('./runner-type')
 
 module.exports.scaleUpAllRunners = scaleUpAllRunners
 module.exports.scaleDownAllRunners = scaleDownAllRunners
@@ -42,7 +43,7 @@ async function scaleUpRunners (count) {
   console.info(`scale up ${count} runners...`)
   const createPromises = []
   for (let i = 0; i < count; i++) {
-    createPromises[i] = createRunnerHelper.createRunner()
+    createPromises[i] = createRunnerHelper.createRunner(runnerType.default)
   }
   await Promise.all(createPromises)
   console.info(chalk.green(`scale up ${count} runners succeed`))

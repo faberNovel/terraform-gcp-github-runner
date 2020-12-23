@@ -7,6 +7,7 @@ const createRunnerHelper = require('../src/create-runner-helper')
 const gitHubHelper = require('../src/github-helper')
 const getVMHelper = require('../src/get-runner-helper')
 const deleteVmHelper = require('../src/delete-runner-helper')
+const runnerType = require('../src/runner-type')
 
 chai.should()
 chai.use(chaiAsPromised)
@@ -19,7 +20,7 @@ describe('Scale helper tests', () => {
   describe('When calling scale up runners', () => {
     it('should scale up runners', async () => {
       const count = 3
-      sandbox.mock(createRunnerHelper).expects('createRunner').exactly(count).resolves()
+      sandbox.mock(createRunnerHelper).expects('createRunner').withExactArgs(runnerType.default).exactly(count).resolves()
       await scaleHelper.scaleUpRunners(count)
     })
   })
