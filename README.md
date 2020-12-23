@@ -42,7 +42,7 @@ To address a specific GCP projet:
 | github | n/a | <pre>object({<br>    organisation        = string<br>    app_id              = string<br>    app_installation_id = string<br>    client_id           = string<br>    client_secret       = string<br>    key_pem_b64         = string<br>    webhook_secret      = string<br>  })</pre> | n/a | yes |
 | google | n/a | <pre>object({<br>    project              = string<br>    region               = string<br>    zone                 = string<br>    credentials_json_b64 = string<br>    env                  = string<br>    time_zone            = string<br>  })</pre> | n/a | yes |
 | runner | n/a | <pre>object({<br>    type         = string<br>    taint_labels = bool<br>  })</pre> | n/a | yes |
-| scaling | n/a | <pre>object({<br>    max_count                              = number<br>    scale_up_non_busy_runners_target_count = number<br>    scale_down_non_busy_runners_chunk_size = number<br>    scale_down_schedule                    = string<br>  })</pre> | n/a | yes |
+| scaling | n/a | <pre>object({<br>    idle_count                             = number<br>    idle_schedule                          = string<br>    max_count                              = number<br>    scale_up_non_busy_runners_target_count = number<br>    scale_down_non_busy_runners_chunk_size = number<br>    scale_down_schedule                    = string<br>  })</pre> | n/a | yes |
 | triggers | n/a | <pre>object({<br>    healthcheck_schedule = string<br>    renew_schedule       = string<br>  })</pre> | n/a | yes |
 
 ## Outputs

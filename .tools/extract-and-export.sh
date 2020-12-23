@@ -50,6 +50,8 @@ extract_and_export ".runner.type" "$json_file_path" "RUNNER_MACHINE_TYPE"
 extract_and_export ".runner.taint_labels" "$json_file_path" "RUNNER_TAINT_LABELS"
 
 extract_and_export ".scaling.max_count" "$json_file_path" "SCALING_MAX_COUNT"
+extract_and_export ".scaling.idle_count" "$json_file_path" "SCALING_IDLE_COUNT"
+extract_and_export ".scaling.idle_schedule" "$json_file_path" "SCALING_IDLE_SCHEDULE"
 extract_and_export ".scaling.scale_up_non_busy_runners_target_count" "$json_file_path" "SCALING_UP_NON_BUSY_RUNNERS_TARGET_COUNT"
 extract_and_export ".scaling.scale_down_non_busy_runners_chunk_size" "$json_file_path" "SCALING_DOWN_NON_BUSY_RUNNERS_CHUNK_SIZE"
 
