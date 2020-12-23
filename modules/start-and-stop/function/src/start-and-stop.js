@@ -29,11 +29,11 @@ async function startAndStop (data, context) {
 
     const action = payload.action
     switch (action) {
-      case 'create_all_temp_runners':
-        await createAllTempRunners()
+      case 'create_all_runners':
+        await createAllRunners()
         break
-      case 'delete_all_temp_runners':
-        await deleteAllTempRunners()
+      case 'delete_all_runners':
+        await deleteAllRunners()
         break
       case 'healthcheck':
         await healthCheck()
@@ -74,12 +74,12 @@ async function scaleDown () {
   await scalePolicy.scaleDown()
 }
 
-async function createAllTempRunners () {
-  await scaleHelper.scaleUpAllTempRunners()
+async function createAllRunners () {
+  await scaleHelper.scaleUpAllRunners()
 }
 
-async function deleteAllTempRunners () {
-  await scaleHelper.scaleDownAllTempRunners()
+async function deleteAllRunners () {
+  await scaleHelper.scaleDownAllRunners()
 }
 
 async function healthCheck () {

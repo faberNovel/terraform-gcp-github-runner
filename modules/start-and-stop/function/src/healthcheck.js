@@ -1,6 +1,5 @@
 const gitHubHelper = require('./github-helper')
 const deleteRunnerHelper = require('./delete-runner-helper')
-const scaleHelper = require('./scale-helper')
 const createRunnerHelper = require('./create-runner-helper')
 const runnerType = require('./runner-type')
 const getRunnerHelper = require('./get-runner-helper')
@@ -43,12 +42,6 @@ async function removeUnknownGitHubRunners () {
 
 async function createGhostRunnerIfNeeded () {
   console.info('create ghost runner if needed...')
-  const targetIdleRunnerCount = scaleHelper.getTargetRunnersCount(runnerType.idle)
-  if (targetIdleRunnerCount > 0) {
-    console.info(chalk.green(`idle count ${targetIdleRunnerCount} > 0, no ghost runner needed`))
-    return
-  }
-  console.info('ghost runner needed')
   const ghostRunnerExists = await gitHubHelper.gitHubGhostRunnerExists()
   if (ghostRunnerExists) {
     console.info(chalk.green('ghost runner exist, nothing to do'))

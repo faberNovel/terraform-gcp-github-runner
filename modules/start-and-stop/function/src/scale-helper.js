@@ -5,87 +5,64 @@ const gitHubHelper = require('./github-helper')
 const chalk = require('chalk')
 const runnerType = require('./runner-type')
 
-module.exports.scaleIdleRunners = scaleIdleRunners
-module.exports.scaleUpAllTempRunners = scaleUpAllTempRunners
-module.exports.scaleDownAllTempRunners = scaleDownAllTempRunners
-module.exports.getTargetRunnersCount = getTargetRunnersCount
-module.exports.getTargetRunnerCountDelta = getTargetRunnersCountDelta
+module.exports.scaleUpAllRunners = scaleUpAllRunners
+module.exports.scaleDownAllRunners = scaleDownAllRunners
+module.exports.getRunnersMaxCount = getRunnersMaxCount
+module.exports.getRunnersDeltaToMaxCount = getRunnersDeltaToMaxCount
 module.exports.scaleUpRunners = scaleUpRunners
 module.exports.scaleDownRunners = scaleDownRunners
 
-async function scaleIdleRunners () {
-  console.info('scale idle runners...')
-  const type = runnerType.idle
-  const targetRunnerCountDelta = await getTargetRunnersCountDelta(type)
-  console.info(`${targetRunnerCountDelta} idle(s) runner(s) to change`)
+async function scaleUpAllRunners () {
+  console.info('scale up all runners...')
+  const targetRunnerCountDelta = await getRunnersDeltaToMaxCount()
   if (targetRunnerCountDelta > 0) {
-    await scaleUpRunners(type, targetRunnerCountDelta)
-  } else if (targetRunnerCountDelta < 0) {
-    await scaleDownRunners(type, Math.abs(targetRunnerCountDelta), true)
+    await scaleUpRunners(targetRunnerCountDelta)
   }
-  console.info(chalk.green('scale idle runners succeed'))
+  console.info(chalk.green('scale up all runners succeed'))
 }
 
-async function scaleUpAllTempRunners () {
-  console.info('scale up all temp runners...')
-  const type = runnerType.temp
-  const targetRunnerCountDelta = await getTargetRunnersCountDelta(type)
-  if (targetRunnerCountDelta > 0) {
-    await scaleUpRunners(type, targetRunnerCountDelta)
-  }
-  console.info(chalk.green('scale up all temp runners succeed'))
+async function scaleDownAllRunners () {
+  console.info('scale down all runners...')
+  const runnerVms = await getRunnerHelper.getRunnersVms()
+  await scaleDownRunners(runnerVms.length)
+  console.info(chalk.green('scale down all runners succeed'))
 }
 
-async function scaleDownAllTempRunners () {
-  console.info('scale down all temp runners...')
-  const type = runnerType.temp
-  const runnerVms = await getRunnerHelper.getRunnersVms(type)
-  await scaleDownRunners(type, runnerVms.length)
-  console.info(chalk.green('scale down all temp runners succeed'))
+function getRunnersMaxCount () {
+  return Number(process.env.SCALING_MAX_COUNT)
 }
 
-function getTargetRunnersCount (type) {
-  switch (type) {
-    case runnerType.idle:
-      return Number(process.env.RUNNER_IDLE_COUNT)
-    case runnerType.temp:
-      return process.env.RUNNER_TOTAL_COUNT - process.env.RUNNER_IDLE_COUNT
-    default:
-      throw new Error(`Invalid runner type ${type}`)
-  }
-}
-
-async function getTargetRunnersCountDelta (type) {
-  const runnersVms = await getRunnerHelper.getRunnersVms(type)
-  const targetRunnersCount = getTargetRunnersCount(type)
+async function getRunnersDeltaToMaxCount () {
+  const runnersVms = await getRunnerHelper.getRunnersVms()
+  const targetRunnersCount = getRunnersMaxCount()
   const targetRunnerCountDelta = targetRunnersCount - runnersVms.length
   return targetRunnerCountDelta
 }
 
-async function scaleUpRunners (type, count) {
-  console.info(`scale up ${count} runners (type:${type})...`)
+async function scaleUpRunners (count) {
+  console.info(`scale up ${count} runners...`)
   const createPromises = []
   for (let i = 0; i < count; i++) {
-    createPromises[i] = createRunnerHelper.createRunner(type)
+    createPromises[i] = createRunnerHelper.createRunner(runnerType.default)
   }
   await Promise.all(createPromises)
-  console.info(chalk.green(`scale up ${count} runners (type:${type}) succeed`))
+  console.info(chalk.green(`scale up ${count} runners succeed`))
 }
 
-async function scaleDownRunners (type, count) {
-  console.info(`scale down ${count} runners (type:${type})...`)
-  const runnersVms = await getRunnerHelper.getRunnersVms(type)
+async function scaleDownRunners (count) {
+  console.info(`scale down ${count} runners...`)
+  const runnersVms = await getRunnerHelper.getRunnersVms()
   const gcpGitHubRunners = await gitHubHelper.getGcpGitHubRunners()
-  const gcpIdleFilteredGitHubRunners = gcpGitHubRunners.filter(gitHubRunner => {
+  const gcpFilteredGitHubRunners = gcpGitHubRunners.filter(gitHubRunner => {
     return runnersVms.map(vm => vm.name).includes(gitHubRunner.name)
   })
-  const nonBusyIdleFilteredGcpGitHubRunners = gcpIdleFilteredGitHubRunners.filter(gitHubRunner => {
+  const nonBusyFilteredGcpGitHubRunners = gcpFilteredGitHubRunners.filter(gitHubRunner => {
     return gitHubRunner.busy === false
   })
-  const runnersToDelete = nonBusyIdleFilteredGcpGitHubRunners.slice(-count)
-  console.info(`${runnersToDelete.length} non busy gcp runner(s) (type:${type}) to delete`)
+  const runnersToDelete = nonBusyFilteredGcpGitHubRunners.slice(-count)
+  console.info(`${runnersToDelete.length} non busy gcp runner(s) to delete`)
   await Promise.all(runnersToDelete.map(async (gitHubRunner) => {
     await deleteRunnerHelper.deleteRunner(gitHubRunner.name)
   }))
-  console.info(chalk.green(`scale down ${count} runners (type:${type}) succeed`))
+  console.info(chalk.green(`scale down ${count} runners succeed`))
 }

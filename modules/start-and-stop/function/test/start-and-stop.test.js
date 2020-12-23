@@ -16,22 +16,22 @@ describe('start and stop tests', () => {
       return startAndStop.startAndStop(null, null).should.rejected
     })
   })
-  describe('When create all non idle runners payload', () => {
-    it('should create all non idle runners', async () => {
-      const data = makeDataFromAction('create_all_temp_runners')
+  describe('When create all runners payload', () => {
+    it('should create all runners', async () => {
+      const data = makeDataFromAction('create_all_runners')
       const scaleHelperMock = sandbox.mock(scaleHelper)
-      scaleHelperMock.expects('scaleUpAllTempRunners').resolves().once()
+      scaleHelperMock.expects('scaleUpAllRunners').resolves().once()
 
       await startAndStop.startAndStop(data, makeContext())
 
       sandbox.verifyAndRestore()
     })
   })
-  describe('When delete all non idle runners payload', () => {
-    it('should delete all non idle runners', async () => {
-      const payload = makeDataFromAction('delete_all_temp_runners')
+  describe('When delete all runners payload', () => {
+    it('should delete all runners', async () => {
+      const payload = makeDataFromAction('delete_all_runners')
       const scaleHelperMock = sandbox.mock(scaleHelper)
-      scaleHelperMock.expects('scaleDownAllTempRunners').resolves().once()
+      scaleHelperMock.expects('scaleDownAllRunners').resolves().once()
 
       await startAndStop.startAndStop(payload, makeContext())
 

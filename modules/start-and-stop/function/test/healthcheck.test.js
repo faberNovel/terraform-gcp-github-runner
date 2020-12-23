@@ -5,7 +5,6 @@ const healthcheck = require('../src/healthcheck')
 const githubHelper = require('../src/github-helper')
 const deleteRunnerHelper = require('../src/delete-runner-helper')
 const getRunnerHelper = require('../src/get-runner-helper')
-const scaleHelper = require('../src/scale-helper')
 const createRunnerHelper = require('../src/create-runner-helper')
 const runnerType = require('../src/runner-type')
 
@@ -46,9 +45,8 @@ describe('Testing healthchecks', () => {
     })
   })
 
-  describe('when create ghost runner if needed, with no ghost runner and no idle runner', () => {
+  describe('when create ghost runner if needed, with no ghost runner', () => {
     it('should create ghost runner', async () => {
-      sandbox.stub(scaleHelper, 'getTargetRunnersCount').withArgs(runnerType.idle).returns(0)
       sandbox.stub(githubHelper, 'gitHubGhostRunnerExists').resolves(false)
       const ghostVm = { name: 'ghost' }
       sandbox.mock(createRunnerHelper).expects('createRunner').once().withExactArgs(runnerType.ghost).resolves(ghostVm)
@@ -59,17 +57,7 @@ describe('Testing healthchecks', () => {
 
   describe('when create ghost runner if needed, with a ghost', () => {
     it('should not create ghost runner', async () => {
-      sandbox.stub(scaleHelper, 'getTargetRunnersCount').withArgs(runnerType.idle).returns(0)
       sandbox.stub(githubHelper, 'gitHubGhostRunnerExists').resolves(true)
-      sandbox.mock(createRunnerHelper).expects('createRunner').never()
-      sandbox.mock(deleteRunnerHelper).expects('deleteRunnerVm').never()
-      await healthcheck.createGhostRunnerIfNeeded()
-    })
-  })
-
-  describe('when create ghost runner if needed, with idle runner', () => {
-    it('should not create ghost runner', async () => {
-      sandbox.stub(scaleHelper, 'getTargetRunnersCount').withArgs(runnerType.idle).returns(1)
       sandbox.mock(createRunnerHelper).expects('createRunner').never()
       sandbox.mock(deleteRunnerHelper).expects('deleteRunnerVm').never()
       await healthcheck.createGhostRunnerIfNeeded()
