@@ -6,6 +6,8 @@ const githubHelper = require('../src/github-helper')
 const scaleHelper = require('../src/scale-helper')
 const getRunnerHelper = require('../src/get-runner-helper')
 const scalePolicySettings = require('../src/scale-policy-settings')
+const googleSettings = require('../src/google-settings')
+const moment = require('moment-timezone')
 
 chai.should()
 chai.use(chaiAsPromised)
@@ -95,12 +97,51 @@ describe('Scale policy tests', () => {
       scalePolicy.scaleDown()
     })
   })
+
+  describe('When scalling down within idle runner cron', () => {
+    it('should scale down accordingly', async () => {
+      const nonBusyRunners = 2
+      const runners = 2
+      const idleRunners = 1
+      stubExternalDependencies(
+        nonBusyRunners,
+        runners,
+        { runnersMaxCount: 2, scaleDownNonBusyRunnersChunckSize: 2, runnersIdleCount: idleRunners, idleSchedule: '* * 8-19 * * 1-5' }
+      )
+      sandbox.stub(googleSettings, 'timezone').returns('Europe/Paris')
+      const idleTime = moment.tz('2020-12-24 14:00', googleSettings.timezone())
+      sandbox.useFakeTimers(idleTime.toDate())
+      const scalHelperMock = sandbox.mock(scaleHelper)
+      scalHelperMock.expects('scaleDownRunners').withExactArgs(nonBusyRunners - idleRunners).once()
+      scalePolicy.scaleDown()
+    })
+  })
+})
+
+describe('When scalling down out of idle runner cron', () => {
+  it('should scale down accordingly', async () => {
+    const nonBusyRunners = 2
+    const runners = 2
+    stubExternalDependencies(
+      nonBusyRunners,
+      runners,
+      { runnersMaxCount: 2, scaleDownNonBusyRunnersChunckSize: 2, runnersIdleCount: 1, idleSchedule: '* * 8-19 * * 1-5' }
+    )
+    sandbox.stub(googleSettings, 'timezone').returns('Europe/Paris')
+    const idleTime = moment.tz('2020-12-24 20:00', googleSettings.timezone())
+    sandbox.useFakeTimers(idleTime.toDate())
+    const scalHelperMock = sandbox.mock(scaleHelper)
+    scalHelperMock.expects('scaleDownRunners').withExactArgs(nonBusyRunners).once()
+    scalePolicy.scaleDown()
+  })
 })
 
 function stubExternalDependencies (nonBusyRunnersCount, runnersCount, scalePolicyCustomSettings) {
   const scalePolicyDefaultSettings = {
     runnersMaxCount: 1,
-    scaleDownNonBusyRunnersChunckSize: 1
+    scaleDownNonBusyRunnersChunckSize: 1,
+    runnersIdleCount: 0,
+    idleSchedule: ''
   }
   const scalePolicyMergedSettings = { ...scalePolicyDefaultSettings, ...(scalePolicyCustomSettings || {}) }
   sandbox.stub(githubHelper, 'getNonBusyGcpGitHubRunnersCount').resolves(nonBusyRunnersCount)

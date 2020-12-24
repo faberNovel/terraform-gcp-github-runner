@@ -31,6 +31,7 @@ resource "google_cloudfunctions_function" "start_and_stop" {
     "GOOGLE_ZONE"                              = var.google.zone
     "GOOGLE_ENV"                               = var.google.env
     "GOOGLE_PROJECT"                           = var.google.project
+    "GOOGLE_TIMEZONE"                          = var.google.time_zone
     "RUNNER_TAINT_LABELS"                      = var.runner.taint_labels
     "RUNNER_MACHINE_TYPE"                      = var.runner.type
     "RUNNER_SERVICE_ACCOUNT"                   = google_service_account.runner.email
