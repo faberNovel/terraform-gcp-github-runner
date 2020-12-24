@@ -106,7 +106,7 @@ describe('Scale policy tests', () => {
       stubExternalDependencies(
         nonBusyRunners,
         runners,
-        { runnersMaxCount: 2, scaleDownNonBusyRunnersChunckSize: 2, runnersIdleCount: idleRunners, idleSchedule: '* * 8-19 * * 1-5' }
+        { runnersMaxCount: 2, scaleDownNonBusyRunnersChunckSize: 2, runnersIdleCount: idleRunners, idleSchedule: '* * 8-18 * * 1-5' }
       )
       sandbox.stub(googleSettings, 'timezone').returns('Europe/Paris')
       const idleTime = moment.tz('2020-12-24 14:00', googleSettings.timezone())
@@ -116,23 +116,23 @@ describe('Scale policy tests', () => {
       scalePolicy.scaleDown()
     })
   })
-})
 
-describe('When scalling down out of idle runner cron', () => {
-  it('should scale down accordingly', async () => {
-    const nonBusyRunners = 2
-    const runners = 2
-    stubExternalDependencies(
-      nonBusyRunners,
-      runners,
-      { runnersMaxCount: 2, scaleDownNonBusyRunnersChunckSize: 2, runnersIdleCount: 1, idleSchedule: '* * 8-19 * * 1-5' }
-    )
-    sandbox.stub(googleSettings, 'timezone').returns('Europe/Paris')
-    const idleTime = moment.tz('2020-12-24 20:00', googleSettings.timezone())
-    sandbox.useFakeTimers(idleTime.toDate())
-    const scalHelperMock = sandbox.mock(scaleHelper)
-    scalHelperMock.expects('scaleDownRunners').withExactArgs(nonBusyRunners).once()
-    scalePolicy.scaleDown()
+  describe('When scalling down out of idle runner cron', () => {
+    it('should scale down accordingly', async () => {
+      const nonBusyRunners = 2
+      const runners = 2
+      stubExternalDependencies(
+        nonBusyRunners,
+        runners,
+        { runnersMaxCount: 2, scaleDownNonBusyRunnersChunckSize: 2, runnersIdleCount: 1, idleSchedule: '* * 8-18 * * 1-5' }
+      )
+      sandbox.stub(googleSettings, 'timezone').returns('Europe/Paris')
+      const idleTime = moment.tz('2020-12-24 20:00', googleSettings.timezone())
+      sandbox.useFakeTimers(idleTime.toDate())
+      const scalHelperMock = sandbox.mock(scaleHelper)
+      scalHelperMock.expects('scaleDownRunners').withExactArgs(nonBusyRunners).once()
+      scalePolicy.scaleDown()
+    })
   })
 })
 
@@ -155,4 +155,6 @@ function stubExternalDependencies (nonBusyRunnersCount, runnersCount, scalePolic
   sandbox.stub(getRunnerHelper, 'getRunnersVms').resolves(runners)
   sandbox.stub(scalePolicySettings, 'runnersMaxCount').returns(scalePolicyMergedSettings.runnersMaxCount)
   sandbox.stub(scalePolicySettings, 'scaleDownNonBusyRunnersChunckSize').returns(scalePolicyMergedSettings.scaleDownNonBusyRunnersChunckSize)
+  sandbox.stub(scalePolicySettings, 'runnersIdleCount').returns(scalePolicyMergedSettings.runnersIdleCount)
+  sandbox.stub(scalePolicySettings, 'idleSchedule').returns(scalePolicyMergedSettings.idleSchedule)
 }
