@@ -1,6 +1,7 @@
 const Compute = require('@google-cloud/compute')
 const compute = new Compute()
-const zone = compute.zone(process.env.GOOGLE_ZONE)
+const zone = compute.zone(require('./google-settings').zone())
+const env = require('./google-settings').env()
 
 module.exports.getRunnersVms = getRunnersVms
 module.exports.getAllRunnersVms = getAllRunnersVms
@@ -8,7 +9,7 @@ module.exports.getRunnerVmByName = getRunnerVmByName
 module.exports.getAgedRunnersVms = getAgedRunnersVms
 
 async function getRunnersVms () {
-  const filter = `labels.env=${process.env.GOOGLE_ENV}`
+  const filter = `labels.env=${env}`
   const options = {
     filter: filter
   }
@@ -21,7 +22,7 @@ async function getRunnerVmByName (vmName) {
 }
 
 async function getAllRunnersVms () {
-  const filter = `labels.env=${process.env.GOOGLE_ENV}`
+  const filter = `labels.env=${env}`
   const options = {
     filter: filter
   }
