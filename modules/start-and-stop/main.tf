@@ -82,7 +82,7 @@ resource "google_cloud_scheduler_job" "renew_runners" {
 
 resource "google_cloud_scheduler_job" "scale_down" {
   name      = "scale_down"
-  schedule  = var.scaling.scale_down_schedule
+  schedule  = var.scaling.down_schedule
   time_zone = var.google.time_zone
 
   pubsub_target {
