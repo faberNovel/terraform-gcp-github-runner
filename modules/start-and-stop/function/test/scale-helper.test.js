@@ -57,7 +57,7 @@ describe('Scale helper tests', () => {
 
 async function getRunnersDeltaToMaxCountWrapped (givenRunnersCount, runnersMaxCount, getRunnersDeltaToMaxCount) {
   sandbox.stub(getVMHelper, 'getRunnersVms').resolves(new Array(givenRunnersCount))
-  sandbox.stub(scalePolicySettings, 'runnersMaxCount').returns(runnersMaxCount)
+  sandbox.stub(scalePolicySettings, 'upMax').returns(runnersMaxCount)
   const delta = await getRunnersDeltaToMaxCount(true)
   return delta
 }

@@ -30,7 +30,7 @@ async function scaleDownAllRunners () {
 
 async function getRunnersDeltaToMaxCount () {
   const runnersVms = await getRunnerHelper.getRunnersVms()
-  const targetRunnersCount = scalePolicySettings.runnersMaxCount()
+  const targetRunnersCount = scalePolicySettings.upMax()
   const targetRunnerCountDelta = targetRunnersCount - runnersVms.length
   return targetRunnerCountDelta
 }

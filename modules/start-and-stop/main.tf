@@ -28,20 +28,20 @@ resource "google_cloudfunctions_function" "start_and_stop" {
   max_instances         = 1
 
   environment_variables = {
-    "GOOGLE_ZONE"                              = var.google.zone
-    "GOOGLE_ENV"                               = var.google.env
-    "GOOGLE_PROJECT"                           = var.google.project
-    "GOOGLE_TIMEZONE"                          = var.google.time_zone
-    "RUNNER_TAINT_LABELS"                      = var.runner.taint_labels
-    "RUNNER_MACHINE_TYPE"                      = var.runner.type
-    "RUNNER_SERVICE_ACCOUNT"                   = google_service_account.runner.email
-    "SCALING_MAX_COUNT"                        = var.scaling.max_count
-    "SCALING_IDLE_COUNT"                       = var.scaling.idle_count
-    "SCALING_IDLE_SCHEDULE"                    = var.idle_schedule
-    "SCALING_UP_NON_BUSY_RUNNERS_TARGET_COUNT" = var.scaling.scale_up_non_busy_runners_target_count
-    "SCALING_DOWN_NON_BUSY_RUNNERS_CHUNK_SIZE" = var.scaling.scale_down_non_busy_runners_chunk_size
-    "GITHUB_API_TRIGGER_URL"                   = var.github_api_trigger_url
-    "GITHUB_ORG"                               = var.github_org
+    "GOOGLE_ZONE"            = var.google.zone
+    "GOOGLE_ENV"             = var.google.env
+    "GOOGLE_PROJECT"         = var.google.project
+    "GOOGLE_TIMEZONE"        = var.google.time_zone
+    "RUNNER_TAINT_LABELS"    = var.runner.taint_labels
+    "RUNNER_MACHINE_TYPE"    = var.runner.type
+    "RUNNER_SERVICE_ACCOUNT" = google_service_account.runner.email
+    "SCALING_IDLE_COUNT"     = var.scaling.idle_count
+    "SCALING_IDLE_SCHEDULE"  = var.scaling.idle_schedule
+    "SCALING_UP_RATE"        = var.scaling.up_rate
+    "SCALING_UP_MAX"         = var.scaling.up_max
+    "SCALING_DOWN_RATE"      = var.scaling.down_rate
+    "GITHUB_API_TRIGGER_URL" = var.github_api_trigger_url
+    "GITHUB_ORG"             = var.github_org
   }
 
   event_trigger {
