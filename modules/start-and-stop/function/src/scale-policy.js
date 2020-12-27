@@ -35,15 +35,17 @@ async function scaleDown () {
   const nonBusyRunnersCount = await gitHubHelper.getNonBusyGcpGitHubRunnersCount()
   if (nonBusyRunnersCount > 0) {
     console.log(`non busy runners ${nonBusyRunnersCount} > 0, evaluate scale down possibility`)
-    var runnersCount
+    var availableRunnersForScaleDown
     if (scalePolicySettings.idleCount() > 0 && isDateInIdlePeriod(moment())) {
-      runnersCount = Math.max(0, nonBusyRunnersCount - scalePolicySettings.idleCount())
+      availableRunnersForScaleDown = Math.max(0, nonBusyRunnersCount - scalePolicySettings.idleCount())
+      console.log(`in idling range, trying to keep ${scalePolicySettings.idleCount()} idle runner(s)`)
     } else {
-      runnersCount = nonBusyRunnersCount
+      availableRunnersForScaleDown = nonBusyRunnersCount
+      console.log('outside idling range')
     }
     const scaleDownRate = scalePolicySettings.downRate()
-    console.log(`scale down rate = ${scaleDownRate}, available runners for scale down = ${runnersCount}`)
-    const scaleDownCount = Math.min(runnersCount, scaleDownRate)
+    console.log(`scale down rate = ${scaleDownRate}, available runners for scale down = ${availableRunnersForScaleDown}`)
+    const scaleDownCount = Math.min(availableRunnersForScaleDown, scaleDownRate)
     await scaleHelper.scaleDownRunners(scaleDownCount)
   } else {
     console.log(`non busy runners count (${nonBusyRunnersCount}) is 0, nothing to do`)
