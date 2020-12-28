@@ -7,10 +7,12 @@ variable "runner" {
 
 variable "scaling" {
   type = object({
-    max_count                              = number
-    scale_up_non_busy_runners_target_count = number
-    scale_down_non_busy_runners_chunk_size = number
-    scale_down_schedule                    = string
+    idle_count    = number
+    idle_schedule = string
+    up_rate       = number
+    up_max        = number
+    down_rate     = number
+    down_schedule = string
   })
 }
 

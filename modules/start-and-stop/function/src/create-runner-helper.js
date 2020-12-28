@@ -3,11 +3,14 @@ const Fs = require('fs')
 const { v4: uuidv4 } = require('uuid')
 const chalk = require('chalk')
 const compute = new Compute()
-const zone = compute.zone(process.env.GOOGLE_ZONE)
+const zone = compute.zone(require('./google-settings').zone())
 const githubHelper = require('./github-helper.js')
 const pWaitFor = require('p-wait-for')
 const utils = require('./utils')
 const runnerType = require('./runner-type')
+const googleSettings = require('./google-settings')
+const env = googleSettings.env()
+const project = googleSettings.project()
 
 module.exports.createRunner = createRunner
 module.exports.getRunnerNamePrefix = getRunnerNamePrefix
@@ -24,9 +27,9 @@ async function createRunner (type) {
 function getRunnerNamePrefix (type) {
   switch (type) {
     case runnerType.default:
-      return `vm-gcp-${process.env.GOOGLE_ENV}`
+      return `vm-gcp-${env}`
     case runnerType.ghost:
-      return `vm-gcp-ghost-${process.env.GOOGLE_ENV}`
+      return `vm-gcp-ghost-${env}`
     default:
       throw new Error(`Invalid runner type ${type}`)
   }
@@ -37,7 +40,7 @@ function createRunnerName (type) {
 }
 
 async function createRunnerVm (runnerName, type) {
-  const createVmPromise = zone.createVM(runnerName, createVmConfig(type, process.env.GOOGLE_ENV))
+  const createVmPromise = zone.createVM(runnerName, createVmConfig(type, env))
   utils.logPromise(createVmPromise, `create runner ${runnerName} VM (type:${type})`)
   const [vm] = await createVmPromise
 
@@ -82,7 +85,7 @@ function createVmConfig (type, env) {
         boot: true,
         autoDelete: true,
         initializeParams: {
-          sourceImage: `https://www.googleapis.com/compute/v1/projects/${process.env.GOOGLE_PROJECT}/global/images/debian-runner`
+          sourceImage: `https://www.googleapis.com/compute/v1/projects/${project}/global/images/debian-runner`
         }
       }
     ],
