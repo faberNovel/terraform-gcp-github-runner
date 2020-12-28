@@ -27,17 +27,27 @@ describe('Scale helper tests', () => {
   })
 
   describe('When calling scale down runners', () => {
-    const scaleDownRunners = scaleHelper.__get__('scaleDownRunners')
-
     it('should scale down runners according github status', async () => {
       const count = 10
       const busyCount = 6
       const vms = makeFakeVMs(count)
       stubExternalDependencies(vms, busyCount)
 
-      await scaleDownRunners(count)
+      await scaleHelper.scaleDownRunners(count)
 
       countFakeVmsDeleted(vms).should.equals(count - busyCount)
+    })
+  })
+
+  describe('When calling scale down runners with 0', () => {
+    it('should not scale down any runner', async () => {
+      const count = 0
+      const vms = makeFakeVMs(2)
+      stubExternalDependencies(vms, 0)
+
+      await scaleHelper.scaleDownRunners(count)
+
+      countFakeVmsDeleted(vms).should.equals(0)
     })
   })
 

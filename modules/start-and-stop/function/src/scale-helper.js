@@ -47,6 +47,10 @@ async function scaleUpRunners (count) {
 
 async function scaleDownRunners (count) {
   console.info(`scale down ${count} runners...`)
+  if (count === 0) {
+    console.info(chalk.green(`scale down ${count}, nothing to do`))
+    return
+  }
   const runnersVms = await getRunnerHelper.getRunnersVms()
   const gcpGitHubRunners = await gitHubHelper.getGcpGitHubRunners()
   const gcpFilteredGitHubRunners = gcpGitHubRunners.filter(gitHubRunner => {
