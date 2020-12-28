@@ -47,6 +47,6 @@ sudo apt-get install -y 'stackdriver-agent=6.*'
 ## Runner
 cd /home/$RUNNER_USER
 sudo -u $RUNNER_USER mkdir actions-runner && cd "$_"
-sudo -u $RUNNER_USER curl -O -L https://github.com/actions/runner/releases/download/v2.274.2/actions-runner-linux-x64-2.274.2.tar.gz
-sudo -u $RUNNER_USER tar xzf ./actions-runner-linux-x64-2.274.2.tar.gz
+sudo -u $RUNNER_USER curl -O -L https://github.com/actions/runner/releases/download/v2.275.1/actions-runner-linux-x64-2.275.1.tar.gz
+sudo -u $RUNNER_USER tar xzf ./actions-runner-linux-x64-2.275.1.tar.gz
 exit 0
