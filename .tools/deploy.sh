@@ -49,9 +49,9 @@ terraform_deploy () {
   echo "Deploying infra using terraform done"
 }
 
+# Default scripts params
 skip_packer_deploy=false
 skip_terraform_deploy=false
-
 # Parsing script params
 while true; do
   case "$1" in
