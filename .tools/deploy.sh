@@ -47,7 +47,12 @@ terraform_deploy () {
   # Deploy terraform
   echo "Deploying infra using terraform..."
   terraform init -backend-config="$backend_config_file_path"
-  terraform apply -var-file="$google_env_file_path" -var-file="$github_env_file_path"
+  terraform_apply_cmd="terraform apply -var-file=$google_env_file_path -var-file=$github_env_file_path"
+  if [ "$auto_approve" = true ]; then
+    terraform_apply_cmd="$terraform_apply_cmd -auto-approve"
+  fi
+  eval "$terraform_apply_cmd"
+  
   echo "Deploying infra using terraform done"
 }
 
