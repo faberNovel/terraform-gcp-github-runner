@@ -67,28 +67,28 @@ while true; do
 done
 
 if [ "$dev" = true ]; then
-    google_env_file="google-dev.tfvars.json"
-    github_env_file="github-dev.tfvars.json"
-    backend_config_file="backend-dev.tfvars.json"
+  google_env_file="google-dev.tfvars.json"
+  github_env_file="github-dev.tfvars.json"
+  backend_config_file="backend-dev.tfvars.json"
 fi
 
 if [ "$prod" = true ]; then
-    google_env_file="google-prod.tfvars.json"
-    github_env_file="github-prod.tfvars.json"
-    backend_config_file="backend-prod.tfvars.json"
+  google_env_file="google-prod.tfvars.json"
+  github_env_file="github-prod.tfvars.json"
+  backend_config_file="backend-prod.tfvars.json"
 fi
 
 # Checking script params
 if [ -z "$google_env_file" ]; then
-    usage
+  usage
 fi
 
 if [ -z "$github_env_file" ]; then
-    usage
+  usage
 fi
 
 if [ -z "$backend_config_file" ]; then
-    usage
+  usage
 fi
 
 google_env_file_path=$(realpath "$google_env_file")
