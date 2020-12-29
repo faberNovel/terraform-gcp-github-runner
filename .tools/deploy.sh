@@ -5,9 +5,33 @@ set -e
 # Printing script usage
 program_name=$0
 usage () {
-  echo "usage: $program_name { dev | prod | --google-env-file google-env-file.json --github-env-file github-env-file.json --backend-config-file backend.json }"
+  echo "usage: $program_name { dev | prod | --google-env-file google-env-file.json --github-env-file github-env-file.json --backend-config-file backend.json } [ --skip-packer-deploy ]"
   exit 1
 }
+
+packer_deploy () {
+  # Deploy packer image
+  echo "Deploying runner image using packer..."
+  cd image
+  base_packer_cmd="bash packer.sh --env-file $google_env_file_path --packer-action"
+  packer_cmd_build="$base_packer_cmd 'build'"
+  set +e
+  eval "$packer_cmd_build"
+  packer_cmd_exit_code=$?
+  set -e
+  if [ $packer_cmd_exit_code -ne 0 ]; then
+    echo "Packer build failed, maybe the image already exists, check logs for more info"
+    read -r -p "Would you like to force deploy the image? (y/n):" input
+    if [ "$input" = "y" ]; then
+      packer_cmd_build_force="$base_packer_cmd 'build -force'"
+      eval "$packer_cmd_build_force"
+    fi
+  fi
+  echo "Deploying runner image using packer done"
+  cd "$project_root_path"
+}
+
+skip_packer_deploy=false
 
 # Parsing script params
 while true; do
@@ -17,6 +41,7 @@ while true; do
     --backend-config-file ) backend_config_file="$2"; shift 2 ;;
     dev ) dev=true; shift 1 ;;
     prod ) prod=true; shift 1;;
+    --skip-packer-deploy ) skip_packer_deploy=true; shift 1;;
     * ) break ;;
   esac
 done
@@ -54,25 +79,11 @@ project_root_path=$(realpath "$(dirname "$0")/..")
 # cd project root directory
 cd "$project_root_path"
 
-# Deploy packer image
-echo "Deploying runner image using packer..."
-cd image
-base_packer_cmd="bash packer.sh --env-file $google_env_file_path --packer-action"
-packer_cmd_build="$base_packer_cmd 'build'"
-set +e
-eval "$packer_cmd_build"
-packer_cmd_exit_code=$?
-set -e
-if [ $packer_cmd_exit_code -ne 0 ]; then
-  echo "Packer build failed, maybe the image already exists, check logs for more info"
-  read -r -p "Would you like to force deploy the image? (y/n):" input
-  if [ "$input" = "y" ]; then
-    packer_cmd_build_force="$base_packer_cmd 'build -force'"
-    eval "$packer_cmd_build_force"
-  fi
+if [ "$skip_packer_deploy" = true ]; then
+  echo "Skipping packer deploy"
+else
+  packer_deploy
 fi
-echo "Deploying runner image using packer done"
-cd "$project_root_path"
 
 # Compile TS
 declare -a js_src_folders=("modules/start-and-stop/function" "modules/github-api/src" "modules/github-hook/function")
