@@ -79,7 +79,7 @@ function createVmConfig (type, env) {
   const stopScript = Fs.readFileSync('runner-scripts/stop-script.sh', 'utf8')
   const config = {
     machineType: process.env.RUNNER_MACHINE_TYPE,
-    http: true,
+    https: true,
     disks: [
       {
         boot: true,
