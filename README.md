@@ -1,50 +1,52 @@
+# Terraform / Packer project for scalable self hosted GitHub action runners on GCP 
 This Terraform projet is made to deploy GitHub self hosted runner VMs on GCP.
 The self hosted runner are setup at the GitHub organisation level.
 
-## Dependencies
-* terraform, tfenv
-* bash or compatible
-* node12
-
-### Google Cloud Plateform
+## Setup
+TODO
+### GitHub Setup
+TODO : refactor and add srceens
+* Create a GitHub app.
+* Grant organisation / self-hosted runners / R/W permissions.
+* Generate a private key, pass it in `b64` in terraform variable `secrets.github_key_pem_b64`.
+* Pass the app installation id in terraform as `github.app_installation_id` and the app id as `github.app_id`.
+### Google Cloud Plateform Setup
+TODO : refactor and add screens
 To address a specific GCP projet:
 * Create a GCP project and pass it to the terraform variable `google_project`.
 * Setup an [account service key](https://cloud.google.com/iam/docs/creating-managing-service-account-keys), with owner role.
 * Create a `json` key for this account.
 * Pass this key encoded in `b64` in terraform variable `secrets.google_credentials_json_b64`.
 
-### GitHub
-* Create a GitHub app.
-* Grant organisation / self-hosted runners / R/W permissions.
-* Generate a private key, pass it in `b64` in terraform variable `secrets.github_key_pem_b64`.
-* Pass the app installation id in terraform as `github.app_installation_id` and the app id as `github.app_id`.
+## Usage
+TODO
 
-## Setup
-TODO
-### GitHub Setup
-TODO
-### Google Cloud Plateform Setup
+## Releases
 TODO
 
 ## Architecture
+TODO
+### How it works
+TODO
+### Component scheme
 ![Architecture](docs/components-scheme.svg)
 
-## Scaling
+### Scaling
 TODO
-### Scale Up
+#### Scale Up
 TODO
-### Scale Down
+#### Scale Down
 TODO
-### Idle Runner
+#### Idle Runner
 TODO
 
-## System health
+### System health
 TODO
-### Monitoring
+#### Monitoring
 TODO
-### Health checks
+#### Health checks
 TODO
-### Runner renewal
+#### Runner renewal
 TODO
 
 <!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
@@ -77,3 +79,12 @@ TODO
 | github\_webhook\_url | n/a |
 
 <!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
+
+## Contributing
+TODO
+
+## Similar projets
+TODO
+
+## License
+TODO
