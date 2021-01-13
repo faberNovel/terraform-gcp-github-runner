@@ -1,6 +1,9 @@
-# Terraform / Packer project for scalable self hosted GitHub action runners on GCP 
-This Terraform projet is made to deploy GitHub self hosted runner VMs on GCP.
-The self hosted runner are setup at the GitHub organisation level.
+# Terraform / Packer project for scalable self hosted GitHub action runners on GCP 🚀
+This project leverages [Terraform](https://www.terraform.io/) and [Packer](https://www.packer.io/) to deploy and maintain scalable [self hosted GitHub actions runners](https://docs.github.com/en/free-pro-team@latest/actions/hosting-your-own-runners/about-self-hosted-runners) infrastructure on GCP for a GitHub organization.
+* Auto scaling of runners, supporting simple and powerful [scaling policy configuration](#inputs) 🧰
+* Fast scaling up thanks to prebuild image via Packer 🚄
+* Support Docker out of the box 🏗️
+* [Cost efficient](#cost) versus [Linux GitHub Runner](https://docs.github.com/en/free-pro-team@latest/github/setting-up-and-managing-billing-and-payments-on-github/about-billing-for-github-actions#about-billing-for-github-actions) 💰
 
 ## Setup
 TODO
@@ -47,6 +50,9 @@ TODO
 #### Health checks
 TODO
 #### Runner renewal
+TODO
+
+## Cost
 TODO
 
 <!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
