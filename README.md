@@ -6,13 +6,25 @@ This project leverages [Terraform](https://www.terraform.io/) and [Packer](https
 * [Cost efficient](#cost) versus [Linux GitHub Runner](https://docs.github.com/en/free-pro-team@latest/github/setting-up-and-managing-billing-and-payments-on-github/about-billing-for-github-actions#about-billing-for-github-actions) 💰
 
 ## Setup
-TODO
+To setup the infrastucture, manual steps which can not be done through Terraform must be done:
+1. A GitHub App with proper setup needs to be created and installed in the GitHub organization where self hosted runners will be available. [GitHub setup section](#github-setup) explains how to setup this GitHub App.
+2. An empty GCP project which will host the self hosted runners and scaling logic must be created. [GCP setup section](#google-cloud-plateform-setup) explains how to setup this GCP project.
+3. Update GitHup App with GCP project information computed during GCP deployement. 
+
 ### GitHub Setup
-TODO : refactor and add srceens
-* Create a GitHub app.
-* Grant organisation / self-hosted runners / R/W permissions.
-* Generate a private key, pass it in `b64` in terraform variable `secrets.github_key_pem_b64`.
-* Pass the app installation id in terraform as `github.app_installation_id` and the app id as `github.app_id`.
+This section explains how to setup the GitHub App in the GitHub organization where we want to use self hosted runners. The GitHub App will allow GCP to communicate with the GitHub organization in order to create / delete runners and scaling up / down when needed. Check for [components scheme](#component-scheme) for more information. To be able to properly setup the GitHup App in the GitHub organization, you need to be an admin of this GitHub organization.
+* Create a [GitHub App](https://github.com/settings/apps/new):
+  * In `Webhook`, uncheck `Active` for now.
+  * In `Repository permissions` grant `Read-only` permission to `Checks` and `Metadata` (needed to forward scale up event from GitHub towards GCP)
+  * In `Organization permissions`, grant `Read & write` to `Self-hosted runners`
+  * In `Subscribe to events`, check `Check run`
+  * Check `Any account` for `Where can this GitHub App be installed?`
+* From the GitHub App (`https://github.com/settings/apps/{your-app-name}`):
+  * Create and store a `client secret` 
+  * Create and store a `private key`
+  * Store the `app id` and the `client id`
+  * Install the GitHub App in your GitHub Organization using `https://github.com/settings/apps/{your-app-name}/installations`. You will then land on the installed GitHub App web page (the url should look like `https://github.com/settings/installations/{installation_id}`). Store the `installation_id`.
+
 ### Google Cloud Plateform Setup
 TODO : refactor and add screens
 To address a specific GCP projet:
