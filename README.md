@@ -92,11 +92,21 @@ You are all set!
 ## Usage
 TODO
 
+### Deploy
+TODO
+
+### Destroy
+TODO
+
 ## Releases
 TODO
 
 ## Architecture
 TODO
+
+### Project layout
+TODO
+
 ### How it works
 TODO
 ### Component scheme
