@@ -7,8 +7,8 @@ This project leverages [Terraform](https://www.terraform.io/) and [Packer](https
 
 ## Setup
 To setup the infrastucture, manual steps which can not be done through Terraform must be done:
-1. A GitHub App with proper setup needs to be created and installed in the GitHub organization where self hosted runners will be available. [GitHub setup section](#github-setup) explains how to setup this GitHub App
-2. An empty GCP project which will host the self hosted runners and scaling logic must be created. [GCP setup section](#google-cloud-plateform-setup) explains how to setup this GCP project
+1. Setup a GitHub App which will be installed in the GitHub organization where self hosted runners will be available. [GitHub setup section](#1-github-setup) explains how to setup this GitHub App
+2. Setup a GCP project which will host the self hosted runners and scaling logic must be created. [GCP setup section](#2-google-cloud-plateform-setup) explains how to setup this GCP project
 3. Deploy the infrastructure on GCP using Terraform using Packer and Terraform
 4. Update GitHup App Webhook setting with GCP project information computed during GCP deployement
 
@@ -33,7 +33,7 @@ To address a specific GCP projet:
 * Download the json key file associated with the service account. You will set it as terraform `variable google.credentials_json_b64`
 * Enable [Compute Engine API](https://console.developers.google.com/apis/api/compute.googleapis.com) on the project
 * Enable [Identity and Access Management (IAM) API](https://console.developers.google.com/apis/library/iam.googleapis.com) on the project
-* Create an App Engine Application at https://console.cloud.google.com/appengine/start?project={your-gcp-project} with the corresponding zone you want to use in your GCP project
+* Create an App Engine Application at `https://console.cloud.google.com/appengine/start?project={your-gcp-project}` with the corresponding zone you want to use in your GCP project
 
 ### 3-Deploy the infrastructure on GCP using Terraform/Packer
 From now you have everything to deploy the infrastructure on GCP using Terraform and Packer.
@@ -41,9 +41,9 @@ For Terraform, you can refer to [inputs](#inputs) to set project [input variable
 For Packer, you can refer to [Packer json config](https://www.packer.io/docs/from-1.5/syntax-json) located at [runner.json](image/runner.json)
 
 Nevertheless, deploying the infrastructure can be a tedious task, as two tools are involved (Terraform and Packer) and they share a lot parameters.
-To ease deploying a set a scripts is available in [tools folder](.tools). From here, `deploy.sh` and `destroy.sh` do as they are named, deploying and destroying the whole GCP infrastructure easely. To use these two scripts you need to store your Terraform varaibles in files with a specific layout. The scripts will load these variables and use them in Terrafrom and Packer. The layout to use is:
+To ease deploying a set a scripts is available in [tools folder](.tools). From here, `deploy.sh` and `destroy.sh` do as they are named, deploying and destroying the whole GCP infrastructure easely. To use these two scripts you need to store your Terraform variables in files with a specific layout. The scripts will load these variables and use them in Terrafrom and Packer. The layout to use is:
 * A `google` tfvars file containing GCP related Terraform variables:
-```
+```HCL
 {
   "google": {
     "region" : "a-gcp-region",
@@ -62,17 +62,19 @@ To ease deploying a set a scripts is available in [tools folder](.tools). From h
 }
 ```
 * A `github` tfvars file containing GitHub related Terrafrom variables:
-```
+```HCL
 {
   "github": {
     "organisation" : "a-github-organization"
     ...
 }
 ```
-* A `terraform backend` tfvars file, passed to Terraform via `[-backend-config option](https://www.terraform.io/docs/cli/commands/init.html#backend-initialization)
+* A `terraform backend` tfvars file, passed to Terraform via [`-backend-config` option](https://www.terraform.io/docs/cli/commands/init.html#backend-initialization)
 
 From now, you can use `deploy.sh`:
-`deploy.sh --google-env-file google-env-file.json --github-env-file github-env-file.json --backend-config-file backend.json`
+```shell
+deploy.sh --google-env-file google-env-file.json --github-env-file github-env-file.json --backend-config-file backend.json
+```
 Other options are available, just run the scripts without params to print the documentation.
 
 After deployement, Terraform will print the `github_webhook_url` needed for [part 4 of the setup](#4-post-deployement-steps)
@@ -80,10 +82,10 @@ After deployement, Terraform will print the `github_webhook_url` needed for [par
 ### 4-Post deployement steps
 * Enable the GitHub webhook, from the GitHub App (`https://github.com/settings/apps/{your-app}`):
   * In `Webhook`, check `Active`, and set `Webhook URL` to `github_webhook_url` from [part 3 of the setup](#3-Deploy-the-infrastructure-on-GCP-using-Terraform/Packer)
-  * Go to https://github.com/settings/apps/{your-app}/permissions, in `Subscribe to events`, check `Check run`
+  * Go to `https://github.com/settings/apps/{your-app}/permissions`, in `Subscribe to events`, check `Check run`
 * Enable ghost runner (see [architecture](#architecture) for more info about ghost runner):
-  * From https://console.cloud.google.com/cloudscheduler?project={your-gcp-project}, execute `healthcheck`
-  * Wait the ghost runner to appears `offline` in https://github.com/organizations/{your-org}/settings/actions
+  * From `https://console.cloud.google.com/cloudscheduler?project={your-gcp-project}`, execute `healthcheck`
+  * Wait the ghost runner to appears `offline` in `https://github.com/organizations/{your-org}/settings/actions`
 
 You are all set!
 
