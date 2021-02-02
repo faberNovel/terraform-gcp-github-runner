@@ -20,11 +20,11 @@ variable "scaling" {
   })
   description = <<EOT
   `idle_count`: The number of runners to keep [idle](#idle-runner).<br>
-  `idle_schedule`: A cron describing the [idling period](#idle-runner) of runners.<br>
+  `idle_schedule`: A cron describing the [idling period](#idle-runner) of runners. [Syntax](#cron-syntax).<br>
   `up_rate`: The number of runners to create when [scaling up](#scale-up).<br>
   `up_max`: The maximum number of runners.<br>
   `down_rate`: The number of inative runners to delete when [scaling down](#scale-down).<br>
-  `down_schedule`: A cron to trigger regularly [scaling down](#scale-down).
+  `down_schedule`: A cron to trigger regularly [scaling down](#scale-down). [Syntax](#cron-syntax).
   EOT
 }
 
@@ -34,8 +34,8 @@ variable "triggers" {
     renew_schedule       = string
   })
   description = <<EOT
-  `healthcheck_schedule`: A cron to trigger [health checks](#health-checks).<br>
-  `renew_schedule`: A cron to trigger [runners renewal](#runner-renewal).<br>
+  `healthcheck_schedule`: A cron to trigger [health checks](#health-checks). [Syntax](#cron-syntax).<br>
+  `renew_schedule`: A cron to trigger [runners renewal](#runner-renewal). [Syntax](#cron-syntax).<br>
   EOT
 }
 
