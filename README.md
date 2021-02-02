@@ -5,12 +5,32 @@ This project leverages [Terraform](https://www.terraform.io/) and [Packer](https
 * Support Docker out of the box 🏗️
 * [Cost efficient](#cost) versus [Linux GitHub Runner](https://docs.github.com/en/free-pro-team@latest/github/setting-up-and-managing-billing-and-payments-on-github/about-billing-for-github-actions#about-billing-for-github-actions) 💰
 
+## Table of contents
+- [Setup](#setup)
+  - [1-GitHub Setup](#1-github-setup)
+  - [2-Google Cloud Platform Setup](#2-google-cloud-platform-setup)
+  - [3-Deploy the infrastructure on GCP using Terraform/Packer](#3-deploy-the-infrastructure-on-gcp-using-terraformpacker)
+  - [4-Post deployement steps](#4-post-deployement-steps)
+- [Usage](#usage)
+  - [Deploy](#deploy)
+  - [Destroy](#destroy)
+- [Releases](#releases)
+- [Architecture](#architecture)
+- [Cost](#cost)
+- [Requirements](#requirements)
+- [Providers](#providers)
+- [Inputs](#inputs)
+- [Outputs](#outputs)
+- [Contributing](#contributing)
+- [Similar projects](#similar-projects)
+- [License](#license)
+
 ## Setup
-To setup the infrastucture, manual steps which can not be done through Terraform must be done:
+To setup the infrastucture, here are the manual steps which can not be done through Terraform:
 1. Setup a GitHub App which will be installed in the GitHub organization where self hosted runners will be available. [GitHub setup section](#1-github-setup) explains how to setup this GitHub App
-2. Setup a GCP project which will host the self hosted runners and scaling logic must be created. [GCP setup section](#2-google-cloud-plateform-setup) explains how to setup this GCP project
+2. Setup a GCP project which will host the self hosted runners and scaling logic must be created. [GCP setup section](#2-google-cloud-platform-setup) explains how to setup this GCP project
 3. Deploy the infrastructure on GCP using Terraform using Packer and Terraform
-4. Update GitHup App Webhook setting with GCP project information computed during GCP deployement
+4. Update GitHup App Webhook setting with GCP project information computed during GCP deployment
 
 ### 1-GitHub Setup
 This section explains how to setup the GitHub App in the GitHub organization where we want to use self hosted runners. The GitHub App will allow GCP to communicate with the GitHub organization in order to create / delete runners and scaling up / down when needed. Check for [components scheme](#component-scheme) for more information. To be able to properly setup the GitHup App in the GitHub organization, you need to be an admin of this GitHub organization.
@@ -26,7 +46,7 @@ This section explains how to setup the GitHub App in the GitHub organization whe
   * Generate, set and store the `Webhook secret`. It will needed for part 4 of the setup.
   * Install the GitHub App in your GitHub Organization using `https://github.com/settings/apps/{your-app-name}/installations`. You will then land on the installed GitHub App web page (the url should look like `https://github.com/settings/installations/{installation_id}`). Store the `installation_id`.
 
-### 2-Google Cloud Plateform Setup
+### 2-Google Cloud Platform Setup
 To address a specific GCP projet:
 * [Create a GCP project](https://console.cloud.google.com/projectcreate)
 * [Create a GCP service account](https://cloud.google.com/docs/authentication/getting-started) for this project with the `owner` role
@@ -167,8 +187,9 @@ TODO
 ## Contributing
 TODO
 
-## Similar projets
-TODO
+## Similar projects
+
+- [Terraform AWS GitHub Runner](https://github.com/philips-labs/terraform-aws-github-runner)
 
 ## License
 TODO
