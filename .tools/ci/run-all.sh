@@ -14,9 +14,7 @@ if [ "$ci" = true ]; then
 else
   echo "Not running in CI"
   volume_options="-v $PWD:/wd --workdir /wd"
-  cat ~/.terraform.d/credentials.tfrc.json > terraformrc
 fi
-export TF_CLI_CONFIG_FILE="terraformrc"
 
 # Read versions
 node_version=$(head -n 1 .nvmrc)
@@ -38,7 +36,7 @@ eval "$js_cmd"
 echo "Build and test TF"
 tf_cmd="docker run \
 $volume_options --entrypoint /bin/sh --rm \
---env TF_CLI_CONFIG_FILE --env CI \
+--env CI \
 hashicorp/terraform:$terraform_version .tools/ci/test-tf.sh"
 echo "$tf_cmd"
 eval "$tf_cmd"
