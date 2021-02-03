@@ -14,15 +14,9 @@ jobs:
 
       - name: Setup env
         env:
-          TF_CLI_CONFIG_FILE_CONTENT: ${{ secrets.TF_CLI_CONFIG_FILE_CONTENT }}
-          BACKEND_DEV_TFVARS_JSON: ${{ secrets.BACKEND_DEV_TFVARS_JSON }}
-          GOOGLE_TFVARS_JSON: ${{ secrets.GOOGLE_DEV_TFVARS_JSON }}
-          APP_GITHUB_TFVARS_JSON: ${{ secrets.APP_GITHUB_TFVARS_JSON }}
+          GOOGLE_CI_TFVARS_JSON: ${{ secrets.GOOGLE_CI_TFVARS_JSON }}
         run: |
-          echo $TF_CLI_CONFIG_FILE_CONTENT > terraformrc
-          echo $BACKEND_DEV_TFVARS_JSON > backend.tfvars.json
-          echo $GOOGLE_TFVARS_JSON > google.tfvars.json
-          echo $APP_GITHUB_TFVARS_JSON > github.tfvars.json        
+          echo $GOOGLE_CI_TFVARS_JSON > google-ci.tfvars.json
       
       - name: Run all tests
         run: sh .tools/ci/run-all.sh
