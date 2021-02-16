@@ -1,0 +1,22 @@
+name: CI
+on: [push]
+
+jobs:
+  ci:
+    runs-on: [self-hosted, linux, docker]
+    container:
+      image: docker://docker:stable-git
+      options: --name=runner 
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2.1.0
+
+      - name: Setup env
+        env:
+          GOOGLE_CI_TFVARS_JSON: ${{ secrets.GOOGLE_CI_TFVARS_JSON }}
+        run: |
+          echo $GOOGLE_CI_TFVARS_JSON > google-ci.tfvars.json
+      
+      - name: Run all tests
+        run: sh .tools/ci/run-all.sh

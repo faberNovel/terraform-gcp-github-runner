@@ -1,0 +1,8 @@
+.terraform
+**.DS_Store
+backend-*.tfvars.json
+github-*.tfvars.json
+google-*.tfvars.json
+terraformrc
+**/auth.json
+**/dev.env

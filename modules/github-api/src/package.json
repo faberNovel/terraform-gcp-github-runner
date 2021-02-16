@@ -1,0 +1,35 @@
+{
+  "name": "github_api",
+  "version": "1.0.0",
+  "main": "github_api.js",
+  "license": "MIT",
+  "engines": {
+    "node": "12"
+  },
+  "scripts": {
+    "build": "echo \"no-op\"",
+    "run": "node -e 'require(\"./github_api.js\").githubApi()'",
+    "lint": "eslint *.js",
+    "predev": "bash ../../../.tools/setup.sh",
+    "dev": "node -r dotenv/config -e 'require(\"./github_api.js\").dev()' dotenv_config_path=../../../dev.env",
+    "test": "mocha github_api.test.js"
+  },
+  "dependencies": {
+    "@google-cloud/secret-manager": "^3.1.0",
+    "@octokit/auth-app": "^2.4.14",
+    "@octokit/rest": "^18.0.3",
+    "chai": "^4.2.0",
+    "chai-as-promised": "^7.1.1",
+    "dotenv": "^8.2.0",
+    "mocha": "^8.1.1",
+    "sinon": "^9.0.3"
+  },
+  "devDependencies": {
+    "eslint": "^7.7.0",
+    "eslint-config-standard": "^14.1.1",
+    "eslint-plugin-import": "^2.22.0",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-promise": "^4.2.1",
+    "eslint-plugin-standard": "^4.0.1"
+  }
+}
