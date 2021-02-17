@@ -3,7 +3,7 @@ on: [push]
 
 jobs:
   ci:
-    runs-on: [self-hosted, linux, docker]
+    runs-on: [ubuntu-20.04]
     container:
       image: docker://docker:stable-git
       options: --name=runner 
