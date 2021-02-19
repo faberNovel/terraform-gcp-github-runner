@@ -228,7 +228,7 @@ Health checks are regularly triggered on the system by the cron [`triggers.healt
 By default those checks are triggered once a day [`terraform.tfvars.json`](terraform.tfvars.json). You can manually trigger them at `https://console.cloud.google.com/cloudscheduler?project=your-gcp-project`.
 
 #### Runner renewal
-Runner renewal is regularly triggered on the system by the cron [`triggers.renew_schedule`](#inputs)` to ensure runners do not stay alive too much time (the longer a runner stay alive, the higher the chance are it fails).
+Runner renewal is regularly triggered on the system by the cron [`triggers.renew_schedule`](#inputs) to ensure runners do not stay alive too much time (the longer a runner stay alive, the higher the chance are it fails).
 By default those checks are triggered once a day [`terraform.tfvars.json`](terraform.tfvars.json). You can manually trigger them at `https://console.cloud.google.com/cloudscheduler?project=your-gcp-project`.
 
 ## Cost
