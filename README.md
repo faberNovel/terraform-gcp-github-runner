@@ -245,7 +245,7 @@ Cost can be simplified to compute cost given:
 * Cloud function needs in term of computation is very low, so we are using minimum resource possible. This is negliseable vs Compute cost.
 * Secret manager usage is fairly limited to cloud functions and VMs, which is negligeable vs Compute cost.
 
-The only cost which would not be negligeable vs Compute cost is if your GitHub Aciton workflow would imply a lot of egress traffic, like pushing heavy artifacts outside of GCP.
+The only cost which would not be negligeable vs Compute cost is if your GitHub Action workflow would imply a lot of egress traffic, like pushing heavy artifacts outside of GCP.
 To represent the moment where this solution is cost efficent vs GitHub Action Hosted Runners, we can use the following inequation:
 * `W` the number of minutes of CI by month
 * `O` the number of minutes where VMs do nothing by month
