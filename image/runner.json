@@ -11,7 +11,7 @@
         "type": "googlecompute",
         "project_id": "{{user `project_id`}}",
         "machine_type": "{{user `machine_type`}}",
-        "source_image_family": "debian-10",
+        "source_image_family": "debian-11",
         "region": "{{user `region`}}",
         "zone": "{{user `zone`}}",
         "image_description": "Runner for GitHub Action",
